@@ -21,9 +21,6 @@ import ptf.testutils as testutils
 # Thrift interface base tests
 #
 ################################################################
-# TODO: Temporary solution
-import sys
-sys.path.append("/usr/include/lib/python2.7/site-packages/")
 import switch_sai_thrift.switch_sai_rpc as switch_sai_rpc
 from thrift.transport import TSocket
 from thrift.transport import TTransport

@@ -15,10 +15,6 @@
 """
 Thrift SAI interface basic tests
 """
-import sys
-# Temporary solution for saithrift
-# Should be verified and fixed on a new SAI
-sys.path.append("/usr/include/lib/python2.7/site-packages/")
 
 import switch_sai_thrift
 from sai_base_test import *
@@ -71,9 +67,9 @@ def switch_init(client):
             print "max ports: " + attribute.value.u32
         elif attribute.id == SAI_SWITCH_ATTR_PORT_LIST:
             for port_id in attribute.value.objlist.object_id_list:
- #               attr_value = sai_thrift_attribute_value_t(booldata=1)
- #               attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_ADMIN_STATE, value=attr_value)
- #               client.sai_thrift_set_port_attribute(port_id, attr)
+                attr_value = sai_thrift_attribute_value_t(booldata=1)
+                attr = sai_thrift_attribute_t(id=SAI_PORT_ATTR_ADMIN_STATE, value=attr_value)
+                client.sai_thrift_set_port_attribute(port_id, attr)
                 sai_port_list.append(port_id)
         else:
             print "unknown switch attribute"
