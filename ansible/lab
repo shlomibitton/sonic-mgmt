@@ -60,7 +60,6 @@ sonic_a7260
 ptf_ptf1    ansible_host=10.255.0.188 ansible_ssh_user=root ansible_ssh_pass=root
 ptf_vms1-1  ansible_host=10.255.0.178 ansible_ssh_user=root ansible_ssh_pass=root
 ptf_vms6-1  ansible_host=10.250.0.102 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-1029    ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1041    ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1038    ansible_host=10.213.84.41 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-1025    ansible_host=10.213.84.213 ansible_ssh_user=root ansible_ssh_pass=root
@@ -70,7 +69,7 @@ ptf-r-anaconda-10  ansible_host=10.213.103.5 ansible_ssh_user=root ansible_ssh_p
 ptf-r-tigris-04    ansible_host=10.213.104.5 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-tigris-13    ansible_host=10.215.0.61 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-leopard-01   ansible_host=10.215.22.61 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-r-tigon-01   ansible_host=10.213.84.64 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-r-tigon-01   ansible_host=10.213.84.98 ansible_ssh_user=root ansible_ssh_pass=root
 mts-ptf     ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc01  ansible_host=10.75.206.220 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc02  ansible_host=10.75.207.41 ansible_ssh_user=root ansible_ssh_pass=root
