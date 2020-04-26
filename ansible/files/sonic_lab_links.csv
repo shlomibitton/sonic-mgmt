@@ -669,5 +669,5 @@ r-tigon-01,Ethernet224,arc-switch1003,Ethernet48,50000,1728,Access
 r-tigon-01,Ethernet232,arc-switch1003,Ethernet49,50000,1729,Access
 r-tigon-01,Ethernet240,arc-switch1003,Ethernet50,50000,1730,Access
 r-tigon-01,Ethernet242,arc-switch1003,Ethernet51,50000,1731,Access
-r-tigon-01,Ethernet248,arc-host62,p2p1,50000,1681-1731,Trunk
+arc-switch1003,Ethernet52,arc-host62,p2p1,50000,1681-1731,Trunk
 
