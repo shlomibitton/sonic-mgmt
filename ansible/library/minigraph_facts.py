@@ -489,6 +489,7 @@ def parse_xml(filename, hostname):
     elif (hwsku == "Mellanox-SN2700" or hwsku == "ACS-MSN2700") or \
          (hwsku == "ACS-MSN3700") or (hwsku == "ACS-MSN3700C") or \
          (hwsku == "ACS-MSN3800") or (hwsku == "Mellanox-SN3800-D112C8") or (hwsku == "ACS-MSN4700") or (hwsku == "ACS-MSN4600C"):
+         (hwsku == "ACS-MSN4700") or (hwsku == "ACS-MSN3420"):
         if hostname == "arc-switch1038":
             for i in range(1, 17):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
@@ -697,6 +698,9 @@ def parse_xml(filename, hostname):
         elif hostname == "r-leopard-01":
             for i in range(1, 33):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 8)
+        elif hostname == "r-lionfish-07":
+            for i in range(1, 61):
+                port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
         else:
             for i in range(1, 33):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)

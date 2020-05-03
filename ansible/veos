@@ -43,6 +43,9 @@ MTBC-R730-04 ansible_host=mtbc-r730-04
 [vm_host_15]
 ARC-HOST70 ansible_host=arc-host70
 
+[vm_host_16]
+R-MGTSWH-136 ansible_host=r-mgtswh-136
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -68,6 +71,7 @@ vm_host_12
 vm_host_13
 vm_host_14
 vm_host_15
+vm_host_16
 vm_host_50
 vm_host_52
 vm_host_54
@@ -588,6 +592,7 @@ vms_12
 vms_13
 vms_14
 vms_15
+vms_16
 vms_50
 vms_52
 vms_54
@@ -698,6 +703,13 @@ vms_15
 [server_15:vars]
 host_var_file=host_vars/ARC-HOST70.yml
 
+[server_16:children]
+vm_host_16
+vms_16
+
+[server_16:vars]
+host_var_file=host_vars/R-MGTSWH-136.yml
+
 [server_50:children]
 vm_host_50
 vms_50
@@ -747,6 +759,7 @@ server_12
 server_13
 server_14
 server_15
+server_16
 server_50
 server_52
 server_54
