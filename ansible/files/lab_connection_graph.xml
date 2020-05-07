@@ -20,6 +20,7 @@
       <Device Hostname="r-tigris-04" HwSku="ACS-MSN3800" Type="DevSonic"/>
       <Device Hostname="r-tigris-13" HwSku="ACS-MSN3800" Type="DevSonic"/>
       <Device Hostname="r-leopard-01" HwSku="ACS-MSN4700" Type="DevSonic"/>
+      <Device Hostname="r-tigon-01" HwSku="ACS-MSN4600C" Type="DevSonic"/>
       <Device Hostname="arc-switch1005" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1016" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1007" HwSku="MLNX-OS" Type="FanoutLeaf"/>
@@ -38,6 +39,7 @@
       <Device Hostname="str-7260-11" HwSku="Arista-7260QX-64" Type="FanoutRoot"/>
       <Device Hostname="mtbc-sonic-02-2700" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="mtbc-3700c-02" HwSku="MLNX-OS" Type="FanoutLeaf"/>
+      <Device Hostname="arc-switch1003" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-host60" HwSku="TestServ" Type="Server"/>
       <Device Hostname="mts-sai-host-3" HwSku="TestServ" Type="Server"/>
       <Device Hostname="arc-host83" HwSku="TestServ" Type="Server"/>
@@ -573,6 +575,110 @@
       <DeviceInterfaceLink BandWidth="100000" EndDevice="r-anaconda-51" EndPort="ethernet 1/30" StartDevice="r-leopard-01" StartPort="Ethernet116"/>
       <DeviceInterfaceLink BandWidth="50000" EndDevice="r-anaconda-51" EndPort="ethernet 1/31/1" StartDevice="r-leopard-01" StartPort="Ethernet120"/>
       <DeviceInterfaceLink BandWidth="50000" EndDevice="r-anaconda-51" EndPort="ethernet 1/31/2" StartDevice="r-leopard-01" StartPort="Ethernet124"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/1/1"  StartDevice="r-tigon-01" StartPort="Ethernet0"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/1/2"  StartDevice="r-tigon-01" StartPort="Ethernet2"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/2/1"  StartDevice="r-tigon-01" StartPort="Ethernet8"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/2/2"  StartDevice="r-tigon-01" StartPort="Ethernet10"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/3/1"  StartDevice="r-tigon-01" StartPort="Ethernet16"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/3/2"  StartDevice="r-tigon-01" StartPort="Ethernet18"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/4"    StartDevice="r-tigon-01" StartPort="Ethernet24"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/5/1"  StartDevice="r-tigon-01" StartPort="Ethernet32"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/5/2"  StartDevice="r-tigon-01" StartPort="Ethernet34"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/6/1"  StartDevice="r-tigon-01" StartPort="Ethernet40"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/6/2"  StartDevice="r-tigon-01" StartPort="Ethernet42"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/7/1"  StartDevice="r-tigon-01" StartPort="Ethernet48"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/7/2"  StartDevice="r-tigon-01" StartPort="Ethernet50"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/8"    StartDevice="r-tigon-01" StartPort="Ethernet56"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/9/1"  StartDevice="r-tigon-01" StartPort="Ethernet64"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/9/2"  StartDevice="r-tigon-01" StartPort="Ethernet68"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/10/1" StartDevice="r-tigon-01" StartPort="Ethernet72"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/10/2" StartDevice="r-tigon-01" StartPort="Ethernet74"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/11/1" StartDevice="r-tigon-01" StartPort="Ethernet80"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/11/2" StartDevice="r-tigon-01" StartPort="Ethernet82"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/12"   StartDevice="r-tigon-01" StartPort="Ethernet88"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/13/1" StartDevice="r-tigon-01" StartPort="Ethernet96"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/13/2" StartDevice="r-tigon-01" StartPort="Ethernet98"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/14/1" StartDevice="r-tigon-01" StartPort="Ethernet104"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/14/2" StartDevice="r-tigon-01" StartPort="Ethernet106"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/15/1" StartDevice="r-tigon-01" StartPort="Ethernet112"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/15/2" StartDevice="r-tigon-01" StartPort="Ethernet114"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/16"   StartDevice="r-tigon-01" StartPort="Ethernet120"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/17/1" StartDevice="r-tigon-01" StartPort="Ethernet128"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/17/2" StartDevice="r-tigon-01" StartPort="Ethernet130"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/18/1" StartDevice="r-tigon-01" StartPort="Ethernet136"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/18/2" StartDevice="r-tigon-01" StartPort="Ethernet138"/>
+	    <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/19/1" StartDevice="r-tigon-01" StartPort="Ethernet144"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/19/2" StartDevice="r-tigon-01" StartPort="Ethernet146"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/20"   StartDevice="r-tigon-01" StartPort="Ethernet152"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/21/1" StartDevice="r-tigon-01" StartPort="Ethernet160"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/21/2" StartDevice="r-tigon-01" StartPort="Ethernet162"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/22/1" StartDevice="r-tigon-01" StartPort="Ethernet168"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/22/2" StartDevice="r-tigon-01" StartPort="Ethernet170"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/23/1" StartDevice="r-tigon-01" StartPort="Ethernet176"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/23/2" StartDevice="r-tigon-01" StartPort="Ethernet178"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/24"   StartDevice="r-tigon-01" StartPort="Ethernet184"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/25"   StartDevice="r-tigon-01" StartPort="Ethernet192"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/26"   StartDevice="r-tigon-01" StartPort="Ethernet200"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/27/1" StartDevice="r-tigon-01" StartPort="Ethernet208"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/27/2" StartDevice="r-tigon-01" StartPort="Ethernet210"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/28"   StartDevice="r-tigon-01" StartPort="Ethernet216"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/29"   StartDevice="r-tigon-01" StartPort="Ethernet224"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/30"   StartDevice="r-tigon-01" StartPort="Ethernet232"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/31/1" StartDevice="r-tigon-01" StartPort="Ethernet240"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/31/2" StartDevice="r-tigon-01" StartPort="Ethernet242"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/32"   StartDevice="r-tigon-01" StartPort="Ethernet248"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/33"   StartDevice="r-tigon-01" StartPort="Ethernet256"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/34"   StartDevice="r-tigon-01" StartPort="Ethernet264"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/35/1" StartDevice="r-tigon-01" StartPort="Ethernet272"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/35/2" StartDevice="r-tigon-01" StartPort="Ethernet274"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/36"   StartDevice="r-tigon-01" StartPort="Ethernet280"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/37"   StartDevice="r-tigon-01" StartPort="Ethernet288"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/38"   StartDevice="r-tigon-01" StartPort="Ethernet296"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/39/1" StartDevice="r-tigon-01" StartPort="Ethernet304"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/39/2" StartDevice="r-tigon-01" StartPort="Ethernet306"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/40"   StartDevice="r-tigon-01" StartPort="Ethernet312"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/41/1" StartDevice="r-tigon-01" StartPort="Ethernet320"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/41/2" StartDevice="r-tigon-01" StartPort="Ethernet322"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/42/1" StartDevice="r-tigon-01" StartPort="Ethernet328"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/42/2" StartDevice="r-tigon-01" StartPort="Ethernet330"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/43/1" StartDevice="r-tigon-01" StartPort="Ethernet336"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/43/2" StartDevice="r-tigon-01" StartPort="Ethernet338"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/44"   StartDevice="r-tigon-01" StartPort="Ethernet344"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/45/1" StartDevice="r-tigon-01" StartPort="Ethernet352"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/45/2" StartDevice="r-tigon-01" StartPort="Ethernet354"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/46/1" StartDevice="r-tigon-01" StartPort="Ethernet360"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/46/2" StartDevice="r-tigon-01" StartPort="Ethernet362"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/47/1" StartDevice="r-tigon-01" StartPort="Ethernet368"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/47/2" StartDevice="r-tigon-01" StartPort="Ethernet370"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/48"   StartDevice="r-tigon-01" StartPort="Ethernet376"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/49/1" StartDevice="r-tigon-01" StartPort="Ethernet384"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/49/2" StartDevice="r-tigon-01" StartPort="Ethernet386"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/50/1" StartDevice="r-tigon-01" StartPort="Ethernet392"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/50/2" StartDevice="r-tigon-01" StartPort="Ethernet394"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/51/1" StartDevice="r-tigon-01" StartPort="Ethernet400"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/51/2" StartDevice="r-tigon-01" StartPort="Ethernet402"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/52"   StartDevice="r-tigon-01" StartPort="Ethernet408"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/53/1" StartDevice="r-tigon-01" StartPort="Ethernet416"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/53/2" StartDevice="r-tigon-01" StartPort="Ethernet418"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/54/1" StartDevice="r-tigon-01" StartPort="Ethernet424"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/54/2" StartDevice="r-tigon-01" StartPort="Ethernet426"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/55/1" StartDevice="r-tigon-01" StartPort="Ethernet432"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/55/2" StartDevice="r-tigon-01" StartPort="Ethernet434"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/56"   StartDevice="r-tigon-01" StartPort="Ethernet440"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/57/1" StartDevice="r-tigon-01" StartPort="Ethernet448"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/57/2" StartDevice="r-tigon-01" StartPort="Ethernet450"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/58/1" StartDevice="r-tigon-01" StartPort="Ethernet456"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/58/2" StartDevice="r-tigon-01" StartPort="Ethernet458"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/59/1" StartDevice="r-tigon-01" StartPort="Ethernet464"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/59/2" StartDevice="r-tigon-01" StartPort="Ethernet466"/>
+	    <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/60"   StartDevice="r-tigon-01" StartPort="Ethernet472"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/61/1" StartDevice="r-tigon-01" StartPort="Ethernet480"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/61/2" StartDevice="r-tigon-01" StartPort="Ethernet482"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/62/1" StartDevice="r-tigon-01" StartPort="Ethernet488"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/62/2" StartDevice="r-tigon-01" StartPort="Ethernet490"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/63/1" StartDevice="r-tigon-01" StartPort="Ethernet496"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/63/2" StartDevice="r-tigon-01" StartPort="Ethernet498"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/64"   StartDevice="r-tigon-01" StartPort="Ethernet504"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/1" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet0"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/2" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet4"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mtbc-sonic-02-2700" EndPort="ethernet 1/3" StartDevice="mtbc-sonic-03-2700" StartPort="Ethernet8"/>
@@ -778,6 +884,7 @@
       <DeviceInterfaceLink BandWidth="50000" EndDevice="r-sonic-04" EndPort="p4p1" StartDevice="r-tigris-17" StartPort="ethernet 1/63/2"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="dev-r730-03" EndPort="enp4s0f1" StartDevice="mtbc-sonic-02-2700" StartPort="ethernet 1/32"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="mtbc-r730-04" EndPort="enp130s0f1" StartDevice="mtbc-3700c-02" StartPort="ethernet 1/32"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-host62" EndPort="p2p1" StartDevice="arc-switch1003" StartPort="ethernet 1/63/2"/>
     </DeviceInterfaceLinks>
   </PhysicalNetworkGraphDeclaration>
   <DataPlaneGraph>
@@ -819,6 +926,9 @@
     </DevicesL3Info>
     <DevicesL3Info Hostname="r-anaconda-51">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.26.51/22"/>
+    </DevicesL3Info>
+    <DevicesL3Info Hostname="arc-switch1003">
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.43/22"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch232-005">
       <ManagementIPInterface Name="ManagementIp" Prefix="0.0.0.0/0"/>
@@ -1384,6 +1494,112 @@
         <InterfaceVlan mode="Access" portname="ethernet 1/31/1" vlanids="131"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/31/2" vlanids="132"/>
         <InterfaceVlan mode="Trunk" portname="ethernet 1/32" vlanids="101-132"/>
+    </DevicesL2Info>
+    <DevicesL2Info Hostname="arc-switch1003">
+        <InterfaceVlan mode="Access" portname="ethernet 1/1/1"  vlanids="101"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/1/2"  vlanids="102"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/2/1"  vlanids="103"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/2/2"  vlanids="104"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/3/1"  vlanids="105"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/3/2"  vlanids="106"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/4"    vlanids="107"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/5/1"  vlanids="108"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/5/2"  vlanids="109"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/6/1"  vlanids="110"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/6/2"  vlanids="111"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/7/1"  vlanids="112"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/7/2"  vlanids="113"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/8"    vlanids="114"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/9/1"  vlanids="115"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/9/2"  vlanids="116"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/10/1" vlanids="117"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/10/2" vlanids="118"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/11/1" vlanids="119"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/11/2" vlanids="120"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/12"   vlanids="121"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/13/1" vlanids="122"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/13/2" vlanids="123"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/14/1" vlanids="124"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/14/2" vlanids="125"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/15/1" vlanids="126"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/15/2" vlanids="127"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/16"   vlanids="128"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/17/1" vlanids="129"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/17/2" vlanids="130"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/18/1" vlanids="131"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/18/2" vlanids="132"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/19/1" vlanids="133"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/19/2" vlanids="134"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/20"   vlanids="135"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/21/1" vlanids="136"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/21/2" vlanids="137"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/22/1" vlanids="138"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/22/2" vlanids="139"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/23/1" vlanids="140"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/23/2" vlanids="141"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/24"   vlanids="142"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/25"   vlanids="143"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/26"   vlanids="144"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/27/1" vlanids="145"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/27/2" vlanids="146"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/28"   vlanids="147"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/29"   vlanids="148"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/30"   vlanids="149"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/31/1" vlanids="150"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/31/2" vlanids="151"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/32"   vlanids="152"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/33"   vlanids="153"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/34"   vlanids="154"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/35/1" vlanids="155"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/35/2" vlanids="156"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/36"   vlanids="157"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/37"   vlanids="158"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/38"   vlanids="159"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/39/1" vlanids="160"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/39/2" vlanids="161"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/40"   vlanids="162"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/41/1" vlanids="163"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/41/2" vlanids="164"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/42/1" vlanids="165"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/42/2" vlanids="166"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/43/1" vlanids="167"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/43/2" vlanids="168"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/44"   vlanids="169"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/45/1" vlanids="170"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/45/2" vlanids="171"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/46/1" vlanids="172"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/46/2" vlanids="173"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/47/1" vlanids="174"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/47/2" vlanids="175"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/48"   vlanids="176"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/49/1" vlanids="177"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/49/2" vlanids="178"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/50/1" vlanids="179"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/50/2" vlanids="180"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/51/1" vlanids="181"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/51/2" vlanids="182"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/52"   vlanids="183"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/53/1" vlanids="184"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/53/2" vlanids="185"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/54/1" vlanids="186"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/54/2" vlanids="187"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/55/1" vlanids="188"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/55/2" vlanids="189"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/56"   vlanids="190"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/57/1" vlanids="191"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/57/2" vlanids="192"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/58/1" vlanids="193"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/58/2" vlanids="194"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/59/1" vlanids="195"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/59/2" vlanids="196"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/60"   vlanids="197"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/61/1" vlanids="198"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/61/2" vlanids="199"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/62/1" vlanids="200"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/62/2" vlanids="201"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/63/1" vlanids="202"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/63/2" vlanids="203"/>
+        <InterfaceVlan mode="Trunk"  portname="ethernet 1/64"   vlanids="1-203"/>
     </DevicesL2Info>
     <DevicesL2Info Hostname="mtbc-sonic-02-2700">
       <InterfaceVlan mode="Access" portname="ethernet 1/1" vlanids="101"/>
