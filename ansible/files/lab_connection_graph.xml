@@ -1494,7 +1494,7 @@
         <InterfaceVlan mode="Access" portname="ethernet 1/30"   vlanids="149"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/31/1" vlanids="150"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/31/2" vlanids="151"/>
-        <InterfaceVlan mode="Trunk" portname="ethernet 1/32"   vlanids="1-151"/>
+        <InterfaceVlan mode="Trunk" portname="ethernet 1/32"   vlanids="101-151"/>
     </DevicesL2Info>
     <DevicesL2Info Hostname="mtbc-sonic-02-2700">
       <InterfaceVlan mode="Access" portname="ethernet 1/1" vlanids="101"/>
