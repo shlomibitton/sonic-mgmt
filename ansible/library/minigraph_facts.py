@@ -715,6 +715,9 @@ def parse_xml(filename, hostname):
         elif hostname == "r-tigris-13":
             for i in range(1, 65):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+        elif hostname == "r-leopard-01":
+            for i in range(1, 33):
+                port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 8)
         else:
             for i in range(1, 33):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
