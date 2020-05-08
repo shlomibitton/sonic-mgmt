@@ -7,9 +7,11 @@ modules, we have no other choice, at least for interacting with SONiC, localhost
 
 We can consider using netmiko for interacting with the VMs used in testing.
 """
-import json
 import logging
 import os
+import re
+import json
+import ipaddress
 from multiprocessing.pool import ThreadPool
 from datetime import datetime
 
@@ -91,7 +93,7 @@ class SonicHost(AnsibleHostBase):
 
     For running ansible module on the SONiC switch
     """
-    CRITICAL_SERVICES = ["swss", "syncd", "database", "teamd", "bgp", "pmon", "lldp"]
+    CRITICAL_SERVICES = ["swss", "syncd", "database", "teamd", "bgp", "pmon", "lldp", "snmp"]
 
     def __init__(self, ansible_adhoc, hostname, gather_facts=False):
         AnsibleHostBase.__init__(self, ansible_adhoc, hostname)
@@ -214,6 +216,55 @@ class SonicHost(AnsibleHostBase):
         logging.debug("Status of critical services: %s" % str(result))
         return all(result.values())
 
+    def critical_process_status(self, service):
+        """
+        @summary: Check whether critical process status of a service.
+
+        @param service: Name of the SONiC service
+        """
+        result = {'status': True}
+        result['exited_critical_process'] = []
+        result['running_critical_process'] = []
+        critical_process_list = []
+
+        # return false if the service is not started
+        service_status = self.is_service_fully_started(service)
+        if service_status == False:
+            result['status'] = False
+            return result
+
+        # get critical process list for the service
+        output = self.command("docker exec {} bash -c '[ -f /etc/supervisor/critical_processes ] && cat /etc/supervisor/critical_processes'".format(service), module_ignore_errors=True)
+        for l in output['stdout'].split():
+            critical_process_list.append(l.rstrip())
+        if len(critical_process_list) == 0:
+            return result
+
+        # get process status for the service
+        output = self.command("docker exec {} supervisorctl status".format(service))
+        logging.info("====== supervisor process status for service {} ======".format(service))
+
+        for l in output['stdout_lines']:
+            (pname, status, info) = re.split("\s+", l, 2)
+            if status != "RUNNING":
+                if pname in critical_process_list:
+                    result['exited_critical_process'].append(pname)
+                    result['status'] = False
+            else:
+                if pname in critical_process_list:
+                    result['running_critical_process'].append(pname)
+
+        return result
+
+    def all_critical_process_status(self):
+        """
+        @summary: Check whether all critical processes status for all critical services
+        """
+        result = {}
+        for service in self.CRITICAL_SERVICES:
+            result[service] = self.critical_process_status(service)
+        return result
+
     def get_crm_resources(self):
         """
         @summary: Run the "crm show resources all" command and parse its output
@@ -257,7 +308,7 @@ class SonicHost(AnsibleHostBase):
 
         daemons = self.shell('docker exec pmon supervisorctl status')['stdout_lines']
 
-        daemon_list = [ line.strip().split()[0] for line in daemons if len(line.strip()) > 0 ] 
+        daemon_list = [ line.strip().split()[0] for line in daemons if len(line.strip()) > 0 ]
 
         daemon_ctl_key_prefix = 'skip_'
         daemon_config_file_path = os.path.join('/usr/share/sonic/device', self.facts["platform"], 'pmon_daemon_control.json')
@@ -294,7 +345,7 @@ class SonicHost(AnsibleHostBase):
         return the number of NPUs on the DUT
         """
         return self.facts["num_npu"]
-    
+
     def get_syncd_docker_names(self):
         """
         @summary: get the list of syncd dockers names for the number of NPUs present on the DUT
@@ -308,6 +359,7 @@ class SonicHost(AnsibleHostBase):
             for npu in range(0,num_npus):
                 syncd_docker_names.append("syncd{}".format(npu))
         return syncd_docker_names
+
     def get_swss_docker_names(self):
         swss_docker_names = []
         if self.facts["num_npu"] == 1:
@@ -380,6 +432,127 @@ class SonicHost(AnsibleHostBase):
         """
         return self.command("sudo config interface startup {}".format(ifname))
 
+    def get_ip_route_info(self, dstip):
+        """
+        @summary: return route information for a destionation IP
+
+        @param dstip: destination IP (either ipv4 or ipv6)
+
+============ 4.19 kernel ==============
+admin@vlab-01:~$ ip route list match 0.0.0.0
+default proto bgp src 10.1.0.32 metric 20
+        nexthop via 10.0.0.57 dev PortChannel0001 weight 1
+        nexthop via 10.0.0.59 dev PortChannel0002 weight 1
+        nexthop via 10.0.0.61 dev PortChannel0003 weight 1
+        nexthop via 10.0.0.63 dev PortChannel0004 weight 1
+
+admin@vlab-01:~$ ip -6 route list match ::
+default proto bgp src fc00:1::32 metric 20
+        nexthop via fc00::72 dev PortChannel0001 weight 1
+        nexthop via fc00::76 dev PortChannel0002 weight 1
+        nexthop via fc00::7a dev PortChannel0003 weight 1
+        nexthop via fc00::7e dev PortChannel0004 weight 1 pref medium
+
+============ 4.9 kernel ===============
+admin@vlab-01:~$ ip route list match 0.0.0.0
+default proto 186 src 10.1.0.32 metric 20
+        nexthop via 10.0.0.57  dev PortChannel0001 weight 1
+        nexthop via 10.0.0.59  dev PortChannel0002 weight 1
+        nexthop via 10.0.0.61  dev PortChannel0003 weight 1
+        nexthop via 10.0.0.63  dev PortChannel0004 weight 1
+
+admin@vlab-01:~$ ip -6 route list match ::
+default via fc00::72 dev PortChannel0001 proto 186 src fc00:1::32 metric 20  pref medium
+default via fc00::76 dev PortChannel0002 proto 186 src fc00:1::32 metric 20  pref medium
+default via fc00::7a dev PortChannel0003 proto 186 src fc00:1::32 metric 20  pref medium
+default via fc00::7e dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pref medium
+
+        """
+
+        if dstip.version == 4:
+            rt = self.command("ip route list match {}".format(dstip))['stdout_lines']
+        else:
+            rt = self.command("ip -6 route list match {}".format(dstip))['stdout_lines']
+
+        logging.info("route raw info for {}: {}".format(dstip, rt))
+
+        rtinfo = {'set_src': None, 'nexthops': [] }
+
+        # parse set_src
+        m = re.match(r"^default proto (bgp|186) src (\S+)", rt[0])
+        m1 = re.match(r"^default via (\S+) dev (\S+) proto 186 src (\S+)", rt[0])
+        if m:
+            rtinfo['set_src'] = ipaddress.ip_address(m.group(2))
+        elif m1:
+            rtinfo['set_src'] = ipaddress.ip_address(m1.group(3))
+
+        # parse nexthops
+        for l in rt:
+            m = re.search(r"(default|nexthop) via (\S+) dev (\S+)", l)
+            if m:
+                rtinfo['nexthops'].append((ipaddress.ip_address(m.group(2)), m.group(3)))
+
+        logging.info("route parsed info for {}: {}".format(dstip, rtinfo))
+
+        return rtinfo
+
+    def get_bgp_neighbor_info(self, neighbor_ip):
+        """
+        @summary: return bgp neighbor info
+
+        @param neighbor_ip: bgp neighbor IP
+        """
+        nbip = ipaddress.ip_address(neighbor_ip)
+        if nbip.version == 4:
+            out = self.command("vtysh -c \"show ip bgp neighbor {} json\"".format(neighbor_ip))
+        else:
+            out = self.command("vtysh -c \"show bgp ipv6 neighbor {} json\"".format(neighbor_ip))
+        nbinfo = json.loads(re.sub(r"\\\"", '"', re.sub(r"\\n", "", out['stdout'])))
+        logging.info("bgp neighbor {} info {}".format(neighbor_ip, nbinfo))
+
+        return nbinfo[str(neighbor_ip)]
+
+    def check_bgp_session_state(self, neigh_ips, state="established"):
+        """
+        @summary: check if current bgp session equals to the target state
+
+        @param neigh_ips: bgp neighbor IPs
+        @param state: target state
+        """
+        neigh_ok = []
+        bgp_facts = self.bgp_facts()['ansible_facts']
+        logging.info("bgp_facts: {}".format(bgp_facts))
+        for k, v in bgp_facts['bgp_neighbors'].items():
+            if v['state'] == state:
+                if k in neigh_ips:
+                    neigh_ok.append(k)
+        logging.info("bgp neighbors that match the state: {}".format(neigh_ok))
+        if len(neigh_ips) == len(neigh_ok):
+            return True
+
+        return False
+
+    def check_bgp_session_nsf(self, neighbor_ip):
+        """
+        @summary: check if bgp neighbor session enters NSF state or not
+
+        @param neighbor_ip: bgp neighbor IP
+        """
+        nbinfo = self.get_bgp_neighbor_info(neighbor_ip)
+        if nbinfo['bgpState'].lower() == "Active".lower():
+            if nbinfo['bgpStateIs'].lower() == "passiveNSF".lower():
+                return True
+        return False
+
+    def get_version(self):
+        """
+            Gets the SONiC version this device is running.
+
+            Returns:
+                str: the firmware version number (e.g. 20181130.31)
+        """
+        output = dut.command("sonic-cfggen -y /etc/sonic/sonic_version.yml -v build_version")
+        return output["stdout_lines"][0].strip()
 
 class EosHost(AnsibleHostBase):
     """
@@ -429,6 +602,52 @@ class EosHost(AnsibleHostBase):
         logging.info("Set interface [%s] lacp rate to [%s]" % (interface_name, mode))
         return out
 
+    def kill_bgpd(self):
+        out = self.host.eos_config(lines=['agent Rib shutdown'])
+        return out
+
+    def start_bgpd(self):
+        out = self.host.eos_config(lines=['no agent Rib shutdown'])
+        return out
+
+    def check_bgp_session_state(self, neigh_ips, neigh_desc, state="established"):
+        """
+        @summary: check if current bgp session equals to the target state
+
+        @param neigh_ips: bgp neighbor IPs
+        @param neigh_desc: bgp neighbor description
+        @param state: target state
+        """
+        neigh_ips_ok = []
+        neigh_desc_ok = []
+        out_v4 = self.host.eos_command(
+            commands=['show ip bgp summary | json'])[self.hostname]
+        logging.info("ip bgp summary: {}".format(out_v4))
+
+        out_v6 = self.host.eos_command(
+            commands=['show ipv6 bgp summary | json'])[self.hostname]
+        logging.info("ipv6 bgp summary: {}".format(out_v6))
+
+        for k, v in out_v4['stdout'][0]['vrfs']['default']['peers'].items():
+            if v['peerState'].lower() == state.lower():
+                if k in neigh_ips:
+                    neigh_ips_ok.append(neigh_ips)
+                if v['description'] in neigh_desc:
+                    neigh_desc_ok.append(v['description'])
+
+        for k, v in out_v6['stdout'][0]['vrfs']['default']['peers'].items():
+            if v['peerState'].lower() == state.lower():
+                if k in neigh_ips:
+                    neigh_ips_ok.append(neigh_ips)
+                if v['description'] in neigh_desc:
+                    neigh_desc_ok.append(v['description'])
+
+        if len(neigh_ips) == len(neigh_ips_ok) and len(neigh_desc) == len(neigh_desc_ok):
+            return True
+
+        return False
+
+
 class FanoutHost():
     """
     @summary: Class for Fanout switch
@@ -454,10 +673,10 @@ class FanoutHost():
 
     def get_fanout_type(self):
         return self.type
-    
+
     def shutdown(self, interface_name):
         return self.host.shutdown(interface_name)[self.hostname]
-    
+
     def no_shutdown(self, interface_name):
         return self.host.no_shutdown(interface_name)[self.hostname]
 
@@ -466,7 +685,7 @@ class FanoutHost():
 
     def __str__(self):
         return "{ os: '%s', hostname: '%s', device_type: '%s' }" % (self.os, self.hostname, self.type)
-    
+
     def __repr__(self):
         return self.__str__()
 

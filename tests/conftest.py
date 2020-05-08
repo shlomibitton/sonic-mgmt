@@ -1,3 +1,9 @@
+# Adding pytest base dir to Python system path.
+# This is required in order to import from common package including pytest_plugins within this file.
+import site
+from os.path import dirname, abspath
+site.addsitedir(dirname(abspath(__file__)))
+
 import sys
 import os
 import glob
@@ -42,7 +48,7 @@ class TestbedInfo(object):
         CSV_FIELDS = ('conf-name', 'group-name', 'topo', 'ptf_image_name', 'ptf', 'ptf_ip', 'server', 'vm_base', 'dut', 'comment')
 
         with open(self.testbed_filename) as f:
-            topo = csv.DictReader(f, fieldnames=CSV_FIELDS)
+            topo = csv.DictReader(f, fieldnames=CSV_FIELDS, delimiter=',')
 
             # Validate all field are in the same order and are present
             header = next(topo)
@@ -57,6 +63,9 @@ class TestbedInfo(object):
                     ptfaddress = ipaddress.IPNetwork(line['ptf_ip'])
                     line['ptf_ip'] = str(ptfaddress.ip)
                     line['ptf_netmask'] = str(ptfaddress.netmask)
+
+                line['duts'] = line['dut'].translate(string.maketrans("", ""), "[] ").split(';')
+                del line['dut']
 
                 topo = line['topo']
                 del line['topo']
@@ -82,16 +91,46 @@ def pytest_addoption(parser):
     # test_vrf options
     parser.addoption("--vrf_capacity", action="store", default=None, type=int, help="vrf capacity of dut (4-1000)")
     parser.addoption("--vrf_test_count", action="store", default=None, type=int, help="number of vrf to be tested (1-997)")
+
     ############################
     # test_techsupport options #
     ############################
-
     parser.addoption("--loop_num", action="store", default=10, type=int,
                     help="Change default loop range for show techsupport command")
     parser.addoption("--loop_delay", action="store", default=10, type=int,
                     help="Change default loops delay")
     parser.addoption("--logs_since", action="store", type=int,
                     help="number of minutes for show techsupport command")
+
+    ############################
+    #   sanity_check options   #
+    ############################
+    parser.addoption("--skip_sanity", action="store_true", default=False,
+                     help="Skip sanity check")
+    parser.addoption("--allow_recover", action="store_true", default=False,
+                     help="Allow recovery attempt in sanity check in case of failure")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enhance_inventory(request):
+    """
+    This fixture is to enhance the capability of parsing the value of pytest cli argument '--inventory'.
+    The pytest-ansible plugin always assumes that the value of cli argument '--inventory' is a single
+    inventory file. With this enhancement, we can pass in multiple inventory files using the cli argument
+    '--inventory'. The multiple inventory files can be separated by comma ','.
+
+    For example:
+        pytest --inventory "inventory1, inventory2" <other arguments>
+        pytest --inventory inventory1,inventory2 <other arguments>
+
+    This fixture is automatically applied, you don't need to declare it in your test script.
+    """
+    inv_opt = request.config.getoption("ansible_inventory")
+    inv_files = [inv_file.strip() for inv_file in inv_opt.split(",")]
+    try:
+        setattr(request.config.option, "ansible_inventory", inv_files)
+    except AttributeError:
+        logger.error("Failed to set enhanced 'ansible_inventory' to request.config.option")
 
 
     # fw_utility options
@@ -115,7 +154,7 @@ def testbed(request):
 
 
 @pytest.fixture(scope="module")
-def testbed_devices(ansible_adhoc, testbed):
+def testbed_devices(ansible_adhoc, testbed, duthost):
     """
     @summary: Fixture for creating dut, localhost and other necessary objects for testing. These objects provide
         interfaces for interacting with the devices used in testing.
@@ -127,15 +166,15 @@ def testbed_devices(ansible_adhoc, testbed):
 
     devices = {
         "localhost": Localhost(ansible_adhoc),
-        "dut": SonicHost(ansible_adhoc, testbed["dut"], gather_facts=True)}
+        "duts" : [SonicHost(ansible_adhoc, x, gather_facts=True) for x in testbed["duts"]],
+    }
 
     if "ptf" in testbed:
         devices["ptf"] = PTFHost(ansible_adhoc, testbed["ptf"])
     else:
         # when no ptf defined in testbed.csv
         # try to parse it from inventory
-        dut = devices["dut"]
-        ptf_host = dut.host.options["inventory_manager"].get_host(dut.hostname).get_vars()["ptf_host"]
+        ptf_host = duthost.host.options["inventory_manager"].get_host(duthost.hostname).get_vars()["ptf_host"]
         devices["ptf"] = PTFHost(ansible_adhoc, ptf_host)
 
     return devices
@@ -167,16 +206,21 @@ def enable_ssh_timout(dut):
 
 
 @pytest.fixture(scope="module")
-def duthost(testbed_devices, request):
+def duthost(ansible_adhoc, testbed, request):
     '''
     @summary: Shortcut fixture for getting DUT host. For a lengthy test case, test case module can
               pass a request to disable sh time out mechanis on dut in order to avoid ssh timeout.
               After test case completes, the fixture will restore ssh timeout.
-    @param testbed_devices: Ansible framework testbed devices
+    @param ansible_adhoc: Fixture provided by the pytest-ansible package. Source of the various device objects. It is
+        mandatory argument for the class constructors.
+    @param testbed: Ansible framework testbed information
+    @param request: request parameters for duthost test fixture
     '''
     stop_ssh_timeout = getattr(request.module, "pause_ssh_timeout", None)
+    dut_index = getattr(request.module, "dut_index", 0)
+    assert dut_index < len(testbed["duts"]), "DUT index '{0}' is out of bound '{1}'".format(dut_index, len(testbed["duts"]))
 
-    duthost = testbed_devices["dut"]
+    duthost = SonicHost(ansible_adhoc, testbed["duts"][dut_index], gather_facts=True)
     if stop_ssh_timeout is not None:
         disable_ssh_timout(duthost)
 
@@ -203,7 +247,11 @@ def nbrhosts(ansible_adhoc, testbed, creds):
     vm_base = int(testbed['vm_base'][2:])
     devices = {}
     for k, v in testbed['topo']['properties']['topology']['VMs'].items():
-        devices[k] = EosHost(ansible_adhoc, "VM%04d" % (vm_base + v['vm_offset']), creds['eos_login'], creds['eos_password'])
+        devices[k] = {'host': EosHost(ansible_adhoc, \
+                                      "VM%04d" % (vm_base + v['vm_offset']), \
+                                      creds['eos_login'], \
+                                      creds['eos_password']),
+                      'conf': testbed['topo']['properties']['configuration'][k]}
     return devices
 
 @pytest.fixture(scope="module")
