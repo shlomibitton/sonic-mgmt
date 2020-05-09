@@ -110,6 +110,11 @@ def pytest_addoption(parser):
     parser.addoption("--allow_recover", action="store_true", default=False,
                      help="Allow recovery attempt in sanity check in case of failure")
 
+    # fw_utility options
+    parser.addoption("--config_file", action="store", default=None, help="name of configuration file (per each vendor)")
+    parser.addoption("--binaries_path", action="store", default=None, help="path to binaries files")
+    parser.addoption("--second_image_path", action="store", default=None, help="path to second image to be installed if there is no image available")
+
 
 @pytest.fixture(scope="session", autouse=True)
 def enhance_inventory(request):
@@ -131,12 +136,6 @@ def enhance_inventory(request):
         setattr(request.config.option, "ansible_inventory", inv_files)
     except AttributeError:
         logger.error("Failed to set enhanced 'ansible_inventory' to request.config.option")
-
-
-    # fw_utility options
-    parser.addoption("--config_file", action="store", default=None, help="name of configuration file (per each vendor)")
-    parser.addoption("--binaries_path", action="store", default=None, help="path to binaries files")
-    parser.addoption("--second_image_path", action="store", default=None, help="path to second image to be installed if there is no image available")
 
 
 @pytest.fixture(scope="session")
