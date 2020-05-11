@@ -9,7 +9,6 @@ import logging
 from common import reboot
 from common.utilities import wait_until
 from common.plugins.loganalyzer.loganalyzer import LogAnalyzer, LogAnalyzerError
-from check_critical_services import check_critical_services
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
