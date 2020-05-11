@@ -122,10 +122,10 @@ def test_fast_reboot(duthost, testbed_devices, conn_graph_facts):
     """
     localhost = testbed_devices["localhost"]
 
-    if ans_host.facts["hwsku"] not in sku_supporting_fast_reboot:
-        pytest.skip("Fast reboot skipped because %s doesn't support it" % ans_host.facts["hwsku"])
+    if duthost.facts["hwsku"] not in sku_supporting_fast_reboot:
+        pytest.skip("Fast reboot skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
-    reboot_and_check(localhost, ans_host, conn_graph_facts["device_conn"], reboot_type=REBOOT_TYPE_FAST)
+    reboot_and_check(localhost, duthost, conn_graph_facts["device_conn"], reboot_type=REBOOT_TYPE_FAST)
 
 
 def test_warm_reboot(duthost, testbed_devices, conn_graph_facts):
@@ -184,8 +184,8 @@ def test_power_off_reboot(duthost, testbed_devices, conn_graph_facts, psu_contro
     """
     localhost = testbed_devices["localhost"]
 
-    if ans_host.facts["hwsku"] not in sku_supporting_reboot_cause_test:
-        pytest.skip("Reboot-cause check skipped because %s doesn't support it" % ans_host.facts["hwsku"])
+    if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
+        pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
     psu_ctrl = psu_controller
     if psu_ctrl is None:
@@ -222,8 +222,8 @@ def test_watchdog_reboot(duthost, testbed_devices, conn_graph_facts):
     """
     localhost = testbed_devices["localhost"]
 
-    if ans_host.facts["hwsku"] not in sku_supporting_reboot_cause_test:
-        pytest.skip("Reboot-cause check skipped because %s doesn't support it" % ans_host.facts["hwsku"])
+    if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
+        pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
     test_watchdog_supported = "python -c \"import sonic_platform.platform as P; P.Platform().get_chassis().get_watchdog(); exit()\""
 
