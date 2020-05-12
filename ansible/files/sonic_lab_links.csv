@@ -451,7 +451,7 @@ r-leopard-01,Ethernet112,r-anaconda-43,Ethernet29,100000,1709,Access
 r-leopard-01,Ethernet116,r-anaconda-43,Ethernet30,100000,1710,Access
 r-leopard-01,Ethernet120,r-anaconda-43,Ethernet31,50000,1711,Access
 r-leopard-01,Ethernet124,r-anaconda-43,Ethernet32,50000,1712,Access
-r-anaconda-51,Ethernet33,arc-host70,p5p1,200000,1681-1712,Trunk
+r-leopard-20,Ethernet33,arc-host70,p5p1,200000,1681-1712,Trunk
 
 mts-sonic-dut,Ethernet0,mts-sonic-fanout,Ethernet1,100000,1681,Access
 mts-sonic-dut,Ethernet4,mts-sonic-fanout,Ethernet2,100000,1682,Access

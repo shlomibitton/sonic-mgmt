@@ -105,7 +105,7 @@ arc-switchmtbc02  ansible_host=10.75.67.41 os=mellanox
 r-panther-03      ansible_host=10.210.25.83 os=mellanox
 r-tigris-17       ansible_host=10.210.25.57 os=mellanox
 r-anaconda-43     ansible_host=10.210.25.21 os=mellanox
-r-anaconda-51     ansible_host=10.210.26.51 os=mellanox
+r-leopard-20     ansible_host=10.210.25.114 os=mellanox
 mtbc-sonic-02-2700  ansible_host=10.75.67.45 os=mellanox
 mtbc-3700c-02     ansible_host=10.75.67.51 os=mellanox
 dummy-fanout     ansible_host=1.1.1.1 os=mellanox
