@@ -17,7 +17,7 @@ def platform_components(request, testbed_devices):
     Fixture that returns the platform components list
     according to the given config file.
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
 
     config_file = request.config.getoption("--config_file")
     # config file contains platform string identifier and components separated by ','.
@@ -51,7 +51,7 @@ def component_firmware(request, testbed_devices, component_object):
     """
     Fixture that returns component firmware paths
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
 
     binaries_path = request.config.getoption('--binaries_path')
     if not binaries_path:
@@ -78,7 +78,7 @@ def backup_platform_file(testbed_devices):
     """
     Backup the original 'platform_components.json' file
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
 
     platform_type = dut.facts['platform']
     platform_comp_path = '/usr/share/sonic/device/' + platform_type + '/platform_components.json'
@@ -96,7 +96,7 @@ def setup_images(request, testbed_devices, platform_components, component_object
     Setup part of 'update from next image test' case.
     Backup both images files and generate new json files
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
 
     set_default_boot(request)
     set_next_boot(request)

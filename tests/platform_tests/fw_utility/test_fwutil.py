@@ -15,7 +15,7 @@ def test_show_positive(testbed_devices, platform_components):
     Verify firmware status is valid
     Note: use vendor specific platform config file
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
     fw_status = get_fw_status(dut)
 
     logger.info("Verify platform schema")
@@ -29,8 +29,7 @@ def test_install_positive(request, skip_if_no_update, testbed_devices, component
     """
     Verify firmware install from local path
     """
-    dut = testbed_devices['dut']
-
+    dut = testbed_devices['duts'][0]
     install_cmd_tmplt = "fwutil install chassis component {} fw -y {}"
 
     if not component_firmware['is_latest_installed']:
@@ -110,7 +109,7 @@ def test_install_negative(request, testbed_devices, component_object, component_
     Verify that firmware utility is able to handle
     invalid install flow as expected
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
     comp_name = component_object.get_name()
     fw_path = component_firmware['latest_firmware']
 
@@ -145,7 +144,7 @@ def test_update_negative(request, testbed_devices, backup_platform_file):
     Verify that firmware utility is able to handle
     invalid 'platform_components.json' file as expected
     """
-    dut = testbed_devices['dut']
+    dut = testbed_devices['duts'][0]
     platform_type = dut.facts['platform']
     cmd = 'fwutil update -y'
 
