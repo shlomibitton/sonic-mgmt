@@ -97,14 +97,6 @@ def pytest_addoption(parser):
     parser.addoption("--logs_since", action="store", type=int,
                     help="number of minutes for show techsupport command")
 
-    ############################
-    #   sanity_check options   #
-    ############################
-    parser.addoption("--skip_sanity", action="store_true", default=False,
-                     help="Skip sanity check")
-    parser.addoption("--allow_recover", action="store_true", default=False,
-                     help="Allow recovery attempt in sanity check in case of failure")
-
     # fw_utility options
     parser.addoption("--config_file", action="store", default=None, help="name of configuration file (per each vendor)")
     parser.addoption("--binaries_path", action="store", default=None, help="path to binaries files")
