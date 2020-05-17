@@ -63,10 +63,10 @@ r-leopard-01-t1,vm-t1,t1,docker-ptf-mlnx,ptf-r-leopard-01,10.215.22.61/16,server
 r-leopard-01-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,ptf-r-leopard-01,10.215.22.61/16,server_15,VM1501,r-leopard-01,Mellanox MTR testbed
 r-leopard-01-ptf32,vm-t1,ptf32,docker-ptf-mlnx,ptf-r-leopard-01,10.215.22.61/16,server_15,VM1501,r-leopard-01,Mellanox MTR testbed
 
-r-tigon-01-t0,vm-t1,t0,docker-ptf-mlnx,ptf-r-tigon-01,10.213.84.98/16,server_4,VM0401,r-tigon-01,Mellanox MTR testbed
-r-tigon-01-t1,vm-t1,t1,docker-ptf-mlnx,ptf-r-tigon-01,10.213.84.98/16,server_4,VM0401,r-tigon-01,Mellanox MTR testbed
-r-tigon-01-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,ptf-r-tigon-01,10.213.84.98/16,server_4,VM0401,r-tigon-01,Mellanox MTR testbed
-r-tigon-01-ptf32,vm-t1,ptf32,docker-ptf-mlnx,ptf-r-tigon-01,10.213.84.98/16,server_4,VM0401,r-tigon-01,Mellanox MTR testbed
+r-tigon-04-t0,vm-t1,t0,docker-ptf-mlnx,ptf-r-tigon-04,10.213.84.61/16,server_4,VM0401,r-tigon-04,Mellanox MTR testbed
+r-tigon-04-t1,vm-t1,t1,docker-ptf-mlnx,ptf-r-tigon-04,10.213.84.61/16,server_4,VM0401,r-tigon-04,Mellanox MTR testbed
+r-tigon-04-t1-lag,vm-t1,t1-lag,docker-ptf-mlnx,ptf-r-tigon-04,10.213.84.61/16,server_4,VM0401,r-tigon-04,Mellanox MTR testbed
+r-tigon-04-ptf32,vm-t1,ptf32,docker-ptf-mlnx,ptf-r-tigon-04,10.213.84.61/16,server_4,VM0401,r-tigon-04,Mellanox MTR testbed
 
 arc-mtbc-1001-t0,vm-t1,t0,docker-ptf-mlnx,ptf-mtbc01,10.75.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
 arc-mtbc-1001-t1,vm-t1,t1,docker-ptf-mlnx,ptf-mtbc01,10.75.206.220/24,server_5,VM0501,arc-mtbc-1001,Mellanox MTBC testbed
