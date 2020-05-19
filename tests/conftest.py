@@ -257,19 +257,22 @@ def fanouthosts(ansible_adhoc, conn_graph_facts, creds):
 
     dev_conn     = conn_graph_facts['device_conn'] if 'device_conn' in conn_graph_facts else {}
     fanout_hosts = {}
-    for dut_port in dev_conn.keys():
-        fanout_rec  = dev_conn[dut_port]
-        fanout_host = fanout_rec['peerdevice']
-        fanout_port = fanout_rec['peerport']
-        if fanout_host in fanout_hosts.keys():
-            fanout  = fanout_hosts[fanout_host]
-        else:
-            host_vars = ansible_adhoc().options['inventory_manager'].get_host(fanout_host).vars
-            os_type = 'eos' if 'os' not in host_vars else host_vars['os']
-            fanout  = FanoutHost(ansible_adhoc, os_type, fanout_host, 'FanoutLeaf', creds['fanout_admin_user'], creds['fanout_admin_password'])
-            fanout_hosts[fanout_host] = fanout
-        fanout.add_port_map(dut_port, fanout_port)
-
+    # WA for virtual testbed which has no fanout
+    try: 
+        for dut_port in dev_conn.keys():
+            fanout_rec  = dev_conn[dut_port]
+            fanout_host = fanout_rec['peerdevice']
+            fanout_port = fanout_rec['peerport']
+            if fanout_host in fanout_hosts.keys():
+                fanout  = fanout_hosts[fanout_host]
+            else:
+                host_vars = ansible_adhoc().options['inventory_manager'].get_host(fanout_host).vars
+                os_type = 'eos' if 'os' not in host_vars else host_vars['os']
+                fanout  = FanoutHost(ansible_adhoc, os_type, fanout_host, 'FanoutLeaf', creds['fanout_admin_user'], creds['fanout_admin_password'])
+                fanout_hosts[fanout_host] = fanout
+            fanout.add_port_map(dut_port, fanout_port)
+    except:
+        pass
     return fanout_hosts
 
 @pytest.fixture(scope='session')
