@@ -191,7 +191,9 @@ def configure_table_size_issu_and_check(table_size, dut, localhost, request, iss
     request.addfinalizer(restore_crm_interval)
 
     logging.info("Wait some time for CRM stats to be available")
-    time.sleep(30)
+    # As tested, after reboot,in some cases it took more than 70s to have crm table size from the CLI
+    # although the polling interval was set to 5s, so extend the waiting time to 80s
+    time.sleep(80)
 
     logging.info("Read CRM stats")
     crm_stats = dut.get_crm_resources()["main_resources"]
