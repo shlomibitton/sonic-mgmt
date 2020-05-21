@@ -12,7 +12,6 @@ def test_check_sfp_presence(duthost, conn_graph_facts):
     """
     ports_config = json.loads(duthost.command("sudo sonic-cfggen -d --var-json PORT")["stdout"])
     sysfs_path = get_sfp_sysfs_path(duthost)
-    check_qsfp_sysfs_command = 'cat {}'.format(sysfs_path)
     check_intf_presence_command = 'show interface transceiver presence {}'
 
     logging.info("Use show interface status information")
@@ -28,7 +27,7 @@ def test_check_sfp_presence(duthost, conn_graph_facts):
         assert intf in presence_list, "Wrong interface name in the output %s" % str(presence_list)
         assert 'Present' in presence_list, "Status is not expected, output %s" % str(presence_list)
 
-        check_sysfs_output = duthost.command(check_qsfp_sysfs_command.format(str(sfp_id)))
+        check_sysfs_output = duthost.command(sysfs_path.format(str(sfp_id)))
         logging.info('output of check sysfs %s' % (str(check_sysfs_output)))
         assert check_sysfs_output["rc"] == 0, "Failed to read sysfs of sfp%s." % str(sfp_id)
         assert check_sysfs_output["stdout"] == '1', "Content of sysfs of sfp%s is not correct" % str(sfp_id)
