@@ -558,6 +558,8 @@ VM1530 ansible_host=10.215.22.91
 VM1531 ansible_host=10.215.22.92
 VM1532 ansible_host=10.215.22.93
 
+[vms_16]
+
 [vms_50]
 VM5001 ansible_host=10.212.232.5
 VM5002 ansible_host=10.212.232.6
