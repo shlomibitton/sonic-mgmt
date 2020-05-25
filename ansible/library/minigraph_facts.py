@@ -625,7 +625,7 @@ def parse_xml(filename, hostname):
             port_alias_to_name_map["etp7b"] = "Ethernet50"
             port_alias_to_name_map["etp8"] = "Ethernet56"
             port_alias_to_name_map["etp9a"] = "Ethernet64"
-            port_alias_to_name_map["etp9b"] = "Ethernet68"
+            port_alias_to_name_map["etp9b"] = "Ethernet66"
             port_alias_to_name_map["etp10a"] = "Ethernet72"
             port_alias_to_name_map["etp10b"] = "Ethernet74"
             port_alias_to_name_map["etp11a"] = "Ethernet80"

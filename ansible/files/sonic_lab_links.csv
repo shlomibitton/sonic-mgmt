@@ -633,7 +633,7 @@ r-tigon-04,Ethernet48,arc-switch1003,Ethernet12,50000,1692,Access
 r-tigon-04,Ethernet50,arc-switch1003,Ethernet13,50000,1693,Access
 r-tigon-04,Ethernet56,arc-switch1003,Ethernet14,50000,1694,Access
 r-tigon-04,Ethernet64,arc-switch1003,Ethernet15,50000,1695,Access
-r-tigon-04,Ethernet68,arc-switch1003,Ethernet16,50000,1696,Access
+r-tigon-04,Ethernet66,arc-switch1003,Ethernet16,50000,1696,Access
 r-tigon-04,Ethernet72,arc-switch1003,Ethernet17,50000,1697,Access
 r-tigon-04,Ethernet74,arc-switch1003,Ethernet18,50000,1698,Access
 r-tigon-04,Ethernet80,arc-switch1003,Ethernet19,50000,1699,Access

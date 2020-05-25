@@ -593,7 +593,7 @@
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/7/2"  StartDevice="r-tigon-04" StartPort="Ethernet50"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1003" EndPort="ethernet 1/8"    StartDevice="r-tigon-04" StartPort="Ethernet56"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/9/1"  StartDevice="r-tigon-04" StartPort="Ethernet64"/>
-      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/9/2"  StartDevice="r-tigon-04" StartPort="Ethernet68"/>
+      <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/9/2"  StartDevice="r-tigon-04" StartPort="Ethernet66"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/10/1" StartDevice="r-tigon-04" StartPort="Ethernet72"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/10/2" StartDevice="r-tigon-04" StartPort="Ethernet74"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/11/1" StartDevice="r-tigon-04" StartPort="Ethernet80"/>
