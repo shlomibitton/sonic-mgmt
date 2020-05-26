@@ -118,8 +118,6 @@ def test_fast_reboot(duthost, localhost, conn_graph_facts):
     """
     @summary: This test case is to perform cold reboot and check platform status
     """
-    localhost = testbed_devices["localhost"]
-
     if duthost.facts["hwsku"] not in sku_supporting_fast_reboot:
         pytest.skip("Fast reboot skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
@@ -179,8 +177,6 @@ def test_power_off_reboot(duthost, localhost, conn_graph_facts, psu_controller, 
     @param psu_controller: The python object of psu controller
     @param power_off_delay: Pytest fixture. The delay between turning off and on the PSU
     """
-    localhost = testbed_devices["localhost"]
-
     if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
@@ -217,8 +213,6 @@ def test_watchdog_reboot(duthost, localhost, conn_graph_facts):
     """
     @summary: This test case is to perform reboot via watchdog and check platform status
     """
-    localhost = testbed_devices["localhost"]
-
     if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
