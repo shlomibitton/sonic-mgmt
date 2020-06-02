@@ -90,7 +90,7 @@ def set_table_size(dut, table_size):
 
 
 @pytest.fixture(scope="module")
-def common_setup_teardown(testbed_devices):
+def common_setup_teardown(duthost, localhost):
     """
     @summary: Fixture for setup and teardown for all the test cases in this script
 
@@ -105,10 +105,8 @@ def common_setup_teardown(testbed_devices):
 
     logging.info("Start common teardown")
 
-    dut = testbed_devices["dut"]
-    dut_platform = dut.facts["platform"]
-    dut_hwsku = dut.facts["hwsku"]
-    localhost = testbed_devices["localhost"]
+    dut_platform = duthost.facts["platform"]
+    dut_hwsku = duthost.facts["hwsku"]
 
     reboot_required = False
 
@@ -116,19 +114,19 @@ def common_setup_teardown(testbed_devices):
     sai_profile = "/usr/share/sonic/device/%s/%s/sai.profile" % (dut_platform, dut_hwsku)
     backup_sai_profile = sai_profile + ".backup"
     logging.info("sai.profile: %s" % sai_profile)
-    if dut.stat(path=backup_sai_profile)["stat"]["exists"]:
+    if duthost.stat(path=backup_sai_profile)["stat"]["exists"]:
         logging.info("Restore %s to %s" % (backup_sai_profile, sai_profile))
-        dut.command("cp %s %s" % (backup_sai_profile, sai_profile))
-        dut.file(path=backup_sai_profile, state="absent")
+        duthost.command("cp %s %s" % (backup_sai_profile, sai_profile))
+        duthost.file(path=backup_sai_profile, state="absent")
         reboot_required = True
 
     # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
     if models[dut_hwsku]["reboot"]["warm_reboot"]:
-        set_issu(dut, issu_enabled=True)
+        set_issu(duthost, issu_enabled=True)
         reboot_required = True
 
     if reboot_required:
-        reboot_dut(dut, localhost)
+        reboot_dut(duthost, localhost)
 
     logging.info("Done common teardown")
 
@@ -205,14 +203,10 @@ def configure_table_size_issu_and_check(table_size, dut, localhost, request, iss
     compare_table_size(table_size, crm_stats)
 
 
-def test_typical_table_size(testbed_devices, request, common_setup_teardown):
+def test_typical_table_size(duthost, localhost, request, common_setup_teardown):
     """
     @summary: Test setting typical table size values and check the result.
     """
-
-    dut = testbed_devices["dut"]
-    localhost = testbed_devices["localhost"]
-
     table_size = {
         "SAI_FDB_TABLE_SIZE": 32768,
         "SAI_IPV4_ROUTE_TABLE_SIZE": 102400,
@@ -232,7 +226,7 @@ def test_typical_table_size(testbed_devices, request, common_setup_teardown):
     }
 
     logging.info("Test typical table size configuration with warm-reboot disabled")
-    configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
+    configure_table_size_issu_and_check(table_size, duthost, localhost, request, issu_enabled=False)
 
     # TODO: Temporarily commented out because of Bug #1800191
     # Know issue: https://redmine.mellanox.com/issues/1800191
@@ -243,13 +237,10 @@ def test_typical_table_size(testbed_devices, request, common_setup_teardown):
     #     configure_table_size_issu_and_check(table_size_issu, dut, localhost, request, issu_enabled=True)
 
 
-def test_more_resources_for_ipv6(testbed_devices, request, common_setup_teardown):
+def test_more_resources_for_ipv6(duthost, localhost, request, common_setup_teardown):
     """
     @summary: Configure more resources for IPv6 and check the result.
     """
-    dut = testbed_devices["dut"]
-    localhost = testbed_devices["localhost"]
-
     table_size = {
         "SAI_FDB_TABLE_SIZE": 32768,
         "SAI_IPV4_ROUTE_TABLE_SIZE": 32768,
@@ -267,7 +258,7 @@ def test_more_resources_for_ipv6(testbed_devices, request, common_setup_teardown
     }
 
     logging.info("Test more resources for ipv6 table size configuration with warm-reboot disabled")
-    configure_table_size_issu_and_check(table_size, dut, localhost, request, issu_enabled=False)
+    configure_table_size_issu_and_check(table_size, duthost, localhost, request, issu_enabled=False)
 
     # TODO: Temporarily commented out because of Bug #1800191
     # Know issue: https://redmine.mellanox.com/issues/1800191
