@@ -40,7 +40,7 @@ class FwComponent(object):
         """
         raise NotImplemented
 
-    def process_versions(self, dut, binaries_path):
+    def process_versions(self, duthost, binaries_path):
         """
         Process latest/other component firmware versions
         """
@@ -79,10 +79,10 @@ class BiosComponent(FwComponent):
 
         return fw_path, fw_ver
 
-    def process_versions(self, dut, binaries_path):
+    def process_versions(self, duthost, binaries_path):
         files_path = os.path.join(binaries_path, 'bios')
-        platform_type = dut.facts['platform']
-        fw_status = get_fw_status(dut)
+        platform_type = duthost.facts['platform']
+        fw_status = get_fw_status(duthost)
         latest = '{}_latest'.format(platform_type)
         other = '{}_other'.format(platform_type)
 
@@ -117,30 +117,29 @@ class BiosComponent(FwComponent):
         return versions
 
     def update_fw(self, request):
-        testbed_device = request.getfixturevalue("testbed_devices")
-        localhost = testbed_device['localhost']
-        dut = testbed_device['dut']
+        localhost = request.getfixturevalue("localhost")
+        duthost = request.getfixturevalue("duthost")
 
         logger.info("Complete {} firmware update: run cold reboot".format(self.get_name()))
         reboot_cmd = 'reboot'
-        reboot_task, reboot_res = dut.command(reboot_cmd, module_ignore_errors=True, module_async=True)
+        reboot_task, reboot_res = duthost.command(reboot_cmd, module_ignore_errors=True, module_async=True)
         logger.info("Wait for DUT to go down")
-        res = localhost.wait_for(host=dut.hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
+        res = localhost.wait_for(host=duthost.hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
         if "failed" in res:
             try:
                 logger.error("Wait for switch down failed, try to kill any possible stuck reboot task")
-                pid = dut.command("pgrep -f '%s'" % reboot_cmd)['stdout']
-                dut.command("kill -9 %s" % pid)
+                pid = duthost.command("pgrep -f '%s'" % reboot_cmd)['stdout']
+                duthost.command("kill -9 %s" % pid)
                 reboot_task.terminate()
                 logger.error("Result of command '%s': " + str(reboot_res.get(timeout=0)))
             except Exception as e:
                 logger.error("Exception raised while cleanup reboot task and get result: " + repr(e))
 
         logger.info("Wait for DUT to come back")
-        localhost.wait_for(host=dut.hostname, port=22, state='started', delay=10, timeout=300)
+        localhost.wait_for(host=duthost.hostname, port=22, state='started', delay=10, timeout=300)
 
         logger.info("Wait until system is stable")
-        wait_until(300, 30, dut.critical_services_fully_started)
+        wait_until(300, 30, duthost.critical_services_fully_started)
 
         logger.info("Wait until system init is done")
         time.sleep(30)
@@ -204,10 +203,10 @@ class CpldComponent(FwComponent):
 
         return parsed_ver, cpld_ver_major == comp_ver_major
 
-    def process_versions(self, dut, binaries_path):
+    def process_versions(self, duthost, binaries_path):
         files_path = os.path.join(binaries_path, 'cpld')
-        platform_type = dut.facts['platform']
-        fw_status = get_fw_status(dut)
+        platform_type = duthost.facts['platform']
+        fw_status = get_fw_status(duthost)
         latest = '{}_latest'.format(platform_type)
         other = '{}_other'.format(platform_type)
 
@@ -243,14 +242,13 @@ class CpldComponent(FwComponent):
         return versions
 
     def update_fw(self, request):
-        testbed_devices = request.getfixturevalue("testbed_devices")
-        localhost = testbed_devices['localhost']
-        dut = testbed_devices['dut']
+        localhost = request.getfixturevalue("localhost")
+        duthost = request.getfixturevalue("duthost")
 
         logger.info("Complete {} firmware update: run power cycle".format(self.get_name()))
         num_psu_cmd = "sudo psuutil numpsus"
         logger.info("Check how much PSUs DUT has")
-        psu_num_out = dut.command(num_psu_cmd)
+        psu_num_out = duthost.command(num_psu_cmd)
         psu_num = 0
         try:
             psu_num = int(psu_num_out['stdout'])
@@ -260,7 +258,7 @@ class CpldComponent(FwComponent):
         logger.info("Create PSU controller")
         psu_control = request.getfixturevalue("psu_controller")
         if psu_control is None:
-            pytest.fail("Failed to create PSU controller: host={}".format(dut.hostname))
+            pytest.fail("Failed to create PSU controller: host={}".format(duthost.hostname))
         all_psu_status = psu_control.get_psu_status()
         if all_psu_status:
             # turn off all psu
@@ -283,21 +281,21 @@ class CpldComponent(FwComponent):
                         time.sleep(5)
 
         logger.info("Wait for DUT to come back")
-        localhost.wait_for(host=dut.hostname, port=22, state='started', delay=10, timeout=300)
+        localhost.wait_for(host=duthost.hostname, port=22, state='started', delay=10, timeout=300)
 
         logger.info("Wait until system is stable")
-        wait_until(300, 30, dut.critical_services_fully_started)
+        wait_until(300, 30, duthost.critical_services_fully_started)
 
         logger.info("Wait until system init is done")
         time.sleep(30)
 
 
-def get_fw_status(dut):
+def get_fw_status(duthost):
     """
     Parse output of 'fwutil show status' and return the data
     """
     cmd = 'fwutil show status'
-    result = dut.command(cmd)
+    result = duthost.command(cmd)
     if result['rc'] != SUCCESS_CODE:
         pytest.fail("Failed to execute command: ={}".format(cmd))
 
@@ -329,14 +327,13 @@ def set_default_boot(request):
     """
     Set current image as default
     """
-    testbed_devices = request.getfixturevalue("testbed_devices")
-    dut = testbed_devices['dut']
+    duthost = request.getfixturevalue("duthost")
 
-    image_facts = dut.image_facts()['ansible_facts']['ansible_image_facts']
+    image_facts = duthost.image_facts()['ansible_facts']['ansible_image_facts']
     current_image = image_facts['current']
 
     logger.info("Set default boot: img={}".format(current_image))
-    result = dut.command("sonic_installer set_default {}".format(current_image))
+    result = duthost.command("sonic_installer set_default {}".format(current_image))
     if result['rc'] != SUCCESS_CODE:
         pytest.fail("Could not set default image {}. Aborting!".format(current_image))
 
@@ -346,10 +343,9 @@ def set_next_boot(request):
     Set other available image as next.
     If there is no other available image, get it from user arguments
     """
-    testbed_devices = request.getfixturevalue("testbed_devices")
-    dut = testbed_devices['dut']
+    duthost = request.getfixturevalue("duthost")
 
-    image_facts = dut.image_facts()['ansible_facts']['ansible_image_facts']
+    image_facts = duthost.image_facts()['ansible_facts']['ansible_image_facts']
     next_img = image_facts['next']
     if next_img == image_facts['current']:
         for img in image_facts['available']:
@@ -360,15 +356,15 @@ def set_next_boot(request):
         try:
             second_image_path = request.config.getoption("--second_image_path")
             next_img = os.path.basename(second_image_path)
-            dut.copy(src=second_image_path, dest='/home/admin')
-            result = dut.command("sonic_installer install -y ./{}".format(next_img))
+            duthost.copy(src=second_image_path, dest='/home/admin')
+            result = duthost.command("sonic_installer install -y ./{}".format(next_img))
             if result['rc'] != SUCCESS_CODE:
                 pytest.fail("Could not install image {}. Aborting!".format(next_img))
         except Exception as e:
             pytest.fail("Not enough images for this test. Aborting!")
 
     logger.info("Set next boot: img={}".format(next_img))
-    result = dut.command("sonic_installer set_next_boot {}".format(next_img))
+    result = duthost.command("sonic_installer set_next_boot {}".format(next_img))
     if result['rc'] != SUCCESS_CODE:
         pytest.fail("Could not set image {} as next boot. Aborting!".format(next_img))
 
@@ -377,46 +373,45 @@ def reboot_to_image(request, image_type):
     """
     Reboot device to the specified image
     """
-    testbed_devices = request.getfixturevalue("testbed_devices")
-    dut = testbed_devices['dut']
-    localhost = testbed_devices['localhost']
+    localhost = request.getfixturevalue("localhost")
+    duthost = request.getfixturevalue("duthost")
 
     logger.info("Set default image: img={}".format(image_type))
-    result = dut.command("sonic_installer set_default {}".format(image_type))
+    result = duthost.command("sonic_installer set_default {}".format(image_type))
     if result['rc'] != SUCCESS_CODE:
         pytest.fail("Failed to set default image: img={}".format(image_type))
 
     logger.info("Reboot the device")
-    reboot_task, reboot_res = dut.command('reboot', module_async=True)
+    reboot_task, reboot_res = duthost.command('reboot', module_async=True)
 
     try:
         logger.info("Wait for device to go down")
-        localhost.wait_for(host=dut.hostname, port=22, state='stopped', delay=10, timeout=300)
+        localhost.wait_for(host=duthost.hostname, port=22, state='stopped', delay=10, timeout=300)
     except Exception as err:
         reboot_task.terminate()
         logger.error("Failed to reboot the device: msg={}".format(reboot_res.get()))
         raise err
 
     logger.info("Wait for device to come back")
-    localhost.wait_for(host=dut.hostname, port=22, state='started', delay=10, timeout=300)
+    localhost.wait_for(host=duthost.hostname, port=22, state='started', delay=10, timeout=300)
 
     logger.info("Wait until system is stable")
-    wait_until(300, 30, dut.critical_services_fully_started)
+    wait_until(300, 30, duthost.critical_services_fully_started)
 
     logger.info("Wait until system init is done")
     time.sleep(30)
 
-    image_facts = dut.image_facts()['ansible_facts']['ansible_image_facts']
+    image_facts = duthost.image_facts()['ansible_facts']['ansible_image_facts']
     if image_facts['current'] != image_type:
         pytest.fail("Reboot to image failed: img={}".format(image_type))
 
 
-def generate_components_file(dut, platform_components, comp_name, fw_path, fw_version):
+def generate_components_file(duthost, platform_components, comp_name, fw_path, fw_version):
     """
     Generate 'platform_components.json' file for positive test cases
     """
-    fw_status = get_fw_status(dut)
-    platform_type = dut.facts['platform']
+    fw_status = get_fw_status(duthost)
+    platform_type = duthost.facts['platform']
 
     json_data = {}
     json_data['chassis'] = {}
@@ -436,18 +431,17 @@ def generate_components_file(dut, platform_components, comp_name, fw_path, fw_ve
 
     dst_path = "/usr/share/sonic/device/{}/platform_components.json".format(platform_type)
     src_path = os.path.join(BASE_DIR, "tmp_platform_components.json")
-    dut.copy(src=src_path, dest=dst_path)
+    duthost.copy(src=src_path, dest=dst_path)
 
 
 def generate_invalid_components_file(request, chassis_key, platform_type, is_valid_comp_structure):
     """
     Generate invlid 'platform_components.json' file for negative test cases
     """
-    testbed_devices = request.getfixturevalue("testbed_devices")
+    duthost = request.getfixturevalue("duthost")
     platform_components = request.getfixturevalue("platform_components")
 
-    dut = testbed_devices['dut']
-    fw_status = get_fw_status(dut)
+    fw_status = get_fw_status(duthost)
 
     json_data = {}
     json_data[chassis_key] = {}
@@ -472,24 +466,23 @@ def generate_invalid_components_file(request, chassis_key, platform_type, is_val
 
     dst_path = "/usr/share/sonic/device/{}/platform_components.json".format(platform_type)
     src_path = os.path.join(BASE_DIR, "tmp_platform_components.json")
-    dut.copy(src=src_path, dest=dst_path)
+    duthost.copy(src=src_path, dest=dst_path)
 
 
 def execute_update_command(request, cmd, component_object, fw_version, expected_log):
     """
     Execute update command and verify that no errors occur
     """
-    testbed_devices = request.getfixturevalue("testbed_devices")
-    dut = testbed_devices['dut']
+    duthost = request.getfixturevalue("duthost")
 
-    loganalyzer = LogAnalyzer(ansible_host=dut, marker_prefix='acl')
+    loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='fwutil')
     loganalyzer.load_common_config()
 
     try:
         loganalyzer.except_regex = [expected_log]
         with loganalyzer:
             logger.info("Execute update command: cmd={}".format(cmd))
-            result = dut.command(cmd)
+            result = duthost.command(cmd)
     except LogAnalyzerError as err:
         raise err
 
@@ -500,7 +493,7 @@ def execute_update_command(request, cmd, component_object, fw_version, expected_
     component_object.update_fw(request)
 
     # check output of show command
-    fw_status = get_fw_status(dut)
+    fw_status = get_fw_status(duthost)
     comp_fw_status = fw_status[component_object.get_name()]
     if not comp_fw_status['version']:
         pytest.fail("Installation didn't work. Aborting!")
@@ -516,11 +509,11 @@ def execute_update_command(request, cmd, component_object, fw_version, expected_
         )
 
 
-def execute_invalid_update_command(dut, cmd, expected_log):
+def execute_invalid_update_command(duthost, cmd, expected_log):
     """
     Execute invalid update command and verify that errors occur
     """
-    result = dut.command(cmd, module_ignore_errors=True)
+    result = duthost.command(cmd, module_ignore_errors=True)
     if result['rc'] == SUCCESS_CODE:
         pytest.fail("Failed to get expected error code: rc={}".format(result['rc']))
 
@@ -533,10 +526,9 @@ def update(request, cmd, component_object, remote_fw_path, local_fw_path, fw_ver
     """"
     Perform firmware update
     """
-    testbed_devices = request.getfixturevalue("testbed_devices")
-    dut = testbed_devices['dut']
+    duthost = request.getfixturevalue("duthost")
 
-    dut.copy(src=local_fw_path, dest=remote_fw_path)
+    duthost.copy(src=local_fw_path, dest=remote_fw_path)
 
     try:
         execute_update_command(
@@ -547,7 +539,7 @@ def update(request, cmd, component_object, remote_fw_path, local_fw_path, fw_ver
             FW_INSTALL_SUCCESS_LOG
         )
     finally:
-        dut.command("rm -f {}".format(remote_fw_path))
+        duthost.command("rm -f {}".format(remote_fw_path))
 
 
 def update_from_current_image(request):
@@ -556,11 +548,10 @@ def update_from_current_image(request):
     """
     logger.info("Update firmware from current image")
 
-    testbed_devices = request.getfixturevalue("testbed_devices")
+    duthost = request.getfixturevalue("duthost")
     platform_components = request.getfixturevalue("platform_components")
     component_object = request.getfixturevalue("component_object")
     component_firmware = request.getfixturevalue("component_firmware")
-    dut = testbed_devices['dut']
 
     update_cmd = 'fwutil update -y --image=current'
     comp_name = component_object.get_name()
@@ -580,7 +571,7 @@ def update_from_current_image(request):
 
         # install latest firmware
         generate_components_file(
-            dut,
+            duthost,
             platform_components,
             comp_name,
             remote_fw_path,
@@ -609,7 +600,7 @@ def update_from_current_image(request):
 
     # install previous firmware
     generate_components_file(
-        dut,
+        duthost,
         platform_components,
         comp_name,
         remote_fw_path,
@@ -630,10 +621,8 @@ def update_from_next_image(request):
     """
     logger.info("Update firmware from next image")
 
-    testbed_devices = request.getfixturevalue("testbed_devices")
     component_object = request.getfixturevalue("component_object")
     component_firmware = request.getfixturevalue("component_firmware")
-    dut = testbed_devices['dut']
 
     set_next_boot(request)
 

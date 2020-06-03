@@ -10,13 +10,12 @@ from fwutil_helper import update_from_current_image, update_from_next_image
 logger = logging.getLogger(__name__)
 
 
-def test_show_positive(testbed_devices, platform_components):
+def test_show_positive(duthost, platform_components):
     """
     Verify firmware status is valid
     Note: use vendor specific platform config file
     """
-    dut = testbed_devices['duts'][0]
-    fw_status = get_fw_status(dut)
+    fw_status = get_fw_status(duthost)
 
     logger.info("Verify platform schema")
     for comp in platform_components:
@@ -25,11 +24,10 @@ def test_show_positive(testbed_devices, platform_components):
 
 
 @pytest.mark.disable_loganalyzer
-def test_install_positive(request, skip_if_no_update, testbed_devices, component_object, component_firmware):
+def test_install_positive(request, skip_if_no_update, component_object, component_firmware):
     """
     Verify firmware install from local path
     """
-    dut = testbed_devices['duts'][0]
     install_cmd_tmplt = "fwutil install chassis component {} fw -y {}"
 
     if not component_firmware['is_latest_installed']:
@@ -104,33 +102,32 @@ def test_install_positive(request, skip_if_no_update, testbed_devices, component
 
 
 @pytest.mark.disable_loganalyzer
-def test_install_negative(request, testbed_devices, component_object, component_firmware):
+def test_install_negative(request, duthost, component_object, component_firmware):
     """
     Verify that firmware utility is able to handle
     invalid install flow as expected
     """
-    dut = testbed_devices['duts'][0]
     comp_name = component_object.get_name()
     fw_path = component_firmware['latest_firmware']
 
     # invalid component name
     logger.info("Verify invalid component name case")
     cmd = "fwutil install chassis component {} fw -y {}".format('UNVALID_FW_NAME', fw_path)
-    execute_invalid_update_command(dut, cmd, UNVALID_NAME_LOG)
+    execute_invalid_update_command(duthost, cmd, UNVALID_NAME_LOG)
 
     # invalid path
     logger.info("Verify invalid path case")
     cmd = "fwutil install chassis component {} fw -y {}".format(comp_name, '/this/is/invalid/path')
-    execute_invalid_update_command(dut, cmd, UNVALID_PATH_LOG)
+    execute_invalid_update_command(duthost, cmd, UNVALID_PATH_LOG)
 
     # invalid url
     logger.info("Verify invalid url case")
     cmd = "fwutil install chassis component {} fw -y {}".format(comp_name, 'http://this/is/invalid/url')
-    execute_invalid_update_command(dut, cmd, UNVALID_URL_LOG)
+    execute_invalid_update_command(duthost, cmd, UNVALID_URL_LOG)
 
 
 @pytest.mark.disable_loganalyzer
-def test_update_positive(request, skip_if_no_update, testbed_devices, setup_images):
+def test_update_positive(request, skip_if_no_update, setup_images):
     """
     Verify firmware update from current/next image
     """
@@ -139,13 +136,12 @@ def test_update_positive(request, skip_if_no_update, testbed_devices, setup_imag
 
 
 @pytest.mark.disable_loganalyzer
-def test_update_negative(request, testbed_devices, backup_platform_file):
+def test_update_negative(request, duthost, backup_platform_file):
     """
     Verify that firmware utility is able to handle
     invalid 'platform_components.json' file as expected
     """
-    dut = testbed_devices['duts'][0]
-    platform_type = dut.facts['platform']
+    platform_type = duthost.facts['platform']
     cmd = 'fwutil update -y'
 
     # invalid platform schema
@@ -156,7 +152,7 @@ def test_update_negative(request, testbed_devices, backup_platform_file):
         platform_type=platform_type,
         is_valid_comp_structure=True
     )
-    execute_invalid_update_command(dut, cmd, INVALID_PLATFORM_SCHEMA_LOG)
+    execute_invalid_update_command(duthost, cmd, INVALID_PLATFORM_SCHEMA_LOG)
 
     # invalid chassis schema
     logger.info("Verify invalid chassis schema case")
@@ -166,7 +162,7 @@ def test_update_negative(request, testbed_devices, backup_platform_file):
         platform_type='INVALID_PLATFORM',
         is_valid_comp_structure=True
     )
-    execute_invalid_update_command(dut, cmd, INVALID_CHASSIS_SCHEMA_LOG)
+    execute_invalid_update_command(duthost, cmd, INVALID_CHASSIS_SCHEMA_LOG)
 
     # invalid components schema
     logger.info("Verify invalid components schema case")
@@ -176,4 +172,4 @@ def test_update_negative(request, testbed_devices, backup_platform_file):
         platform_type=platform_type,
         is_valid_comp_structure=False
     )
-    execute_invalid_update_command(dut, cmd, INVALID_COMPONENT_SCHEMA_LOG)
+    execute_invalid_update_command(duthost, cmd, INVALID_COMPONENT_SCHEMA_LOG)
