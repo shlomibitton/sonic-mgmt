@@ -547,30 +547,35 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 32
-        }
-    },
-    "ACS-MSN4700": {
-        "reboot": {
-            "cold_reboot": True,
-            "fast_reboot": False,
-            "warm_reboot": False
         },
-        "fans": {
-            "number": 6,
-            "hot_swappable": True
-        },
-        "psus": {
-            "number": 2,
-            "hot_swappable": True
-        },
-        "cpu_pack": {
-            "number": 1
-        },
-        "cpu_cores": {
-            "number": 4
-        },
-        "ports": {
-            "number": 32
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 32
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            },
+            "comex_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN4600C": {
@@ -595,6 +600,35 @@ SWITCH_MODELS = {
         },
         "ports": {
             "number": 64
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 2
+            },
+            "module": {
+                "start": 1,
+                "number": 60
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            },
+            "comex_ambient": {
+                "number": 1
+            }
         }
     },
     "ACS-MSN3420": {

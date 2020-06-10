@@ -4,10 +4,9 @@ import pytest
 import random
 import time
 from common.mellanox_data import SWITCH_MODELS
-from common.plugins.loganalyzer.loganalyzer import LogAnalyzer
 from common.utilities import wait_until
 from ..thermal_control_test_helper import *
-from mellanox_thermal_control_test_helper import MockerHelper, AbnormalFanMocker
+from .mellanox_thermal_control_test_helper import MockerHelper, AbnormalFanMocker
 
 THERMAL_CONTROL_TEST_WAIT_TIME = 65
 THERMAL_CONTROL_TEST_CHECK_INTERVAL = 5
@@ -18,41 +17,32 @@ PSU_PRESENCE_PATH = '/run/hw-management/thermal/psu{}_status'
 PSU_SPEED_PATH = '/run/hw-management/thermal/psu{}_fan1_speed_get'
 PSU_SPEED_TOLERANCE = 0.25
 
-LOG_EXPECT_CHANGE_MIN_COOLING_LEVEL_RE = '.*Changed minimum cooling level to {}.*'
-
 
 @pytest.mark.disable_loganalyzer
 def test_dynamic_minimum_table(duthost, mocker_factory):
-    air_flow_dirs = ['p2c', 'c2p', 'unk']
     max_temperature = 45000 # 45 C
     cooling_cur_state = get_cooling_cur_state(duthost)
     if cooling_cur_state >= COOLING_CUR_STATE_THRESHOLD:
         pytest.skip('The cooling level {} is higher than threshold {}.'.format(cooling_cur_state, COOLING_CUR_STATE_THRESHOLD))
 
     mocker = mocker_factory(duthost, 'MinTableMocker')
-    loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix='thermal_control')
-    loganalyzer.load_common_config()
 
-    for index in range(len(air_flow_dirs)):
-        air_flow_index = random.randint(0, len(air_flow_dirs) - 1)
-        air_flow_dir = air_flow_dirs[air_flow_index]
-        air_flow_dirs.remove(air_flow_dir)
-        temperature = random.randint(0, max_temperature)
-        trust_state = True if random.randint(0, 1) else False
-        logging.info('Testing with air_flow_dir={}, temperature={}, trust_state={}'.format(air_flow_dir, temperature, trust_state))
-        expect_minimum_cooling_level = mocker.get_expect_cooling_level(air_flow_dir, temperature, trust_state)
-        loganalyzer.expect_regex = [LOG_EXPECT_CHANGE_MIN_COOLING_LEVEL_RE.format(expect_minimum_cooling_level)]
-        with loganalyzer:
-            mocker.mock_min_table(air_flow_dir, temperature, trust_state)
-            time.sleep(THERMAL_CONTROL_TEST_WAIT_TIME)
+    temperature = random.randint(0, max_temperature)
+    trust_state = True if random.randint(0, 1) else False
+    logging.info('Testing with temperature={}, trust_state={}'.format(temperature, trust_state))
+    expect_minimum_cooling_level = mocker.get_expect_cooling_level(temperature, trust_state)
+    mocker.mock_min_table(temperature, trust_state)
+    time.sleep(THERMAL_CONTROL_TEST_WAIT_TIME)
+    actual_cooling_level = get_cooling_cur_state(duthost)
+    assert actual_cooling_level >= expect_minimum_cooling_level, 'Cooling level {} is less than minimum allowed {}'.format(actual_cooling_level, expect_minimum_cooling_level)
 
-        temperature = random.randint(0, max_temperature)
-        logging.info('Testing with air_flow_dir={}, temperature={}, trust_state={}'.format(air_flow_dir, temperature, not trust_state))
-        expect_minimum_cooling_level = mocker.get_expect_cooling_level(air_flow_dir, temperature, not trust_state)
-        loganalyzer.expect_regex = [LOG_EXPECT_CHANGE_MIN_COOLING_LEVEL_RE.format(expect_minimum_cooling_level)]
-        with loganalyzer:
-            mocker.mock_min_table(air_flow_dir, temperature, not trust_state)
-            time.sleep(THERMAL_CONTROL_TEST_WAIT_TIME)
+    temperature = random.randint(0, max_temperature)
+    logging.info('Testing with temperature={}, trust_state={}'.format(temperature, not trust_state))
+    expect_minimum_cooling_level = mocker.get_expect_cooling_level(temperature, not trust_state)
+    mocker.mock_min_table(temperature, not trust_state)
+    time.sleep(THERMAL_CONTROL_TEST_WAIT_TIME)
+    actual_cooling_level = get_cooling_cur_state(duthost)
+    assert actual_cooling_level >= expect_minimum_cooling_level, 'Cooling level {} is less than minimum allowed {}'.format(actual_cooling_level, expect_minimum_cooling_level)
 
 
 @pytest.mark.disable_loganalyzer
@@ -80,11 +70,12 @@ def test_set_psu_fan_speed(duthost, mocker_factory):
     logging.info('Full speed={}'.format(full_speeds))
     logging.info('Mock FAN presence...')
     single_fan_mocker.mock_presence()
-    assert wait_until(THERMAL_CONTROL_TEST_WAIT_TIME, THERMAL_CONTROL_TEST_CHECK_INTERVAL, check_cooling_cur_state, duthost, 10, operator.ne), \
-        'Current cooling state is {}'.format(get_cooling_cur_state(duthost))
+    wait_until(THERMAL_CONTROL_TEST_WAIT_TIME, THERMAL_CONTROL_TEST_CHECK_INTERVAL, check_cooling_cur_state, duthost, 10, operator.ne)
     logging.info('Wait {} seconds for the policy to take effect...'.format(THERMAL_CONTROL_TEST_CHECK_INTERVAL))
     time.sleep(THERMAL_CONTROL_TEST_CHECK_INTERVAL)
     cooling_cur_state = get_cooling_cur_state(duthost)
+    if cooling_cur_state == 10:
+        pytest.skip('Cooling level is still 10, ignore the rest test')
     logging.info('Cooling level changed to {}'.format(cooling_cur_state))
     current_speeds = []
     for index in range(psu_num):

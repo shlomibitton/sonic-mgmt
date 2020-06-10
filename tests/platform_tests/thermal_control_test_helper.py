@@ -111,7 +111,7 @@ def mocker_factory():
             sub_folder_dir = os.path.join(current_file_dir, "mellanox")
             if sub_folder_dir not in sys.path:
                 sys.path.append(sub_folder_dir)
-            import mellanox_thermal_control_test_helper
+            from .mellanox import mellanox_thermal_control_test_helper
             mocker_type = BaseMocker.get_mocker_type(mocker_name)
             if mocker_type:
                 mocker_object = mocker_type(dut)
@@ -170,14 +170,6 @@ class SingleFanMocker(BaseMocker):
     def mock_presence(self):
         """
         Change the mocked FAN status to 'Present'
-        :return:
-        """
-        pass
-
-    def mock_status(self, status):
-        """
-        Change the mocked FAN status to good or bad
-        :param status: bool value indicate the target status of the FAN.
         :return:
         """
         pass
@@ -262,7 +254,7 @@ def get_fields(line, field_ranges):
     return fields
 
 
-def check_cli_output_with_mocker(dut, mocker_object, command, max_wait_time, key_index=0):
+def check_cli_output_with_mocker(dut, mocker_object, command, max_wait_time):
     """
     Check the command line output matches the mocked data.
     :param dut: DUT object representing a SONiC switch under test. 
@@ -281,7 +273,7 @@ def check_cli_output_with_mocker(dut, mocker_object, command, max_wait_time, key
     actual_data = {}
     for line in output["stdout_lines"][2:]:
         fields = get_fields(line, field_ranges)
-        actual_data[fields[key_index]] = fields
+        actual_data[fields[0]] = fields
     
     return mocker_object.check_result(actual_data)
 
