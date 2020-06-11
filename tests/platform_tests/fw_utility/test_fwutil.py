@@ -1,10 +1,10 @@
-import pytest
-import os
 import logging
+import pytest
 
-from fwutil_helper import UNVALID_NAME_LOG, UNVALID_PATH_LOG, UNVALID_URL_LOG
-from fwutil_helper import INVALID_PLATFORM_SCHEMA_LOG, INVALID_CHASSIS_SCHEMA_LOG, INVALID_COMPONENT_SCHEMA_LOG
-from fwutil_helper import get_fw_status, update, execute_invalid_update_command, generate_invalid_components_file
+from fwutil_helper import FW_TYPE_INSTALL, FW_TYPE_UPDATE
+from fwutil_helper import FW_INSTALL_INVALID_NAME_LOG, FW_INSTALL_INVALID_PATH_LOG, FW_INSTALL_INVALID_URL_LOG
+from fwutil_helper import FW_UPDATE_INVALID_PLATFORM_SCHEMA_LOG, FW_UPDATE_INVALID_CHASSIS_SCHEMA_LOG, FW_UPDATE_INVALID_COMPONENT_SCHEMA_LOG
+from fwutil_helper import get_fw_status, install_firmware, generate_invalid_components_file, execute_invalid_command
 from fwutil_helper import update_from_current_image, update_from_next_image
 
 logger = logging.getLogger(__name__)
@@ -24,84 +24,38 @@ def test_show_positive(duthost, platform_components):
 
 
 @pytest.mark.disable_loganalyzer
+@pytest.mark.parametrize("component_firmware", [ FW_TYPE_INSTALL ], indirect=True)
 def test_install_positive(request, skip_if_no_update, component_object, component_firmware):
     """
     Verify firmware install from local path
     """
-    install_cmd_tmplt = "fwutil install chassis component {} fw -y {}"
+    comp_name = component_object.get_name()
 
     if not component_firmware['is_latest_installed']:
-        fw_name = os.path.basename(component_firmware['latest_firmware'])
-        remote_fw_path = os.path.join('/tmp', fw_name)
-        local_fw_path = component_firmware['latest_firmware']
+        fw_path = component_firmware['latest_firmware']
         fw_version = component_firmware['latest_version']
-        install_cmd = install_cmd_tmplt.format(component_object.get_name(), remote_fw_path)
-
-        msg = "Install latest firmware for {}: version={}, path={}".format(
-            component_object.get_name(),
-            component_firmware['latest_version'],
-            component_firmware['latest_firmware']
-        )
-        logger.info(msg)
 
         # install latest firmware
-        update(
-            request,
-            install_cmd,
-            component_object,
-            remote_fw_path,
-            local_fw_path,
-            fw_version
-        )
+        logger.info("Install latest {} firmware: version={}, path={}".format(comp_name, fw_version, fw_path))
+        install_firmware(request, fw_path, fw_version)
     else:
-        fw_name = os.path.basename(component_firmware['previous_firmware'])
-        remote_fw_path = os.path.join('/tmp', fw_name)
-        local_fw_path = component_firmware['previous_firmware']
+        fw_path = component_firmware['previous_firmware']
         fw_version = component_firmware['previous_version']
-        install_cmd = install_cmd_tmplt.format(component_object.get_name(), remote_fw_path)
-
-        msg = "Install previous firmware for {}: version={}, path={}".format(
-            component_object.get_name(),
-            component_firmware['previous_version'],
-            component_firmware['previous_firmware']
-        )
-        logger.info(msg)
 
         # install previous firmware
-        update(
-            request,
-            install_cmd,
-            component_object,
-            remote_fw_path,
-            local_fw_path,
-            fw_version
-        )
+        logger.info("Install previous {} firmware: version={}, path={}".format(comp_name, fw_version, fw_path))
+        install_firmware(request, fw_path, fw_version)
 
-        fw_name = os.path.basename(component_firmware['latest_firmware'])
-        remote_fw_path = os.path.join('/tmp', fw_name)
-        local_fw_path = component_firmware['latest_firmware']
+        fw_path = component_firmware['latest_firmware']
         fw_version = component_firmware['latest_version']
-        install_cmd = install_cmd_tmplt.format(component_object.get_name(), remote_fw_path)
-
-        msg = "Install latest firmware for {}: version={}, path={}".format(
-            component_object.get_name(),
-            component_firmware['latest_version'],
-            component_firmware['latest_firmware']
-        )
-        logger.info(msg)
 
         # install latest firmware
-        update(
-            request,
-            install_cmd,
-            component_object,
-            remote_fw_path,
-            local_fw_path,
-            fw_version
-        )
+        logger.info("Install latest {} firmware: version={}, path={}".format(comp_name, fw_version, fw_path))
+        install_firmware(request, fw_path, fw_version)
 
 
 @pytest.mark.disable_loganalyzer
+@pytest.mark.parametrize("component_firmware", [ FW_TYPE_INSTALL ], indirect=True)
 def test_install_negative(request, duthost, component_object, component_firmware):
     """
     Verify that firmware utility is able to handle
@@ -112,22 +66,23 @@ def test_install_negative(request, duthost, component_object, component_firmware
 
     # invalid component name
     logger.info("Verify invalid component name case")
-    cmd = "fwutil install chassis component {} fw -y {}".format('UNVALID_FW_NAME', fw_path)
-    execute_invalid_update_command(duthost, cmd, UNVALID_NAME_LOG)
+    cmd = "fwutil install chassis component {} fw -y {}".format('INVALID_COMPONENT', fw_path)
+    execute_invalid_command(duthost, cmd, FW_INSTALL_INVALID_NAME_LOG)
 
     # invalid path
     logger.info("Verify invalid path case")
     cmd = "fwutil install chassis component {} fw -y {}".format(comp_name, '/this/is/invalid/path')
-    execute_invalid_update_command(duthost, cmd, UNVALID_PATH_LOG)
+    execute_invalid_command(duthost, cmd, FW_INSTALL_INVALID_PATH_LOG)
 
     # invalid url
     logger.info("Verify invalid url case")
     cmd = "fwutil install chassis component {} fw -y {}".format(comp_name, 'http://this/is/invalid/url')
-    execute_invalid_update_command(duthost, cmd, UNVALID_URL_LOG)
+    execute_invalid_command(duthost, cmd, FW_INSTALL_INVALID_URL_LOG)
 
 
 @pytest.mark.disable_loganalyzer
-def test_update_positive(request, skip_if_no_update, setup_images):
+@pytest.mark.parametrize("component_firmware", [ FW_TYPE_UPDATE ], indirect=True)
+def test_update_positive(request, skip_if_no_update, component_firmware, setup_images):
     """
     Verify firmware update from current/next image
     """
@@ -136,40 +91,40 @@ def test_update_positive(request, skip_if_no_update, setup_images):
 
 
 @pytest.mark.disable_loganalyzer
-def test_update_negative(request, duthost, backup_platform_file):
+def test_update_negative(request, duthost, component_object, backup_platform_file):
     """
     Verify that firmware utility is able to handle
     invalid 'platform_components.json' file as expected
     """
-    platform_type = duthost.facts['platform']
-    cmd = 'fwutil update -y'
+    comp_name = component_object.get_name()
+    cmd = "fwutil update chassis component {} fw -y".format(comp_name)
 
     # invalid platform schema
     logger.info("Verify invalid platform schema case")
     generate_invalid_components_file(
         request,
         chassis_key='INVALID_CHASSIS',
-        platform_type=platform_type,
+        component_key='component',
         is_valid_comp_structure=True
     )
-    execute_invalid_update_command(duthost, cmd, INVALID_PLATFORM_SCHEMA_LOG)
+    execute_invalid_command(duthost, cmd, FW_UPDATE_INVALID_PLATFORM_SCHEMA_LOG)
 
     # invalid chassis schema
     logger.info("Verify invalid chassis schema case")
     generate_invalid_components_file(
         request,
         chassis_key='chassis',
-        platform_type='INVALID_PLATFORM',
+        component_key='INVALID_COMPONENT',
         is_valid_comp_structure=True
     )
-    execute_invalid_update_command(duthost, cmd, INVALID_CHASSIS_SCHEMA_LOG)
+    execute_invalid_command(duthost, cmd, FW_UPDATE_INVALID_CHASSIS_SCHEMA_LOG)
 
     # invalid components schema
     logger.info("Verify invalid components schema case")
     generate_invalid_components_file(
         request,
         chassis_key='chassis',
-        platform_type=platform_type,
+        component_key='component',
         is_valid_comp_structure=False
     )
-    execute_invalid_update_command(duthost, cmd, INVALID_COMPONENT_SCHEMA_LOG)
+    execute_invalid_command(duthost, cmd, FW_UPDATE_INVALID_COMPONENT_SCHEMA_LOG)
