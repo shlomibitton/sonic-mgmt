@@ -3,6 +3,7 @@
 lab: lab_connection_graph.xml
 example_ixia: example_ixia_connection_graph.xml
 
+inventory: lab_connection_graph.xml
 
 
 # Specify all internal mappings below
