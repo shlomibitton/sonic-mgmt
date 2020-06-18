@@ -29,15 +29,21 @@ class AnsibleHostBase(object):
     on the host.
     """
 
-    def __init__(self, ansible_adhoc, hostname, connection=None):
+    def __init__(self, ansible_adhoc, hostname, connection=None, become_user=None):
         if hostname == 'localhost':
             self.host = ansible_adhoc(connection='local', host_pattern=hostname)[hostname]
         else:
             if connection is None:
-                self.host = ansible_adhoc(become=True)[hostname]
+                if become_user is None:
+                    self.host = ansible_adhoc(become=True)[hostname]
+                else:
+                    self.host = ansible_adhoc(become=True, become_user=become_user)[hostname]
             else:
                 logging.debug("connection {} for {}".format(connection, hostname))
-                self.host = ansible_adhoc(become=True, connection=connection)[hostname]
+                if become_user is None:
+                    self.host = ansible_adhoc(become=True, connection=connection)[hostname]
+                else:
+                    self.host = ansible_adhoc(become=True, connection=connection, become_user=become_user)[hostname]
         self.hostname = hostname
 
     def __getattr__(self, item):
@@ -108,18 +114,14 @@ class SonicHost(AnsibleHostBase):
     and also provides the ability to run Ansible modules on the SONiC device.
     """
 
-    # TODO: Because people are editing this variable in a bunch of places it should probably be
-    # revised to "DEFAULT_CRITICAL_SERVICES", and we should make critical_services a property of
-    # SonicHost
-    CRITICAL_SERVICES = ["swss", "syncd", "database", "teamd", "bgp", "pmon", "lldp", "snmp"]
+    _DEFAULT_CRITICAL_SERVICES = ["swss", "syncd", "database", "teamd", "bgp", "pmon", "lldp", "snmp"]
 
     def __init__(self, ansible_adhoc, hostname):
         AnsibleHostBase.__init__(self, ansible_adhoc, hostname)
         self._facts = self._gather_facts()
         self._os_version = self._get_os_version()
 
-        if self.facts["num_npu"] > 1:
-            self._update_critical_services_for_multi_npu()
+        self.reset_critical_services_tracking_list()
 
     @property
     def facts(self):
@@ -151,6 +153,46 @@ class SonicHost(AnsibleHostBase):
 
         return self._os_version
 
+    @property
+    def critical_services(self):
+        """
+        The critical services running on this SONiC device.
+
+        Note:
+            This list is used for tracking purposes ONLY. This list does not
+            show which critical services are currently running. See the
+            critical_services_status method for that info.
+
+        Returns:
+            list[str]: A list of the critical services (e.g. ["swss", "syncd"])
+        """
+
+        return self._critical_services
+
+    @critical_services.setter
+    def critical_services(self, var):
+        """
+        Updates the list of critical services running on this device.
+
+        Note:
+            This list is used for tracking purposes ONLY. Updating the list does
+            not actually modify any services running on the device.
+        """
+
+        if self.facts["num_npu"] > 1:
+            self._critical_services = self._generate_critical_services_for_multi_npu(var)
+        else:
+            self._critical_services = var
+
+        logging.debug(self._critical_services)
+
+    def reset_critical_services_tracking_list(self):
+        """
+        Resets the list of critical services to the default.
+        """
+
+        self.critical_services = self._DEFAULT_CRITICAL_SERVICES
+
     def _gather_facts(self):
         """
         Gather facts about the platform for this SONiC device.
@@ -181,18 +223,21 @@ class SonicHost(AnsibleHostBase):
         except:
             return 1
 
-    def _update_critical_services_for_multi_npu(self):
+    def _generate_critical_services_for_multi_npu(self, services):
         """
-        Updates the critical services for this device with the services for multi-npu platforms.
+        Generates a fully-qualified list of critical services for multi-npu platforms, based on a
+        base list of services.
+
+        Example:
+        ["swss", "syncd"] -> ["swss0", "swss1", "swss2", "syncd0", "syncd1", "syncd2"]
         """
 
         m_service = []
-        for service in self.CRITICAL_SERVICES:
+        for service in services:
             for npu in self.facts["num_npu"]:
                 npu_service = service + npu
                 m_service.insert(npu, npu_service)
-        self.CRITICAL_SERVICES = m_service
-        logging.debug(self.CRITICAL_SERVICES)
+        return m_service
 
     def _get_platform_info(self):
         """
@@ -260,7 +305,7 @@ class SonicHost(AnsibleHostBase):
 
     def critical_services_status(self):
         result = {}
-        for service in self.CRITICAL_SERVICES:
+        for service in self.critical_services:
             result[service] = self.is_service_fully_started(service)
         return result
 
@@ -317,7 +362,7 @@ class SonicHost(AnsibleHostBase):
         @summary: Check whether all critical processes status for all critical services
         """
         result = {}
-        for service in self.CRITICAL_SERVICES:
+        for service in self.critical_services:
             result[service] = self.critical_process_status(service)
         return result
 
@@ -541,7 +586,7 @@ default via fc00::7e dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
 
         # parse nexthops
         for l in rt:
-            m = re.search(r"(default|nexthop) via (\S+) dev (\S+)", l)
+            m = re.search(r"(default|nexthop)\s+via\s+(\S+)\s+dev\s+(\S+)", l)
             if m:
                 rtinfo['nexthops'].append((ipaddress.ip_address(m.group(2)), m.group(3)))
 
@@ -725,14 +770,14 @@ class OnyxHost(AnsibleHostBase):
     def shutdown(self, interface_name):
         out = self.host.onyx_config(
             lines=['shutdown'],
-            parents='interface ethernet %s' % interface_name)
+            parents='interface %s' % interface_name)
         logging.info('Shut interface [%s]' % interface_name)
         return out
 
     def no_shutdown(self, interface_name):
         out = self.host.onyx_config(
             lines=['no shutdown'],
-            parents='interface ethernet %s' % interface_name)
+            parents='interface %s' % interface_name)
         logging.info('No shut interface [%s]' % interface_name)
         return out
 
