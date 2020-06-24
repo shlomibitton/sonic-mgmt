@@ -37,6 +37,12 @@ LOG_EXPECT_FAN_OVER_SPEED_RE = '.*Fan over speed warning:*'
 LOG_EXPECT_FAN_OVER_SPEED_CLEAR_RE = '.*Fan over speed warning cleared:.*'
 
 
+LOG_IGNORE_MELLANOX = ['.*Reg cmd access failed.*',
+                       '.*Could not acquire lock.*',
+                       '.*Failed to query PWM duty.*',
+                       '.*ERR pmon#sensord: Error getting sensor data.*']
+
+
 def check_sensord_status(ans_host):
     """
     @summary: Check sensord running status by analyzing the output of "ps -x" and return the PID if it's running
@@ -95,6 +101,25 @@ def psu_test_setup_teardown(duthost):
             assert False, "Failed to restart sensord task after test."
     else:
         logging.info("sensord is running, pid = {}".format(sensord_pid))
+
+
+@pytest.fixture
+def customize_loganalyzer(duthost, request):
+    loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix=request.node.name)
+    logging.info("Add start marker into DUT syslog")
+    marker = loganalyzer.init()
+    yield loganalyzer
+    logging.info("Load config and analyze log")
+    # Read existed common regular expressions located with legacy loganalyzer module
+    loganalyzer.load_common_config()
+
+    platform = duthost.facts['platform']
+
+    if 'mlnx' in platform:
+        loganalyzer.ignore_regex.extend(LOG_IGNORE_MELLANOX)
+    # Parse syslog and process result. Raise "LogAnalyzerError" exception if: total match or expected missing
+    # match is not equal to zero
+    loganalyzer.analyze(marker)
 
 
 def test_show_platform_summary(duthost):
@@ -374,7 +399,8 @@ def check_thermal_control_load_invalid_file(duthost, file_name):
             restart_thermal_control_daemon(duthost)
 
 
-def test_thermal_control_psu_absence(duthost, psu_controller, mocker_factory):
+@pytest.mark.disable_loganalyzer
+def test_thermal_control_psu_absence(duthost, psu_controller, mocker_factory, customize_loganalyzer):
     """
     @summary: Turn off/on PSUs, check thermal control is working as expect.
     """
