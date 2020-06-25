@@ -1,0 +1,10 @@
+---
+# This playbook is for teardown SONiC extensions.
+# - What Just Happened
+
+- hosts: sonic
+  tasks:
+    - block:
+        - name: Remove what-just-happened configurations
+          become: True
+          command: "dpkg --purge {{ wjh_package_name }}"

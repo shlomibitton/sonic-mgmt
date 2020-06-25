@@ -1,0 +1,39 @@
+---
+# this playbook is for installing WJH package on DUT.
+
+- hosts: sonic
+  tasks:
+    - block:
+        - set_fact:
+            tmp_folder: "/tmp/"
+        - set_fact:
+            filename: "{{ wjh_deb_url | basename }}"
+        - set_fact:
+            tmp_path: "{{ tmp_folder }}{{ filename }}"
+
+        - name: Download WJH package to tmp folder on container.
+          get_url:
+            url: "{{ wjh_deb_url }}"
+            dest: "{{ tmp_folder }}"
+            force: yes
+          run_once: True
+          delegate_to: localhost
+
+        - name: Copy package to DUT.
+          copy: src={{ tmp_path }}
+                dest=/home/admin
+          become: true
+
+        - name: Remove the package from container
+          file:
+            path: "{{ tmp_path }}"
+            state: absent
+          delegate_to: localhost
+
+        - name: Dpkg WJH debian file
+          become: True
+          command: "dpkg -i {{ filename }}"
+
+        - name: Enabled what-just-happened feature
+          become: True
+          command: "config feature what-just-happened enabled"
