@@ -377,13 +377,15 @@ class QosSaiBase:
         def updateIptablesDropRule(duthost, ipVersion,  state='present'):
             duthost.iptables(
                 ip_version=ipVersion,
-                action="Append",
+                action="insert",
+                rule_num="1",
                 chain="INPUT",
                 jump="DROP",
                 protocol="tcp",
                 destination_port="bgp",
                 state=state
             )
+
 
         ipVersions  = [{"ipVersion": "ipv4"}, {"ipVersion": "ipv6"}]
 
@@ -445,6 +447,28 @@ class QosSaiBase:
         logger.info("Start lldp, lldp-syncd, and bgpd services")
         for service in services:
             updateDockerService(duthost, action="start", **service)
+
+    @pytest.fixture(autouse=True)
+    def updateLoganalyzerExceptions(self, duthost, loganalyzer):
+        """
+            Update loganalyzer ignore regex list
+
+            Args:
+                duthost (AnsibleHost): Device Under Test (DUT)
+                loganalyzer (Fixture): log analyzer fixture
+
+            Returns:
+                None
+        """
+        ignoreRegex = [
+            ".*ERR monit.*'lldpd_monitor' process is not running",
+            ".*ERR monit.*'lldp_syncd' process is not running",
+            ".*ERR monit.*'bgpd' process is not running",
+            ".*ERR monit.*'bgpcfgd' process is not running",
+        ]
+        loganalyzer.ignore_regex.extend(ignoreRegex)
+
+        yield
 
     @pytest.fixture(scope='class', autouse=True)
     def disablePacketAging(self, duthost, stopServices):
@@ -512,19 +536,6 @@ class QosSaiBase:
             "portSpeedCableLength": portSpeedCableLength,
         }
 
-    @pytest.fixture(scope='class', autouse=True)
-    def copyPtfDirectory(self, ptfhost):
-        """
-            Copys PTF directory to PTF host. This class-scope fixture runs once before test start
- 
-            Args:
-                ptfhost (AnsibleHost): Packet Test Framework (PTF)
-
-            Returns:
-                None
-        """
-        ptfhost.copy(src="ptftests", dest="/root")
-
     @pytest.fixture(scope='class')
     def ptfPortMapFile(self, request, duthost, ptfhost):
         """
@@ -556,19 +567,6 @@ class QosSaiBase:
         yield "/root/{}".format(portMapFile.split('/')[-1])
 
     @pytest.fixture(scope='class', autouse=True)
-    def copySaiTests(self, ptfhost):
-        """
-            Copys SAI directory to PTF host. This class-scope fixture runs once before test start
- 
-            Args:
-                ptfhost (AnsibleHost): Packet Test Framework (PTF)
- 
-            Returns:
-                None
-        """
-        ptfhost.copy(src="saitests", dest="/root")
-
-    @pytest.fixture(scope='class', autouse=True)
     def dutTestParams(self, duthost, testbed, ptfPortMapFile):
         """
             Prepares DUT host test params
@@ -595,19 +593,6 @@ class QosSaiBase:
                 "sonic_asic_type": duthost.facts['asic_type'],
             }
         }
-
-    @pytest.fixture(scope='class', autouse=True)
-    def changePtfhostMacAddresses(self, ptfhost):
-        """
-            Change MAC addresses (unique) on PTF host. This class-scope fixture runs once before test start
- 
-            Args:
-                ptfhost (AnsibleHost): Packet Test Framework (PTF)
- 
-            Returns:
-                None
-        """
-        ptfhost.script("scripts/change_mac.sh")
 
     @pytest.fixture(scope='class')
     def releaseAllPorts(self, ptfhost, dutTestParams, updateIptables):

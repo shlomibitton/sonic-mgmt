@@ -289,12 +289,9 @@ class AdvancedReboot:
         ]
         self.__transferTestDataFiles(testDataFiles, self.ptfhost)
 
-        self.__runScript(['remove_ip.sh', 'change_mac.sh'], self.ptfhost)
+        self.__runScript(['remove_ip.sh'], self.ptfhost)
 
         self.__prepareTestbedSshKeys()
-
-        logger.info('Copy tests to the PTF container  {}'.format(self.ptfhost.hostname))
-        self.ptfhost.copy(src='ptftests', dest='/root')
 
         logger.info('Copy ARP responder to the PTF container  {}'.format(self.ptfhost.hostname))
         self.ptfhost.copy(src='scripts/arp_responder.py', dest='/opt')

@@ -46,14 +46,14 @@ class AnsibleHostBase(object):
                     self.host = ansible_adhoc(become=True, connection=connection, become_user=become_user)[hostname]
         self.hostname = hostname
 
-    def __getattr__(self, item):
-        if self.host.has_module(item):
-            self.module_name = item
-            self.module = getattr(self.host, item)
+    def __getattr__(self, module_name):
+        if self.host.has_module(module_name):
+            self.module_name = module_name
+            self.module = getattr(self.host, module_name)
 
             return self._run
-        else:
-            raise UnsupportedAnsibleModule("Unsupported module")
+
+        return super(AnsibleHostBase, self).__getattr__(module_name)
 
     def _run(self, *module_args, **complex_args):
 
@@ -642,6 +642,19 @@ default via fc00::7e dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
                 return True
         return False
 
+    def get_dut_iface_mac(self, iface_name):
+        """
+        Gets the MAC address of specified interface.
+
+        Returns:
+            str: The MAC address of the specified interface, or None if it is not found.
+        """
+        for iface, iface_info in self.setup()['ansible_facts'].items():
+            if iface_name in iface:
+                return iface_info["macaddress"]
+
+        return None
+
 class EosHost(AnsibleHostBase):
     """
     @summary: Class for Eos switch
@@ -649,54 +662,83 @@ class EosHost(AnsibleHostBase):
     For running ansible module on the Eos switch
     """
 
-    def __init__(self, ansible_adhoc, hostname, user, passwd, gather_facts=False):
-        AnsibleHostBase.__init__(self, ansible_adhoc, hostname, connection="network_cli")
-        evars = { 'ansible_connection':'network_cli', \
-                  'ansible_network_os':'eos', \
-                  'ansible_user': user, \
-                  'ansible_password': passwd, \
-                  'ansible_ssh_user': user, \
-                  'ansible_ssh_pass': passwd, \
-                  'ansible_become_method': 'enable' }
-        self.host.options['variable_manager'].extra_vars.update(evars)
+    def __init__(self, ansible_adhoc, hostname, eos_user, eos_passwd, shell_user=None, shell_passwd=None, gather_facts=False):
+        '''Initialize an object for interacting with EoS type device using ansible modules
+
+        Args:
+            ansible_adhoc (): The pytest-ansible fixture
+            hostname (string): hostname of the EOS device
+            eos_user (string): Username for accessing the EOS CLI interface
+            eos_passwd (string): Password for the eos_user
+            shell_user (string, optional): Username for accessing the Linux shell CLI interface. Defaults to None.
+            shell_passwd (string, optional): Password for the shell_user. Defaults to None.
+            gather_facts (bool, optional): Whether to gather some basic facts. Defaults to False.
+        '''
+        self.eos_user = eos_user
+        self.eos_passwd = eos_passwd
+        self.shell_user = shell_user
+        self.shell_passwd = shell_passwd
+        AnsibleHostBase.__init__(self, ansible_adhoc, hostname)
         self.localhost = ansible_adhoc(inventory='localhost', connection='local', host_pattern="localhost")["localhost"]
 
+    def __getattr__(self, module_name):
+        if module_name.startswith('eos_'):
+            evars = {
+                'ansible_connection':'network_cli',
+                'ansible_network_os':'eos',
+                'ansible_user': self.eos_user,
+                'ansible_password': self.eos_passwd,
+                'ansible_ssh_user': self.eos_user,
+                'ansible_ssh_pass': self.eos_passwd,
+                'ansible_become_method': 'enable'
+            }
+        else:
+            if not self.shell_user or not self.shell_passwd:
+                raise Exception("Please specify shell_user and shell_passwd for {}".format(self.hostname))
+            evars = {
+                'ansible_connection':'ssh',
+                'ansible_network_os':'linux',
+                'ansible_user': self.shell_user,
+                'ansible_password': self.shell_passwd,
+                'ansible_ssh_user': self.shell_user,
+                'ansible_ssh_pass': self.shell_passwd,
+                'ansible_become_method': 'sudo'
+            }
+        self.host.options['variable_manager'].extra_vars.update(evars)
+        return super(EosHost, self).__getattr__(module_name)
+
     def shutdown(self, interface_name):
-        out = self.host.eos_config(
+        out = self.eos_config(
             lines=['shutdown'],
             parents='interface %s' % interface_name)
         logging.info('Shut interface [%s]' % interface_name)
         return out
 
     def no_shutdown(self, interface_name):
-        out = self.host.eos_config(
+        out = self.eos_config(
             lines=['no shutdown'],
             parents='interface %s' % interface_name)
         logging.info('No shut interface [%s]' % interface_name)
         return out
 
     def check_intf_link_state(self, interface_name):
-        show_int_result = self.host.eos_command(
-            commands=['show interface %s' % interface_name])[self.hostname]
+        show_int_result = self.eos_command(
+            commands=['show interface %s' % interface_name])
         return 'Up' in show_int_result['stdout_lines'][0]
 
-    def command(self, cmd):
-        out = self.host.eos_command(commands=[cmd])
-        return out
-
     def set_interface_lacp_rate_mode(self, interface_name, mode):
-        out = self.host.eos_config(
+        out = self.eos_config(
             lines=['lacp rate %s' % mode],
             parents='interface %s' % interface_name)
         logging.info("Set interface [%s] lacp rate to [%s]" % (interface_name, mode))
         return out
 
     def kill_bgpd(self):
-        out = self.host.eos_config(lines=['agent Rib shutdown'])
+        out = self.eos_config(lines=['agent Rib shutdown'])
         return out
 
     def start_bgpd(self):
-        out = self.host.eos_config(lines=['no agent Rib shutdown'])
+        out = self.eos_config(lines=['no agent Rib shutdown'])
         return out
 
     def check_bgp_session_state(self, neigh_ips, neigh_desc, state="established"):
@@ -709,12 +751,12 @@ class EosHost(AnsibleHostBase):
         """
         neigh_ips_ok = []
         neigh_desc_ok = []
-        out_v4 = self.host.eos_command(
-            commands=['show ip bgp summary | json'])[self.hostname]
+        out_v4 = self.eos_command(
+            commands=['show ip bgp summary | json'])
         logging.info("ip bgp summary: {}".format(out_v4))
 
-        out_v6 = self.host.eos_command(
-            commands=['show ipv6 bgp summary | json'])[self.hostname]
+        out_v6 = self.eos_command(
+            commands=['show ipv6 bgp summary | json'])
         logging.info("ipv6 bgp summary: {}".format(out_v6))
 
         for k, v in out_v4['stdout'][0]['vrfs']['default']['peers'].items():
@@ -807,7 +849,7 @@ class OnyxHost(AnsibleHostBase):
         res = self.localhost.shell(cli_cmd)
 
         if res["localhost"]["rc"] != 0:
-            raise Exception("Unable to execute template\n{}".format(res["stdout"]))
+            raise Exception("Unable to execute template\n{}".format(res["localhost"]["stdout"]))
 
 
 class FanoutHost():
@@ -817,7 +859,7 @@ class FanoutHost():
     For running ansible module on the Fanout switch
     """
 
-    def __init__(self, ansible_adhoc, os, hostname, device_type, user, passwd):
+    def __init__(self, ansible_adhoc, os, hostname, device_type, user, passwd, shell_user=None, shell_passwd=None):
         self.hostname = hostname
         self.type = device_type
         self.host_to_fanout_port_map = {}
@@ -835,7 +877,10 @@ class FanoutHost():
         else:
             # Use eos host if the os type is unknown
             self.os = 'eos'
-            self.host = EosHost(ansible_adhoc, hostname, user, passwd)
+            self.host = EosHost(ansible_adhoc, hostname, user, passwd, shell_user=shell_user, shell_passwd=shell_passwd)
+
+    def __getattr__(self, module_name):
+        return getattr(self.host, module_name)
 
     def get_fanout_os(self):
         return self.os
@@ -844,13 +889,10 @@ class FanoutHost():
         return self.type
 
     def shutdown(self, interface_name):
-        return self.host.shutdown(interface_name)[self.hostname]
+        return self.host.shutdown(interface_name)
 
     def no_shutdown(self, interface_name):
-        return self.host.no_shutdown(interface_name)[self.hostname]
-
-    def command(self, cmd):
-        return self.host.command(cmd)[self.hostname]
+        return self.host.no_shutdown(interface_name)
 
     def __str__(self):
         return "{ os: '%s', hostname: '%s', device_type: '%s' }" % (self.os, self.hostname, self.type)
