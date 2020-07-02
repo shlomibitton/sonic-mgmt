@@ -5,13 +5,17 @@ import yaml
 import pytest
 from common.helpers.platform_api import watchdog
 
+pytestmark = [
+    pytest.mark.topology('any')
+]
+
 logger = logging.getLogger(__name__)
 
 TEST_CONFIG_FILE = os.path.join(os.path.split(__file__)[0], "watchdog.yml")
 TEST_WAIT_TIME_SECONDS = 2
 TIMEOUT_DEVIATION = 2
 
-class TestWatchdogAPI(object):
+class TestWatchdogApi(object):
     ''' Hardware watchdog platform API test cases '''
 
     @pytest.fixture(scope='function', autouse=True)
