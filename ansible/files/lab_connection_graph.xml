@@ -938,7 +938,7 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.114/22"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch1003">
-      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.27.248/22"/>
+      <ManagementIPInterface Name="ManagementIp" Prefix="10.210.25.43/22"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="arc-switch232-005">
       <ManagementIPInterface Name="ManagementIp" Prefix="0.0.0.0/0"/>

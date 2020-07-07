@@ -100,7 +100,7 @@ arc-switch1016    ansible_host=10.210.25.116 os=mellanox
 arc-switch1035    ansible_host=10.210.25.46 os=mellanox
 mts-sonic-fanout  ansible_host=10.9.74.64 os=mellanox
 arc-switch1039    ansible_host=10.210.25.47 os=mellanox
-arc-switch1003    ansible_host=10.210.27.248 os=mellanox
+arc-switch1003    ansible_host=10.210.25.43 os=mellanox
 arc-switchmtbc01  ansible_host=10.75.67.34 os=mellanox
 arc-switchmtbc02  ansible_host=10.75.67.41 os=mellanox
 r-panther-03      ansible_host=10.210.25.83 os=mellanox
