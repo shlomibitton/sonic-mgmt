@@ -344,6 +344,7 @@ def check_show_platform_temperature_output(lines):
         assert len(field_ranges) == 8, 'There must be 8 columns in output of show platform temperature'
 
 
+@pytest.mark.skip(reason="3800 MSFT SKU LACK of thermal data will fail this case")
 def test_show_platform_temperature(duthost, mocker_factory):
     """
     @summary: Check output of 'show platform temperature'
@@ -486,6 +487,7 @@ def turn_off_psu_and_check_thermal_control(dut, psu_ctrl, psu, mocker):
     time.sleep(5)
 
 
+@pytest.mark.skip(reason="Bug SW #2231735")
 @pytest.mark.disable_loganalyzer
 def test_thermal_control_fan_status(duthost, mocker_factory):
     """

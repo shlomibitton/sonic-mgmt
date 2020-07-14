@@ -37,3 +37,7 @@
         - name: Enabled what-just-happened feature
           become: True
           command: "config feature what-just-happened enabled"
+
+        - name: Save configuration
+          become: True
+          command: "config save -y"

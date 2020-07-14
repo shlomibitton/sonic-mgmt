@@ -115,8 +115,7 @@ def get_router_interface_ports(config_facts, testbed):
 
     return router_interface_ports
 
-
-@pytest.mark.parametrize("ipv4, ipv6, mtu", [pytest.param(True, True, 1514)])
+@pytest.mark.parametrize("ipv4, ipv6, mtu", [pytest.param(True, True, 128)])
 def test_basic_fib(testbed, duthost, ptfhost, ipv4, ipv6, mtu, config_facts, build_fib):
 
     timestamp = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
