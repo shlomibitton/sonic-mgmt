@@ -1,8 +1,8 @@
 import os
 import random
 import logging
-from ..thermal_control_test_helper import *
-from common.mellanox_data import SWITCH_MODELS
+from tests.platform_tests.thermal_control_test_helper import *
+from tests.common.mellanox_data import SWITCH_MODELS
 from minimum_table import MINIMUM_TABLE
 
 NOT_AVAILABLE = 'N/A'
@@ -924,7 +924,7 @@ class MinTableMocker(object):
             max_temp = int(range_str_list[1])
             if min_temp <= temperature <= max_temp:
                 return cooling_level - 10
-        
+
         return None
 
     def mock_min_table(self, temperature, trust_state):

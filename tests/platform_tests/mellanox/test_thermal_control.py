@@ -3,10 +3,11 @@ import operator
 import pytest
 import random
 import time
-from common.mellanox_data import SWITCH_MODELS
-from common.utilities import wait_until
-from ..thermal_control_test_helper import *
-from .mellanox_thermal_control_test_helper import MockerHelper, AbnormalFanMocker
+from tests.common.mellanox_data import SWITCH_MODELS
+from tests.common.plugins.loganalyzer.loganalyzer import LogAnalyzer
+from tests.common.utilities import wait_until
+from tests.platform_tests.thermal_control_test_helper import *
+from mellanox_thermal_control_test_helper import MockerHelper, AbnormalFanMocker
 
 pytestmark = [
     pytest.mark.topology('any')
