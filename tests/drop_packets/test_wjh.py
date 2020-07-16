@@ -4,7 +4,7 @@ import scapy
 import re
 import random
 from drop_packets import *
-from ptf.testutils import *
+from ptf.testutils import verify_no_packet_any
 from tests.common.helpers.assertions import pytest_assert
 
 logger = logging.getLogger(__name__)
