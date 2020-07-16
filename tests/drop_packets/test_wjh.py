@@ -4,7 +4,7 @@ import scapy
 import re
 import random
 from drop_packets import *
-from ptf.testutils import verify_no_packet_any
+from ptf.testutils import verify_no_packet_any, simple_ip_only_packet, simple_ipv4ip_packet
 from tests.common.helpers.assertions import pytest_assert
 
 logger = logging.getLogger(__name__)
