@@ -73,11 +73,11 @@ class TestWatchdogApi(object):
         assert not watchdog.is_armed(platform_api_conn)
 
         res = localhost.wait_for(host=duthost.hostname,
-                port=22, state='stopped', delay=5,
+                port=22, state="stopped", delay=5,
                 timeout=watchdog_timeout + TIMEOUT_DEVIATION,
-                msg='Switch stopped',
                 module_ignore_errors=True)
-        assert res.get('msg') == 'Switch stopped'
+
+        assert 'exception' in res
 
     def test_remaining_time(self, duthost, platform_api_conn, conf):
         ''' arm watchdog with a valid timeout and verify that remaining time API works correctly '''
@@ -173,14 +173,12 @@ class TestWatchdogApi(object):
 
         res = localhost.wait_for(host=duthost.hostname, port=22, state="stopped", delay=2,
                                  timeout=actual_timeout + TIMEOUT_DEVIATION,
-                                 msg='Switch did not stop',
                                  module_ignore_errors=True)
-        assert res.get('msg') != 'Switch did not stop'
+        assert 'exception' not in res
 
         res = localhost.wait_for(host=duthost.hostname, port=22, state="started", delay=10, timeout=120,
-                                 msg='Switch did not start',
                                  module_ignore_errors=True)
-        assert res.get('msg') != 'Switch did not start'
+        assert 'exception' not in res
 
         # wait for system to startup
         time.sleep(120)
