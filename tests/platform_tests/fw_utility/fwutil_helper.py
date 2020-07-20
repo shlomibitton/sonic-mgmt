@@ -9,8 +9,8 @@ import tempfile
 import ConfigParser
 import pytest
 
-from common.utilities import wait_until
-from common.plugins.loganalyzer.loganalyzer import LogAnalyzer, LogAnalyzerError
+from tests.common.utilities import wait_until
+from tests.common.plugins.loganalyzer.loganalyzer import LogAnalyzer, LogAnalyzerError
 
 PLATFORM_COMP_PATH_TEMPLATE = '/usr/share/sonic/device/{}/platform_components.json'
 
@@ -40,6 +40,23 @@ logger = logging.getLogger(__name__)
 
 
 class FwComponent(object):
+
+    def _kill_task(self, duthost, cmd, task, result):
+        """
+        Kill task
+        """
+        # W/A for ThreadPool().terminate()
+        try:
+            pid = duthost.command("pgrep -f '{}'".format(cmd))['stdout']
+            duthost.command("kill -s SIGKILL {}".format(pid))
+
+            result_json = json.dumps(result.get(timeout=5), indent=4)
+            logger.error("{} firmware task stucked:\n{}".format(self.get_name(), result_json))
+
+            task.terminate()
+            task.join()
+        except Exception as e:
+            pytest.fail("Failed to kill stucked {} firmware task: {}".format(self.get_name(), str(e)))
 
     def get_name(self):
         """
@@ -144,20 +161,14 @@ class OnieComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
 
-        # W/A for ThreadPool().terminate()
-        if 'failed' in result:
+        if 'Timeout' in result['msg']:
             try:
-                logger.error("Wait for {} to go down failed: try to kill possible stuck firmware task".format(hostname))
+                result_json = json.dumps(fw_result.get(timeout=0), indent=4)
+                logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
+            except:
+                self._kill_task(duthost, cmd, fw_task, fw_result)
 
-                pid = duthost.command("pgrep -f '{}'".format(cmd))['stdout']
-                duthost.command("kill -s SIGKILL {}".format(pid))
-
-                logger.info("Result of task:\n{}".format(json.dumps(fw_result.get(timeout=0), indent=4)))
-
-                fw_task.terminate()
-                fw_task.join()
-            except Exception as e:
-                pytest.fail("Failed to cleanup firmware task: {}".format(str(e)))
+            pytest.fail(result['msg'])
 
         logger.info("Wait for {} to come back".format(hostname))
         localhost.wait_for(host=hostname, port=22, state='started', delay=10, timeout=300)
@@ -356,20 +367,14 @@ class SsdComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
 
-        # W/A for ThreadPool().terminate()
-        if 'failed' in result:
+        if 'Timeout' in result['msg']:
             try:
-                logger.error("Wait for {} to go down failed: try to kill possible stuck firmware task".format(hostname))
+                result_json = json.dumps(fw_result.get(timeout=0), indent=4)
+                logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
+            except:
+                self._kill_task(duthost, cmd, fw_task, fw_result)
 
-                pid = duthost.command("pgrep -f '{}'".format(cmd))['stdout']
-                duthost.command("kill -s SIGKILL {}".format(pid))
-
-                logger.info("Result of task:\n{}".format(json.dumps(fw_result.get(timeout=0), indent=4)))
-
-                fw_task.terminate()
-                fw_task.join()
-            except Exception as e:
-                pytest.fail("Failed to cleanup firmware task: {}".format(str(e)))
+            pytest.fail(result['msg'])
 
         logger.info("Wait for {} to come back".format(hostname))
         localhost.wait_for(host=hostname, port=22, state='started', delay=10, timeout=300)
@@ -499,20 +504,14 @@ class BiosComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
 
-        # W/A for ThreadPool().terminate()
-        if 'failed' in result:
+        if 'Timeout' in result['msg']:
             try:
-                logger.error("Wait for {} to go down failed: try to kill possible stuck firmware task".format(hostname))
+                result_json = json.dumps(fw_result.get(timeout=0), indent=4)
+                logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
+            except:
+                self._kill_task(duthost, cmd, fw_task, fw_result)
 
-                pid = duthost.command("pgrep -f '{}'".format(cmd))['stdout']
-                duthost.command("kill -s SIGKILL {}".format(pid))
-
-                logger.info("Result of task:\n{}".format(json.dumps(fw_result.get(timeout=0), indent=4)))
-
-                fw_task.terminate()
-                fw_task.join()
-            except Exception as e:
-                pytest.fail("Failed to cleanup firmware task: {}".format(str(e)))
+            pytest.fail(result['msg'])
 
         logger.info("Wait for {} to come back".format(hostname))
         localhost.wait_for(host=hostname, port=22, state='started', delay=10, timeout=300)
@@ -756,20 +755,14 @@ class CpldComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=3000, module_ignore_errors=True)
 
-        # W/A for ThreadPool().terminate()
-        if 'failed' in result:
+        if 'Timeout' in result['msg']:
             try:
-                logger.error("Wait for {} to go down failed: try to kill possible stuck firmware task".format(hostname))
+                result_json = json.dumps(fw_result.get(timeout=0), indent=4)
+                logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
+            except:
+                self._kill_task(duthost, cmd, fw_task, fw_result)
 
-                pid = duthost.command("pgrep -f '{}'".format(cmd))['stdout']
-                duthost.command("kill -s SIGKILL {}".format(pid))
-
-                logger.info("Result of task:\n{}".format(json.dumps(fw_result.get(timeout=0), indent=4)))
-
-                fw_task.terminate()
-                fw_task.join()
-            except Exception as e:
-                pytest.fail("Failed to cleanup firmware task: {}".format(str(e)))
+            pytest.fail(result['msg'])
 
         logger.info("Wait for {} to come back".format(hostname))
         localhost.wait_for(host=hostname, port=22, state='started', delay=10, timeout=300)
