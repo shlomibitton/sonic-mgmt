@@ -46,6 +46,9 @@ ARC-HOST70 ansible_host=arc-host70
 [vm_host_16]
 R-MGTSWH-136 ansible_host=r-mgtswh-136
 
+[vm_host_17]
+R-SONIC-08 ansible_host=r-sonic-08
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -72,6 +75,7 @@ vm_host_13
 vm_host_14
 vm_host_15
 vm_host_16
+vm_host_17
 vm_host_50
 vm_host_52
 vm_host_54
@@ -560,6 +564,8 @@ VM1532 ansible_host=10.215.22.93
 
 [vms_16]
 
+[vms_17]
+
 [vms_50]
 VM5001 ansible_host=10.212.232.5
 VM5002 ansible_host=10.212.232.6
@@ -711,6 +717,13 @@ vms_16
 
 [server_16:vars]
 host_var_file=host_vars/R-MGTSWH-136.yml
+
+[server_17:children]
+vm_host_17
+vms_17
+
+[server_17:vars]
+host_var_file=host_vars/R-SONIC-08.yml
 
 [server_50:children]
 vm_host_50
