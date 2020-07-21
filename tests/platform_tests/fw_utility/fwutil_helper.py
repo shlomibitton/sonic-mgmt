@@ -161,7 +161,7 @@ class OnieComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
 
-        if 'Timeout' in result['msg']:
+        if 'msg' in result.keys() and 'Timeout' in result['msg']:
             try:
                 result_json = json.dumps(fw_result.get(timeout=0), indent=4)
                 logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
@@ -367,7 +367,7 @@ class SsdComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
 
-        if 'Timeout' in result['msg']:
+        if 'msg' in result.keys() and 'Timeout' in result['msg']:
             try:
                 result_json = json.dumps(fw_result.get(timeout=0), indent=4)
                 logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
@@ -504,7 +504,7 @@ class BiosComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=180, module_ignore_errors=True)
 
-        if 'Timeout' in result['msg']:
+        if 'msg' in result.keys() and 'Timeout' in result['msg']:
             try:
                 result_json = json.dumps(fw_result.get(timeout=0), indent=4)
                 logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
@@ -755,7 +755,7 @@ class CpldComponent(FwComponent):
         logger.info("Wait for {} to go down".format(hostname))
         result = localhost.wait_for(host=hostname, port=22, state='stopped', timeout=3000, module_ignore_errors=True)
 
-        if 'Timeout' in result['msg']:
+        if 'msg' in result.keys() and 'Timeout' in result['msg']:
             try:
                 result_json = json.dumps(fw_result.get(timeout=0), indent=4)
                 logger.error("{} firmware task failed:\n{}".format(self.get_name(), result_json))
