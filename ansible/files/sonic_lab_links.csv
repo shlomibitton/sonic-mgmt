@@ -796,12 +796,5 @@ r-tigris-06, Ethernet232, dummy-fanout-tigris, Ethernet59, 100000, 1739, Access
 r-tigris-06, Ethernet236, dummy-fanout-tigris, Ethernet60, 100000, 1740, Access
 r-tigris-06, Ethernet240, dummy-fanout-tigris, Ethernet61, 100000, 1741, Access
 r-tigris-06, Ethernet244, dummy-fanout-tigris, Ethernet62, 100000, 1742, Access
-r-tigris-06, Ethernet248, dummy-fanout-tigris, Ethernet63, 100000, 1743, Access
-r-tigris-06, Ethernet252, dummy-fanout-tigris, Ethernet64, 100000, 1744, Access
-dummy-fanout-tigris,Ethernet63,dummy-host-tigris,p5p1,100000,1681-1744,Trunk
-dummy-fanout-tigris,Ethernet64,dummy-host-tigris,p5p1,100000,1681-1744,Trunk
-
-
-
-TODOD CHANGE P5P1 TO THE RIGHT PORT NAME ON THE SERVER
-
+dummy-fanout-tigris,Ethernet63,dummy-host-tigris,p1p2,100000,1681-1744,Trunk
+dummy-fanout-tigris,Ethernet64,dummy-host-tigris,p1p1,100000,1681-1744,Trunk
