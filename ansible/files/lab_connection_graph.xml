@@ -63,7 +63,6 @@
       <Device Hostname="mtbc-r730-04" HwSku="TestServ" Type="Server"/>
       <Device Hostname="r-mgtswh-136" HwSku="TestServ" Type="Server"/>
       <Device Hostname="r-sonic-08" HwSku="TestServ" Type="Server">
-      <!-- TODO: Add the test server for tigris-06 -->
     </Devices>
     <DeviceInterfaceLinks>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1007" EndPort="ethernet 1/1" StartDevice="arc-switch1038" StartPort="Ethernet0"/>
@@ -613,9 +612,6 @@
       <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet236" StartDevice="r-tigris-06" StartPort="Ethernet236"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet240" StartDevice="r-tigris-06" StartPort="Ethernet240"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet244" StartDevice="r-tigris-06" StartPort="Ethernet244"/>
-      <!-- <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet248" StartDevice="r-tigris-06" StartPort="Ethernet248"/>
-      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet252" StartDevice="r-tigris-06" StartPort="Ethernet252"/> -->
-
 
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/1/1"  StartDevice="r-tigon-04" StartPort="Ethernet0"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/1/2"  StartDevice="r-tigon-04" StartPort="Ethernet2"/>
