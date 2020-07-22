@@ -10,9 +10,9 @@ import time
 
 import pytest
 
-from common.utilities import wait, wait_until
-from common.mellanox_data import SWITCH_MODELS as models
-from common.errors import RunAnsibleModuleFail
+from tests.common.utilities import wait, wait_until
+from tests.common.mellanox_data import SWITCH_MODELS as models
+from tests.common.errors import RunAnsibleModuleFail
 
 pytestmark = [pytest.mark.disable_loganalyzer]
 
