@@ -22,6 +22,7 @@
       <Device Hostname="r-leopard-01" HwSku="ACS-MSN4700" Type="DevSonic"/>
       <Device Hostname="r-tigon-04" HwSku="ACS-MSN4600C" Type="DevSonic"/>
       <Device Hostname="r-lionfish-07" HwSku="ACS-MSN3420" Type="DevSonic"/>
+      <Device Hostname="r-tigris-06" HwSku="ACS-MSN3800" Type="DevSonic"/>
       <Device Hostname="arc-switch1005" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1016" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1007" HwSku="MLNX-OS" Type="FanoutLeaf"/>
@@ -42,6 +43,7 @@
       <Device Hostname="mtbc-3700c-02" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-switch1003" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="dummy-fanout" HwSku="MLNX-OS" Type="FanoutLeaf"/>
+      <Device Hostname="dummy-fanout-tigris" HwSku="MLNX-OS" Type="FanoutLeaf"/>
       <Device Hostname="arc-host60" HwSku="TestServ" Type="Server"/>
       <Device Hostname="mts-sai-host-3" HwSku="TestServ" Type="Server"/>
       <Device Hostname="arc-host83" HwSku="TestServ" Type="Server"/>
@@ -60,6 +62,8 @@
       <Device Hostname="dev-r-vrt-233" HwSku="TestServ" Type="Server"/>
       <Device Hostname="mtbc-r730-04" HwSku="TestServ" Type="Server"/>
       <Device Hostname="r-mgtswh-136" HwSku="TestServ" Type="Server"/>
+      <Device Hostname="r-sonic-08" HwSku="TestServ" Type="Server">
+      <!-- TODO: Add the test server for tigris-06 -->
     </Devices>
     <DeviceInterfaceLinks>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1007" EndPort="ethernet 1/1" StartDevice="arc-switch1038" StartPort="Ethernet0"/>
@@ -546,6 +550,73 @@
       <DeviceInterfaceLink BandWidth="50000" EndDevice="r-anaconda-43" EndPort="ethernet 1/29/2" StartDevice="r-tigris-13" StartPort="Ethernet244"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="r-anaconda-43" EndPort="ethernet 1/30" StartDevice="r-tigris-13" StartPort="Ethernet248"/>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="r-anaconda-43" EndPort="ethernet 1/31" StartDevice="r-tigris-13" StartPort="Ethernet252"/>
+
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet0" StartDevice="r-tigris-06" StartPort="Ethernet0"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet4" StartDevice="r-tigris-06" StartPort="Ethernet4"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet8" StartDevice="r-tigris-06" StartPort="Ethernet8"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet12" StartDevice="r-tigris-06" StartPort="Ethernet12"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet16" StartDevice="r-tigris-06" StartPort="Ethernet16"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet20" StartDevice="r-tigris-06" StartPort="Ethernet20"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet24" StartDevice="r-tigris-06" StartPort="Ethernet24"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet28" StartDevice="r-tigris-06" StartPort="Ethernet28"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet32" StartDevice="r-tigris-06" StartPort="Ethernet32"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet36" StartDevice="r-tigris-06" StartPort="Ethernet36"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet40" StartDevice="r-tigris-06" StartPort="Ethernet40"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet44" StartDevice="r-tigris-06" StartPort="Ethernet44"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet48" StartDevice="r-tigris-06" StartPort="Ethernet48"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet52" StartDevice="r-tigris-06" StartPort="Ethernet52"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet56" StartDevice="r-tigris-06" StartPort="Ethernet56"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet60" StartDevice="r-tigris-06" StartPort="Ethernet60"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet64" StartDevice="r-tigris-06" StartPort="Ethernet64"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet68" StartDevice="r-tigris-06" StartPort="Ethernet68"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet72" StartDevice="r-tigris-06" StartPort="Ethernet72"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet76" StartDevice="r-tigris-06" StartPort="Ethernet76"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet80" StartDevice="r-tigris-06" StartPort="Ethernet80"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet84" StartDevice="r-tigris-06" StartPort="Ethernet84"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet88" StartDevice="r-tigris-06" StartPort="Ethernet88"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet92" StartDevice="r-tigris-06" StartPort="Ethernet92"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet96" StartDevice="r-tigris-06" StartPort="Ethernet96"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet100" StartDevice="r-tigris-06" StartPort="Ethernet100"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet104" StartDevice="r-tigris-06" StartPort="Ethernet104"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet108" StartDevice="r-tigris-06" StartPort="Ethernet108"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet112" StartDevice="r-tigris-06" StartPort="Ethernet112"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet116" StartDevice="r-tigris-06" StartPort="Ethernet116"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet120" StartDevice="r-tigris-06" StartPort="Ethernet120"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet124" StartDevice="r-tigris-06" StartPort="Ethernet124"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet128" StartDevice="r-tigris-06" StartPort="Ethernet128"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet132" StartDevice="r-tigris-06" StartPort="Ethernet132"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet136" StartDevice="r-tigris-06" StartPort="Ethernet136"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet140" StartDevice="r-tigris-06" StartPort="Ethernet140"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet144" StartDevice="r-tigris-06" StartPort="Ethernet144"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet148" StartDevice="r-tigris-06" StartPort="Ethernet148"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet152" StartDevice="r-tigris-06" StartPort="Ethernet152"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet156" StartDevice="r-tigris-06" StartPort="Ethernet156"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet160" StartDevice="r-tigris-06" StartPort="Ethernet160"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet164" StartDevice="r-tigris-06" StartPort="Ethernet164"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet168" StartDevice="r-tigris-06" StartPort="Ethernet168"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet172" StartDevice="r-tigris-06" StartPort="Ethernet172"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet176" StartDevice="r-tigris-06" StartPort="Ethernet176"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet180" StartDevice="r-tigris-06" StartPort="Ethernet180"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet184" StartDevice="r-tigris-06" StartPort="Ethernet184"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet188" StartDevice="r-tigris-06" StartPort="Ethernet188"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet192" StartDevice="r-tigris-06" StartPort="Ethernet192"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet196" StartDevice="r-tigris-06" StartPort="Ethernet196"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet200" StartDevice="r-tigris-06" StartPort="Ethernet200"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet204" StartDevice="r-tigris-06" StartPort="Ethernet204"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet208" StartDevice="r-tigris-06" StartPort="Ethernet208"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet212" StartDevice="r-tigris-06" StartPort="Ethernet212"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet216" StartDevice="r-tigris-06" StartPort="Ethernet216"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet220" StartDevice="r-tigris-06" StartPort="Ethernet220"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet224" StartDevice="r-tigris-06" StartPort="Ethernet224"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet228" StartDevice="r-tigris-06" StartPort="Ethernet228"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet232" StartDevice="r-tigris-06" StartPort="Ethernet232"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet236" StartDevice="r-tigris-06" StartPort="Ethernet236"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet240" StartDevice="r-tigris-06" StartPort="Ethernet240"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet244" StartDevice="r-tigris-06" StartPort="Ethernet244"/>
+      <!-- <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet248" StartDevice="r-tigris-06" StartPort="Ethernet248"/>
+      <DeviceInterfaceLink BandWidth="100000" EndDevice="dummy-fanout-tigris" EndPort="Ethernet252" StartDevice="r-tigris-06" StartPort="Ethernet252"/> -->
+
+
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/1/1"  StartDevice="r-tigon-04" StartPort="Ethernet0"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/1/2"  StartDevice="r-tigon-04" StartPort="Ethernet2"/>
       <DeviceInterfaceLink BandWidth="50000"  EndDevice="arc-switch1003" EndPort="ethernet 1/2/1"  StartDevice="r-tigon-04" StartPort="Ethernet8"/>
@@ -953,6 +1024,9 @@
       <ManagementIPInterface Name="ManagementIp" Prefix="0.0.0.0/0"/>
     </DevicesL3Info>
     <DevicesL3Info Hostname="dummy-fanout">
+      <ManagementIPInterface Name="ManagementIp" Prefix="0.0.0.0/0"/>
+    </DevicesL3Info>
+    <DevicesL3Info Hostname="dummy-fanout-tigris">
       <ManagementIPInterface Name="ManagementIp" Prefix="0.0.0.0/0"/>
     </DevicesL3Info>
     <DevicesL2Info Hostname="arc-switch1005">
@@ -1868,6 +1942,72 @@
       <InterfaceVlan mode="Access" portname="Ethernet232" vlanids="159"/>
       <InterfaceVlan mode="Access" portname="Ethernet236" vlanids="160"/>
       <InterfaceVlan mode="Trunk"  portname="Ethernet238" vlanids="101-160"/>
+    </DevicesL2Info>
+    <DevicesL2Info Hostname="dummy-fanout-tigris">
+      <InterfaceVlan mode="Access" portname="Ethernet0"   vlanids="101"/>
+      <InterfaceVlan mode="Access" portname="Ethernet4"   vlanids="102"/>
+      <InterfaceVlan mode="Access" portname="Ethernet8"   vlanids="103"/>
+      <InterfaceVlan mode="Access" portname="Ethernet12"  vlanids="104"/>
+      <InterfaceVlan mode="Access" portname="Ethernet16"  vlanids="105"/>
+      <InterfaceVlan mode="Access" portname="Ethernet20"  vlanids="106"/>
+      <InterfaceVlan mode="Access" portname="Ethernet24"  vlanids="107"/>
+      <InterfaceVlan mode="Access" portname="Ethernet28"  vlanids="108"/>
+      <InterfaceVlan mode="Access" portname="Ethernet32"  vlanids="109"/>
+      <InterfaceVlan mode="Access" portname="Ethernet36"  vlanids="110"/>
+      <InterfaceVlan mode="Access" portname="Ethernet40"  vlanids="111"/>
+      <InterfaceVlan mode="Access" portname="Ethernet44"  vlanids="112"/>
+      <InterfaceVlan mode="Access" portname="Ethernet48"  vlanids="113"/>
+      <InterfaceVlan mode="Access" portname="Ethernet52"  vlanids="114"/>
+      <InterfaceVlan mode="Access" portname="Ethernet56"  vlanids="115"/>
+      <InterfaceVlan mode="Access" portname="Ethernet60"  vlanids="116"/>
+      <InterfaceVlan mode="Access" portname="Ethernet64"  vlanids="117"/>
+      <InterfaceVlan mode="Access" portname="Ethernet68"  vlanids="118"/>
+      <InterfaceVlan mode="Access" portname="Ethernet72"  vlanids="119"/>
+      <InterfaceVlan mode="Access" portname="Ethernet76"  vlanids="120"/>
+      <InterfaceVlan mode="Access" portname="Ethernet80"  vlanids="121"/>
+      <InterfaceVlan mode="Access" portname="Ethernet84"  vlanids="122"/>
+      <InterfaceVlan mode="Access" portname="Ethernet88"  vlanids="123"/>
+      <InterfaceVlan mode="Access" portname="Ethernet92"  vlanids="124"/>
+      <InterfaceVlan mode="Access" portname="Ethernet96"  vlanids="125"/>
+      <InterfaceVlan mode="Access" portname="Ethernet100" vlanids="126"/>
+      <InterfaceVlan mode="Access" portname="Ethernet104" vlanids="127"/>
+      <InterfaceVlan mode="Access" portname="Ethernet108" vlanids="128"/>
+      <InterfaceVlan mode="Access" portname="Ethernet112" vlanids="129"/>
+      <InterfaceVlan mode="Access" portname="Ethernet116" vlanids="130"/>
+      <InterfaceVlan mode="Access" portname="Ethernet120" vlanids="131"/>
+      <InterfaceVlan mode="Access" portname="Ethernet124" vlanids="132"/>
+      <InterfaceVlan mode="Access" portname="Ethernet128" vlanids="133"/>
+      <InterfaceVlan mode="Access" portname="Ethernet132" vlanids="134"/>
+      <InterfaceVlan mode="Access" portname="Ethernet136" vlanids="135"/>
+      <InterfaceVlan mode="Access" portname="Ethernet140" vlanids="136"/>
+      <InterfaceVlan mode="Access" portname="Ethernet144" vlanids="137"/>
+      <InterfaceVlan mode="Access" portname="Ethernet148" vlanids="138"/>
+      <InterfaceVlan mode="Access" portname="Ethernet152" vlanids="139"/>
+      <InterfaceVlan mode="Access" portname="Ethernet156" vlanids="140"/>
+      <InterfaceVlan mode="Access" portname="Ethernet160" vlanids="141"/>
+      <InterfaceVlan mode="Access" portname="Ethernet164" vlanids="142"/>
+      <InterfaceVlan mode="Access" portname="Ethernet168" vlanids="143"/>
+      <InterfaceVlan mode="Access" portname="Ethernet172" vlanids="144"/>
+      <InterfaceVlan mode="Access" portname="Ethernet176" vlanids="145"/>
+      <InterfaceVlan mode="Access" portname="Ethernet180" vlanids="146"/>
+      <InterfaceVlan mode="Access" portname="Ethernet184" vlanids="147"/>
+      <InterfaceVlan mode="Access" portname="Ethernet188" vlanids="148"/>
+      <InterfaceVlan mode="Access" portname="Ethernet192" vlanids="149"/>
+      <InterfaceVlan mode="Access" portname="Ethernet196" vlanids="150"/>
+      <InterfaceVlan mode="Access" portname="Ethernet200" vlanids="151"/>
+      <InterfaceVlan mode="Access" portname="Ethernet204" vlanids="152"/>
+      <InterfaceVlan mode="Access" portname="Ethernet208" vlanids="153"/>
+      <InterfaceVlan mode="Access" portname="Ethernet212" vlanids="154"/>
+      <InterfaceVlan mode="Access" portname="Ethernet216" vlanids="155"/>
+      <InterfaceVlan mode="Access" portname="Ethernet220" vlanids="156"/>
+      <InterfaceVlan mode="Access" portname="Ethernet224" vlanids="157"/>
+      <InterfaceVlan mode="Access" portname="Ethernet228" vlanids="158"/>
+      <InterfaceVlan mode="Access" portname="Ethernet232" vlanids="159"/>
+      <InterfaceVlan mode="Access" portname="Ethernet236" vlanids="160"/>
+      <InterfaceVlan mode="Access" portname="Ethernet240" vlanids="161"/>
+      <InterfaceVlan mode="Access" portname="Ethernet244" vlanids="162"/>
+      <InterfaceVlan mode="Trunk"  portname="Ethernet248" vlanids="101-162"/>
+      <InterfaceVlan mode="Trunk"  portname="Ethernet252" vlanids="101-162"/>
     </DevicesL2Info>
     <DevicesL3Info Hostname="str-7260-11">
       <ManagementIPInterface Name="ManagementIp" Prefix="10.251.0.234/23"/>

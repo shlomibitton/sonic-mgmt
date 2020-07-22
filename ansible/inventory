@@ -89,6 +89,11 @@ arc-switch1029-ptf-any  ansible_host=arc-switch1029  sonic_version=v2  sonic_hws
 r-lionfish-07  ansible_host=r-lionfish-07  sonic_version=v2  sonic_hwsku=ACS-MSN3420 serial_console="ssh -l rcon:7034 10.208.0.49" ptf_host=ptf-dummy ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-186
 r-lionfish-07-ptf-any  ansible_host=r-lionfish-07  sonic_version=v2  sonic_hwsku=ACS-MSN3420 serial_console="ssh -l rcon:7034 10.208.0.49" ptf_host=ptf-dummy ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-186
 
+# MTR testbed r-tigris-06 topologies
+r-tigris-06  ansible_host=r-tigris-06  sonic_version=v2  sonic_hwsku=ACS-MSN3800 serial_console="ssh -l rcon:7032 10.208.0.85" ptf_host=ptf-dummy ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-182
+r-tigris-06-ptf-any  ansible_host=r-tigris-06  sonic_version=v2  sonic_hwsku=ACS-MSN3800 serial_console="ssh -l rcon:7032 10.208.0.85" ptf_host=ptf-dummy ptf_portmap="roles/test/files/mlnx/sw1029_interface_to_front_map.ini" pdu_host=pdu-10-208-0-182
+
+
 # MTS testbed mts-sonic-dut topologies
 mts-sonic-dut ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-9-74-52
 mts-sonic-dut-t1 ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-9-74-52
@@ -258,6 +263,10 @@ r-tigon-04-ptf32
 r-lionfish-07
 r-lionfish-07-ptf-any
 
+# MTR r-tigris-06 topologies
+r-tigris-06
+r-tigris-06-ptf-any
+
 # MTS testbed mts-sonic-dut topologies
 mts-sonic-dut
 mts-sonic-dut-t0
@@ -389,6 +398,10 @@ r-tigon-04-ptf32
 r-lionfish-07
 r-lionfish-07-ptf-any
 
+# MTR r-tigris-06 topologies
+r-tigris-06
+r-tigris-06-ptf-any
+
 # MTR arc-switch1041 topologies
 arc-switch1041
 arc-switch1041-t0
@@ -494,7 +507,7 @@ ptf-1041 ansible_host=10.213.86.93 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-r-tigon-04 ansible_host=10.213.84.61 ansible_ssh_user=root ansible_ssh_pass=root
 10.213.84.61 ansible_host=10.213.84.61 ansible_ssh_user=root ansible_ssh_pass=root
 
-# MTR r-lionfish-07 PTF host
+# MTR r-lionfish-07, r-tigris-06 PTF host
 ptf-dummy ansible_host=1.1.1.1 ansible_ssh_user=root ansible_ssh_pass=root
 1.1.1.1 ansible_host=1.1.1.1 ansible_ssh_user=root ansible_ssh_pass=root
 

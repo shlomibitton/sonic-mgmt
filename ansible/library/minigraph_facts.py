@@ -151,7 +151,7 @@ def parse_dpg(dpg, hname):
             else:
                 intf['mask'] = str(prefix_len)
             intf.update({'attachto': intfname, 'prefixlen': int(prefix_len)})
-                    
+
             # TODO: remove peer_addr after dependency removed
             ipaddr_val = int(ipn.ip)
             peer_addr_val = None
@@ -165,7 +165,7 @@ def parse_dpg(dpg, hname):
                     peer_addr_val = ipaddr_val + 1
                 else:
                     peer_addr_val = ipaddr_val - 1
-                    
+
             if peer_addr_val is not None:
                 intf['peer_addr'] = ipaddress.IPAddress(peer_addr_val)
             intfs.append(intf)
@@ -701,6 +701,9 @@ def parse_xml(filename, hostname):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 8)
         elif hostname == "r-lionfish-07":
             for i in range(1, 61):
+                port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
+        elif hostname == "r-tigris-06":
+            for i in range(1,65):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
         else:
             for i in range(1, 33):

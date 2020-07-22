@@ -18,4 +18,5 @@ r-panther-03,10.210.25.83/22,Mellanox-2700,FanoutLeaf
 r-tigris-17,10.210.25.57/22,Mellanox-3800,FanoutLeaf
 r-anaconda-43,10.210.25.21/22,ACS-MSN3700,FanoutLeaf
 dummy-fanout,1.1.1.1/22,ACS-MSN3700,FanoutLeaf
+dummy-fanout-tigris,1.1.1.1/22,ACS-MSN3700,FanoutLeaf
 r-leopard-20,10.210.25.114/22,ACS-MSN4700,FanoutLeaf
