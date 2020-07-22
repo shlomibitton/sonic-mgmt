@@ -62,7 +62,7 @@
       <Device Hostname="dev-r-vrt-233" HwSku="TestServ" Type="Server"/>
       <Device Hostname="mtbc-r730-04" HwSku="TestServ" Type="Server"/>
       <Device Hostname="r-mgtswh-136" HwSku="TestServ" Type="Server"/>
-      <Device Hostname="r-sonic-08" HwSku="TestServ" Type="Server">
+      <Device Hostname="r-sonic-08" HwSku="TestServ" Type="Server"/>
     </Devices>
     <DeviceInterfaceLinks>
       <DeviceInterfaceLink BandWidth="100000" EndDevice="arc-switch1007" EndPort="ethernet 1/1" StartDevice="arc-switch1038" StartPort="Ethernet0"/>
