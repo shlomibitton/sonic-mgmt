@@ -19,16 +19,15 @@ erspan_dest: ['10.0.0.7']
 
 radius_servers: []
 
-tacacs_servers: ['10.0.0.9', '10.0.0.8']
+tacacs_servers: ['10.7.34.20']
+tacacs_passkey: testing-tacacs
 
-tacacs_passkey: testing123
-tacacs_rw_user: test_rwuser
-tacacs_rw_user_passwd: '123456'
-tacacs_ro_user: test_rouser
-tacacs_ro_user_passwd: '123456'
+tacacs_rw_user: sadmin
+tacacs_rw_user_passwd: 'sadmin'
 
-# tacacs grous
-tacacs_group: 'testlab'
+tacacs_ro_user: sadmin
+tacacs_ro_user_passwd: 'sadmin'
+tacacs_group: "sonicadmin"
 
 # snmp servers
 snmp_servers: ['10.0.0.9']
