@@ -8,12 +8,14 @@ from tests.common.plugins.loganalyzer.loganalyzer import LogAnalyzer
 from tests.common.utilities import wait_until
 from tests.platform_tests.thermal_control_test_helper import *
 from mellanox_thermal_control_test_helper import MockerHelper, AbnormalFanMocker
+from tabulate import tabulate
+import re
 
 pytestmark = [
     pytest.mark.topology('any')
 ]
 
-THERMAL_CONTROL_TEST_WAIT_TIME = 65
+THERMAL_CONTROL_TEST_WAIT_TIME = 75
 THERMAL_CONTROL_TEST_CHECK_INTERVAL = 5
 
 COOLING_CUR_STATE_PATH = '/run/hw-management/thermal/cooling_cur_state'
@@ -80,7 +82,19 @@ def test_set_psu_fan_speed(duthost, mocker_factory):
     time.sleep(THERMAL_CONTROL_TEST_CHECK_INTERVAL)
     cooling_cur_state = get_cooling_cur_state(duthost)
     if cooling_cur_state == 10:
-        pytest.skip('Cooling level is still 10, ignore the rest test')
+        cmd_output = str(duthost.command('show platform temperature')['stdout_lines'])
+        cmd_output = cmd_output.replace("u'", "").replace(',', " ")
+        cmd_output = re.split(r'  +',cmd_output)
+        cmd_output.pop(0)
+        j = 0
+        table = []
+        while j != len(cmd_output):
+            entry = []
+            for i in range(8):
+                entry.append(cmd_output[j + i])
+            table.append(entry)
+            j += 8
+        pytest.skip('Cooling level is still 10, ignore the rest test.\nIt might happen because the asic temperature is still high.\nCurrent system temperature:\n{}'.format(tabulate(table)))
     logging.info('Cooling level changed to {}'.format(cooling_cur_state))
     current_speeds = []
     for index in range(psu_num):
