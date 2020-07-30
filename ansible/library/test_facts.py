@@ -108,7 +108,7 @@ class ParseTestbedTopoinfo():
         self.testbed_topo = defaultdict()
 
     def read_testbed_topo(self):
-        CSV_FIELDS = ('conf-name', 'group-name', 'topo', 'ptf_image_name', 'ptf', 'ptf_ip', 'server', 'vm_base', 'dut', 'comment')
+        CSV_FIELDS = ('conf-name', 'group-name', 'topo', 'ptf_image_name', 'ptf', 'ptf_ip', 'ptf_ipv6', 'server', 'vm_base', 'dut', 'comment')
         with open(self.testbed_filename) as f:
             topo = csv.DictReader(f, fieldnames=CSV_FIELDS, delimiter=',')
 
