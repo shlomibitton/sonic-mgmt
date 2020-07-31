@@ -45,6 +45,7 @@ class AdvancedReboot:
         self.localhost = localhost
         self.testbed = testbed
         self.creds = creds
+        self.enableContinuousIO = False # default value may get overwritten by value in kwargs
         self.__dict__.update(kwargs)
         self.__extractTestParam()
         self.rebootData = {}
@@ -122,8 +123,8 @@ class AdvancedReboot:
         self.rebootData['vlan_ip_range'] = self.mgFacts['minigraph_vlan_interfaces'][0]['subnet']
         self.rebootData['dut_vlan_ip'] = self.mgFacts['minigraph_vlan_interfaces'][0]['addr']
 
-        self.rebootData['dut_username'] = creds['sonicadmin_user']
-        self.rebootData['dut_password'] = creds['sonicadmin_password']
+        self.rebootData['dut_username'] = self.creds['sonicadmin_user']
+        self.rebootData['dut_password'] = self.creds['sonicadmin_password']
 
         # Change network of the dest IP addresses (used by VM servers) to be different from Vlan network
         prefixLen = self.mgFacts['minigraph_vlan_interfaces'][0]['prefixlen'] - 3
@@ -354,10 +355,9 @@ class AdvancedReboot:
             for log in logs:
                 host.fetch(**log)
 
-    def runRebootTestcase(self, prebootList=None, inbootList=None, prebootFiles=None):
+    def imageInstall(self, prebootList=None, inbootList=None, prebootFiles=None):
         '''
-        This method validates and prepare test bed for rebot test case. It runs the reboot test case using provided
-        test arguments
+        This method validates and prepares test bed for reboot test case.
         @param prebootList: list of operation to run before reboot process
         @param inbootList: list of operation to run during reboot prcoess
         @param prebootFiles: preboot files
@@ -380,6 +380,17 @@ class AdvancedReboot:
 
         # Handle mellanox platform
         self.__handleMellanoxDut()
+
+    def runRebootTestcase(self, prebootList=None, inbootList=None, prebootFiles=None):
+        '''
+        This method validates and prepares test bed for reboot test case. It runs the reboot test case using provided
+        test arguments
+        @param prebootList: list of operation to run before reboot process
+        @param inbootList: list of operation to run during reboot prcoess
+        @param prebootFiles: preboot files
+        '''
+
+        self.imageInstall(prebootList, inbootList, prebootFiles)
 
         # Run advanced-reboot.ReloadTest for item in preboot/inboot list
         for rebootOper in self.rebootData['sadList']:
@@ -422,7 +433,8 @@ class AdvancedReboot:
                 "dut_password" : self.rebootData['dut_password'],
                 "dut_hostname" : self.rebootData['dut_hostname'],
                 "reboot_limit_in_seconds" : self.rebootLimit,
-                "reboot_type" :self.rebootType,
+                "reboot_type" : self.rebootType,
+                "enable_continuous_io" : self.enableContinuousIO,
                 "portchannel_ports_file" : self.rebootData['portchannel_interfaces_file'],
                 "vlan_ports_file" : self.rebootData['vlan_interfaces_file'],
                 "ports_file" : self.rebootData['ports_file'],

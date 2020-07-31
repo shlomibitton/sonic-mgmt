@@ -306,16 +306,10 @@ def check_show_platform_fanstatus_output(lines):
         assert len(field_ranges) == 6, 'There must be 6 columns in output of show platform fans'
 
 
-def test_show_platform_fanstatus(duthost, mocker_factory):
+def test_show_platform_fanstatus_mocked(duthost, mocker_factory):
     """
     @summary: Check output of 'show platform fan'.
     """
-    # Do basic check first
-    logging.info("Check output of '%s'" % CMD_PLATFORM_FANSTATUS)
-    cli_fan_status = duthost.command(CMD_PLATFORM_FANSTATUS)
-    lines = cli_fan_status["stdout_lines"]
-    check_show_platform_fanstatus_output(lines)
-
     # Mock data and check
     mocker = mocker_factory(duthost, 'FanStatusMocker')
     if mocker is None:
@@ -345,14 +339,10 @@ def check_show_platform_temperature_output(lines):
 
 
 @pytest.mark.skip(reason="3800 MSFT SKU LACK of thermal data will fail this case")
-def test_show_platform_temperature(duthost, mocker_factory):
+def test_show_platform_temperature_mocked(duthost, mocker_factory):
     """
     @summary: Check output of 'show platform temperature'
     """
-    # Do basic check first
-    logging.info("Check output of '%s'" % CMD_PLATFORM_TEMPER)
-    cli_thermal_status = duthost.command(CMD_PLATFORM_TEMPER)
-
     # Mock data and check
     mocker = mocker_factory(duthost, 'ThermalStatusMocker')
     if mocker is None:

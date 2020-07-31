@@ -115,8 +115,8 @@ mtbc-sonic-01-2410-fastreboot,vm-t1,t0,docker-ptf-mlnx,ptf-mtbc02,10.75.207.41/2
 mtbc-sonic-03-2700-fastreboot,vm-t1,t0,docker-ptf-mlnx,ptf-mtbc03,10.75.207.38/24,,server_10,VM1001,mtbc-sonic-03-2700,Mellanox MTBC testbed
 mts-sonic-dut-fastreboot,vm-t1,t0,docker-ptf-mlnx,ptf-mts,10.9.78.237/24,,server_2,VM0201,mts-sonic-dut,Mellanox MTS testbed
 
-ptf1-m,ptf1,ptf32,docker-ptf-sai-mlnx,ptf-unknown,10.255.0.188/24,,server_1,str-msn2700-01,Test ptf Mellanox
-ptf2-b,ptf2,ptf64,docker-ptf-sai-brcm,ptf-unknown,10.255.0.189/24,,server_1,lab-s6100-01,Test ptf Broadcom
+ptf1-m,ptf1,ptf32,docker-ptf-sai-mlnx,ptf-unknown,10.255.0.188/24,,server_1,,str-msn2700-01,Test ptf Mellanox
+ptf2-b,ptf2,ptf64,docker-ptf-sai-brcm,ptf-unknown,10.255.0.189/24,,server_1,,lab-s6100-01,Test ptf Broadcom
 vms-sn2700-t1,vms1-1,t1,docker-ptf-sai-mlnx,ptf-unknown,10.255.0.178/24,,server_1,VM0100,str-msn2700-01,Tests Mellanox SN2700 vms
 vms-sn2700-t1-lag,vms1-1,t1-lag,docker-ptf-sai-mlnx,ptf-unknown,10.255.0.178/24,,server_1,VM0100,str-msn2700-01,Tests Mellanox SN2700 vms
 vms-sn2700-t0,vms1-1,t0,docker-ptf-sai-mlnx,ptf-unknown,10.255.0.178/24,,server_1,VM0100,str-msn2700-01,Tests Mellanox SN2700 vms
