@@ -126,7 +126,7 @@ def verify_show_platform_fan_output(raw_output_lines):
     @summary: Verify output of `show platform fan`. Expected output is
               "Fan Not detected" or a table of fan status data conaining 8 columns.
     """
-    NUM_EXPECTED_COLS = 8
+    NUM_EXPECTED_COLS = 6
 
     pytest_assert(len(raw_output_lines) > 0, "There must be at least one line of output")
     if len(raw_output_lines) == 1:
