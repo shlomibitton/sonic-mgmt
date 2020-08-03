@@ -23,8 +23,23 @@
     src: "{{ filename }}"
     dest: "{{ filename }}"
 
+- block:
+
+  - set_fact:
+      delimiter: "_"
+
+  - name: Check running image branch on DUT.
+    shell: "show version | grep 'SONiC Software Version:' | grep '201911'"
+    register: version
+    ignore_errors: true
+
+  - name: Set command syntax based on current image branch
+    when: version.rc != 0
+    set_fact:
+      delimiter: "-"
+
 - name: Extract version of the SONiC image file
-  command: sonic_installer binary_version {{ filename }}
+  command: sonic{{ delimiter }}installer binary{{ delimiter }}version {{ filename }}
   register: image_file_version
 
 - name: Remove SONiC image from local server.
@@ -40,7 +55,7 @@
 - block:
 
   - name: Update SONiC image.
-    command: sonic_installer install {{ filename }} -y
+    command: sonic{{ delimiter }}installer install {{ filename }} -y
     register: update_output
 
   - name: Show update result
@@ -60,7 +75,7 @@
   when: update_required
 
 - name: Ensure that target image is always default after reboot
-  command: sonic_installer set_default {{ image_file_version.stdout }}
+  command: sonic{{ delimiter }}installer set{{ delimiter }}default {{ image_file_version.stdout }}
 
 - name: Reboot device.
   command: reboot
