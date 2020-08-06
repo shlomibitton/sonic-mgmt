@@ -18,7 +18,6 @@ pytestmark = [
     pytest.mark.topology('any')
 ]
 
-CMD_PLATFORM_SUMMARY = "show platform summary"
 CMD_PLATFORM_PSUSTATUS = "show platform psustatus"
 CMD_PLATFORM_FANSTATUS = "show platform fan"
 CMD_PLATFORM_TEMPER = "show platform temperature"
@@ -139,6 +138,18 @@ def test_show_platform_summary(duthost):
         actual_fields.add(line.split(":")[0])
     assert actual_fields == expected_fields, \
         "Unexpected output fields, actual=%s, expected=%s" % (str(actual_fields), str(expected_fields))
+def get_psu_num(dut):
+    cmd_num_psu = "sudo psuutil numpsus"
+
+    logging.info("Check whether the DUT has enough PSUs for this testing")
+    psu_num_out = dut.command(cmd_num_psu)
+    psu_num = 0
+    try:
+        psu_num = int(psu_num_out["stdout"])
+    except:
+        assert False, "Unable to get the number of PSUs using command '%s'" % cmd_num_psu
+
+    return psu_num
 
 
 def check_vendor_specific_psustatus(dut, psu_status_line):
@@ -154,32 +165,6 @@ def check_vendor_specific_psustatus(dut, psu_status_line):
         psu_status = psu_match.group(2)
 
         check_psu_sysfs(dut, psu_id, psu_status)
-
-
-def test_show_platform_psustatus(duthost):
-    """
-    @summary: Check output of 'show platform psustatus'
-    """
-    logging.info("Check PSU status using '%s', hostname: %s" % (CMD_PLATFORM_PSUSTATUS, duthost.hostname))
-    psu_status = duthost.command(CMD_PLATFORM_PSUSTATUS)
-    psu_line_pattern = re.compile(r"PSU\s+\d+\s+(OK|NOT OK|NOT PRESENT)")
-    for line in psu_status["stdout_lines"][2:]:
-        assert psu_line_pattern.match(line), "Unexpected PSU status output"
-        check_vendor_specific_psustatus(duthost, line)
-
-
-def get_psu_num(dut):
-    cmd_num_psu = "sudo psuutil numpsus"
-
-    logging.info("Check whether the DUT has enough PSUs for this testing")
-    psu_num_out = dut.command(cmd_num_psu)
-    psu_num = 0
-    try:
-        psu_num = int(psu_num_out["stdout"])
-    except:
-        assert False, "Unable to get the number of PSUs using command '%s'" % cmd_num_psu
-
-    return psu_num
 
 
 def turn_all_psu_on(psu_ctrl):

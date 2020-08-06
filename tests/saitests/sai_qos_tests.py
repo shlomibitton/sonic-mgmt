@@ -1362,7 +1362,7 @@ class LossyQueueTest(sai_base_test.ThriftInterfaceDataPlane):
                 cell_occupancy = (packet_length + cell_size - 1) / cell_size
                 pkts_num_trig_egr_drp /= cell_occupancy
                 # It is possible that pkts_num_trig_egr_drp * cell_occupancy < original pkts_num_trig_egr_drp,
-                # which probaly can fail the assert(xmit_counters[EGRESS_DROP] > xmit_counters_base[EGRESS_DROP])
+                # which probably can fail the assert(xmit_counters[EGRESS_DROP] > xmit_counters_base[EGRESS_DROP])
                 # due to not sending enough packets.
                 # To avoid that we need a larger margin
         else:
@@ -1615,7 +1615,7 @@ class PGHeadroomWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             print >> sys.stderr, "lower bound: %d, actual value: %d, upper bound: %d" % ((expected_wm - margin) * cell_size, pg_headroom_wm_res[pg], ((expected_wm + margin) * cell_size))
             assert(expected_wm == total_hdrm)
             assert(pg_headroom_wm_res[pg] <= (expected_wm + margin) * cell_size)
-            assert(expected_wm * cell_size <= pg_headroom_wm_res[pg])
+            assert((expected_wm - margin) * cell_size <= pg_headroom_wm_res[pg])
 
         finally:
             sai_thrift_port_tx_enable(self.client, asic_type, [dst_port_id])
@@ -1714,7 +1714,7 @@ class QSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             send_packet(self, src_port_id, pkt, pkts_num)
             time.sleep(8)
             q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[dst_port_id])
-            print >> sys.stderr, "exceeded pkts num sent: %d, actual value: %d, expected watermark: %d" % (pkts_num, q_wm_res[queue], ((expected_wm + cell_occupancy) * cell_size))
+            print >> sys.stderr, "exceeded pkts num sent: %d, actual value: %d, lower bound: %d, upper bound: %d" % (pkts_num, q_wm_res[queue], expected_wm * cell_size, (expected_wm + margin) * cell_size)
             assert(fragment < cell_occupancy)
             assert(expected_wm * cell_size <= q_wm_res[queue])
             assert(q_wm_res[queue] <= (expected_wm + margin + cell_occupancy * 2) * cell_size)
