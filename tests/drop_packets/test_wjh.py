@@ -93,7 +93,9 @@ def get_agg_table_output(duthost):
     stdout = duthost.command("show what-just-happened poll --aggregate")
     if stdout['rc'] != 0:
         raise Exception(stdout['stdout'] + stdout['stderr'])
-    table_output = parse_wjh_table(stdout['stdout'])
+    splitted_table = stdout['stdout'].splitlines()[3:]
+    table = "\n".join(splitted_table)
+    table_output = parse_wjh_table(table)
     return table_output
 
 
