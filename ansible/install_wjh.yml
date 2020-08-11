@@ -36,7 +36,7 @@
 
         - name: Enabled what-just-happened feature
           become: True
-          command: "config feature what-just-happened enabled"
+          command: "config feature state what-just-happened enabled"
 
         - name: Save configuration
           become: True
