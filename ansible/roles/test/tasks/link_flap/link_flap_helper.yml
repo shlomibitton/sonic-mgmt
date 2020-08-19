@@ -12,6 +12,11 @@
         link_timeout: 20
       when: link_timeout is not defined
 
+    - name: Set link timeout for Mellanox spectrum 2 (RM 2257439)
+      set_fact:
+        link_timeout: 60
+      when: sonic_hwsku in mellanox_spc2_hwskus
+
     - name: Set default link delay
       set_fact:
         link_delay: 5
