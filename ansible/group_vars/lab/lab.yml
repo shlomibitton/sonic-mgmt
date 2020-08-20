@@ -22,8 +22,8 @@ radius_servers: []
 tacacs_servers: ['10.7.34.20']
 tacacs_passkey: testing-tacacs
 
-tacacs_rw_user: sadmin
-tacacs_rw_user_passwd: 'sadmin'
+tacacs_rw_user: rw_user_user
+tacacs_rw_user_passwd: 'rw_user_pwd'
 
 tacacs_ro_user: sadmin
 tacacs_ro_user_passwd: 'sadmin'
