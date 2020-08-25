@@ -24,26 +24,9 @@ dev-simx-host01-vm01  ansible_host=10.75.206.118 ansible_hostv6="" type=simx son
 [sonic_sn2700_40]
 str-msn2700-01    ansible_host=10.251.0.188 serial="MT1234X56789" base_mac="24:8a:07:12:34:56" syseeprom_info="{'0xFE': '0xFBA1E964', '0x28': 'x86_64-mlnx_x86-r0', '0x29': '2016.11-5.1.0008-9600', '0x22': 'MSN2700-CS2FO', '0x23': 'MT1234X56789', '0x21': 'MSN2700', '0x26': '0', '0x24': '24:8a:07:12:34:56', '0x25': '12/07/2016', '0x2B': 'Mellanox', '0x2A': '128'}"
 
-[sonic_s6100]
-lab-s6100-01      ansible_host=10.251.0.190
-vlab-02           ansible_host=10.250.0.102
-
-[sonic_s6100:vars]
-hwsku="Force10-S6100"
-iface_speed='40000'
-
-[sonic_a7260]
-lab-a7260-01      ansible_host=10.251.0.191    hwsku="Arista-7260CX3-D108C8"
-
-[sonic_a7260:vars]
-iface_speed='100000'
-
 [sonic:children]
 sonic_latest
 sonic_sn2700_40
-sonic_s6000
-sonic_s6100
-sonic_a7260
 
 [ptf]
 ptf_ptf1    ansible_host=10.255.0.188 ansible_ssh_user=root ansible_ssh_pass=root
@@ -98,4 +81,3 @@ mtbc-sonic-02-2700  ansible_host=10.75.67.45 os=mellanox
 mtbc-3700c-02       ansible_host=10.75.67.51 os=mellanox
 dummy-fanout        ansible_host=1.1.1.1 os=mellanox
 dummy-fanout-tigris ansible_host=1.1.1.1 os=mellanox
-
