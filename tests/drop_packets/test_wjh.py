@@ -235,7 +235,7 @@ def check_feature_enabled(duthost):
         pytest.skip("what-just-happened feature is not available. Skipping the test.")
 
 
-def test_tunnel_ip_in_ip(do_test, ptfadapter, duthost, setup, fanouthost, pkt_fields, ports_info):
+def test_tunnel_ip_in_ip(do_test, ptfadapter, duthost, setup, pkt_fields, ports_info):
     dst_ip = pkt_fields['ipv4_dst']
 
     # gather facts
