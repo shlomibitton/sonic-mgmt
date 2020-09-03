@@ -28,13 +28,13 @@
   - set_fact:
       delimiter: "_"
 
-  - name: Check running image branch on DUT.
-    shell: "show version | grep 'SONiC Software Version:' | grep '201911'"
-    register: version
+  - name: Check correct syntax for installer tool on DUT.
+    shell: "sonic_installer list"
+    register: syntax_output
     ignore_errors: true
 
   - name: Set command syntax based on current image branch
-    when: version.rc != 0
+    when: syntax_output.rc != 0
     set_fact:
       delimiter: "-"
 
