@@ -34,7 +34,7 @@
     ignore_errors: true
 
   - name: Set command syntax based on current image branch
-    when: syntax_output.rc != 0
+    when: syntax_output.stderr != ''
     set_fact:
       delimiter: "-"
 
