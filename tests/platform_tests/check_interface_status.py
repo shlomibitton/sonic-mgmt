@@ -8,8 +8,8 @@ import logging
 
 def parse_intf_status(lines):
     """
-    @summary: Parse the output of command "intfutil -c description".
-    @param lines: The output lines of command "intfutil -c description".
+    @summary: Parse the output of command "intfutil description".
+    @param lines: The output lines of command "intfutil description".
     @return: Return a dictionary like:
         {
             "Ethernet0": {
@@ -39,7 +39,7 @@ def check_interface_status(dut, interfaces):
     """
     logging.info("Check interface status using cmd 'intfutil'")
     mg_ports = dut.minigraph_facts(host=dut.hostname)["ansible_facts"]["minigraph_ports"]
-    output = dut.command("intfutil -c description")
+    output = dut.command("intfutil description")
     intf_status = parse_intf_status(output["stdout_lines"][2:])
     check_intf_presence_command = 'show interface transceiver presence {}'
     for intf in interfaces:
