@@ -17,12 +17,6 @@ arc-switch1041-ptf32,vm-t1,ptf32,docker-ptf-mlnx,ptf-1041,10.213.86.93/16,,serve
 
 arc-switch1029-ptf-any,vm-t1,ptf-any,docker-ptf-mlnx,ptf-boxer-sw01,10.213.88.5/16,,server_9,VM0901,arc-switch1029,Mellanox MTR testbed
 
-r-lionfish-07,vm-t1,ptf-any,docker-ptf-mlnx,ptf-dummy,1.1.1.1/16,,server_16,VM0000,r-lionfish-07,Mellanox MTR testbed
-r-lionfish-07-ptf-any,vm-t1,ptf-any,docker-ptf-mlnx,ptf-dummy,1.1.1.1/16,,server_16,VM0000,r-lionfish-07,Mellanox MTR testbed
-
-r-tigris-06,vm-t1,ptf-any,docker-ptf-mlnx,ptf-dummy,1.1.1.1/16,,server_17,VM0000,r-tigris-06,Mellanox MTR testbed
-r-tigris-06-ptf-any,vm-t1,ptf-any,docker-ptf-mlnx,ptf-dummy,1.1.1.1/16,,server_17,VM0000,r-tigris-06,Mellanox MTR testbed
-
 arc-switch1025-t0,vm-t1,t0,docker-ptf-mlnx,ptf-1025,10.213.84.213/16,,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
 arc-switch1025-t0-64-32,vm-t1,t0-64-32,docker-ptf-mlnx,ptf-1025,10.213.84.213/16,,server_6,arc-switch1025,Mellanox MTR testbed
 arc-switch1025-t1,vm-t1,t1,docker-ptf-mlnx,ptf-1025,10.213.84.213/16,,server_6,VM0601,arc-switch1025,Mellanox MTR testbed
