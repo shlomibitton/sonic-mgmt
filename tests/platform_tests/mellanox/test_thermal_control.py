@@ -123,8 +123,8 @@ def test_set_psu_fan_speed(duthost, mocker_factory):
 def get_psu_speed(dut, index):
     index = index + 1
     psu_speed_path = PSU_SPEED_PATH.format(index)
-    file_exists = dut.stat(path=psu_speed_path)
-    if not file_exists:
+    file_stat = dut.stat(path=psu_speed_path)
+    if not file_stat["stat"]["exists"]:
         return None
 
     cmd_output = dut.command('cat {}'.format(psu_speed_path))
