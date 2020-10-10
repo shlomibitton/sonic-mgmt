@@ -381,6 +381,23 @@ class AdvancedReboot:
         # Handle mellanox platform
         self.__handleMellanoxDut()
 
+    def runRebootTest(self):
+        # Run advanced-reboot.ReloadTest for item in preboot/inboot list
+        count = 0
+        for rebootOper in self.rebootData['sadList']:
+            count += 1
+            try:
+                result = self.__runPtfRunner(rebootOper)
+            finally:
+                # always capture the test logs
+                self.__fetchTestLogs(rebootOper)
+                self.__clearArpAndFdbTables()
+            if not result:
+                return result
+            if len(self.rebootData['sadList']) > 1 and count != len(self.rebootData['sadList']):
+                time.sleep(TIME_BETWEEN_SUCCESSIVE_TEST_OPER)
+        return result
+
     def runRebootTestcase(self, prebootList=None, inbootList=None, prebootFiles=None):
         '''
         This method validates and prepares test bed for reboot test case. It runs the reboot test case using provided
