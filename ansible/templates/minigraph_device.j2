@@ -15,7 +15,7 @@
           <MultiPortsInterface>false</MultiPortsInterface>
           <PortName>0</PortName>
           <Priority>0</Priority>
-{% if hwsku == 'ACS-MSN2410' %}
+{% if (inventory_hostname == "arc-mtbc-1001" or inventory_hostname == "mtbc-sonic-01-2410") %}
     {% if index >= 48 %}
           <Speed>100000</Speed>
     {% else %}
