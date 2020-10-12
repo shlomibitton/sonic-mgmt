@@ -128,7 +128,7 @@ def check_psu_sysfs(dut, psu_id, psu_state):
     else:
         from tests.common.mellanox_data import SWITCH_MODELS
         dut_hwsku = dut.facts["hwsku"]
-        hot_swappabe = SWITCH_MODELS[dut_hwsku]["psus"]["hot_swappable"]
+        hot_swappable = SWITCH_MODELS[dut_hwsku]["psus"]["hot_swappable"]
         if hot_swappable:
             psu_exist_content = dut.command("cat {}".format(psu_exist))
             logging.info("PSU state {} file {} read {}".format(psu_state, psu_exist, psu_exist_content["stdout"]))
