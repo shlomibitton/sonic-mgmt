@@ -2,8 +2,8 @@ import os
 import random
 import logging
 from tests.platform_tests.thermal_control_test_helper import *
-from tests.common.mellanox_data import SWITCH_MODELS
-from minimum_table import MINIMUM_TABLE
+from tests.common.mellanox_data import get_platform_data
+from minimum_table import get_min_table
 
 NOT_AVAILABLE = 'N/A'
 
@@ -256,6 +256,12 @@ class FanDrawerData:
         """
         self.index = index
         self.helper = mock_helper
+        self.platform_data = get_platform_data(self.helper.dut)
+        if self.platform_data['fans']['hot_swappable']:
+            self.name = 'drawer{}'.format(index)
+        else:
+            self.name = 'N/A'
+        self.fan_data_list = []
         self.mocked_presence = None
         self.mocked_direction = None
         if 'presence' in naming_rule:
@@ -289,8 +295,7 @@ class FanDrawerData:
         :param presence: Given presence value. 1 means present, 0 means not present.
         :return:
         """
-        dut_hwsku = self.helper.dut.facts["hwsku"]
-        always_present = not SWITCH_MODELS[dut_hwsku]['fans']['hot_swappable']
+        always_present = not self.platform_data['fans']['hot_swappable']
         if always_present:
             self.mocked_presence = 'Present'
         elif self.presence_file:
@@ -337,6 +342,10 @@ class FanDrawerData:
         else:
             assert 0, 'Invalid FAN led color for FAN: {}, green={}, red={}'.format(self.name, green_led_value,
                                                                                    red_led_value)
+
+    def get_expect_led_color(self):
+        if self.mocked_presence == 'Not Present':
+            return 'red'
 
 
 class FanData:
@@ -591,8 +600,17 @@ class RandomFanStatusMocker(FanStatusMocker):
                 logging.info('Failed to mock fan data: {}'.format(e))
                 continue
 
-        dut_hwsku = self.mock_helper.dut.facts["hwsku"]
-        psu_count = SWITCH_MODELS[dut_hwsku]["psus"]["number"]
+        """ Only support in master, commont this out for 201911 for now
+        # update led color here
+        for drawer_data in self.drawer_list:
+            for fan_data in drawer_data.fan_data_list:
+                if drawer_data.mocked_presence == 'Present':
+                    expected_data = self.expected_data[fan_data.name]
+                    expected_data[1] = drawer_data.get_expect_led_color()
+        """
+
+        platform_data = get_platform_data(self.mock_helper.dut)
+        psu_count = platform_data["psus"]["number"]
         naming_rule = FAN_NAMING_RULE['psu_fan']
         for index in range(1, psu_count + 1):
             try:
@@ -686,8 +704,8 @@ class RandomThermalStatusMocker(ThermalStatusMocker):
         Mock random data for all Thermals in this DUT.
         :return:
         """
-        dut_hwsku = self.mock_helper.dut.facts["hwsku"]
-        thermal_dict = SWITCH_MODELS[dut_hwsku]["thermals"]
+        platform_data = get_platform_data(self.mock_helper.dut)
+        thermal_dict = platform_data["thermals"]
         for category, content in thermal_dict.items():
             number = int(content['number'])
             naming_rule = THERMAL_NAMING_RULE[category]
@@ -834,8 +852,8 @@ class AbnormalFanMocker(SingleFanMocker):
         """
         :return: True if FAN is removable else False
         """
-        dut_hwsku = self.mock_helper.dut.facts["hwsku"]
-        return SWITCH_MODELS[dut_hwsku]['fans']['hot_swappable']
+        platform_data = get_platform_data(self.mock_helper.dut)
+        return platform_data['fans']['hot_swappable']
 
     def mock_all_normal(self):
         """
@@ -912,12 +930,12 @@ class MinTableMocker(object):
     FAN_AMB_PATH = 'fan_amb'
     PORT_AMB_PATH = 'port_amb'
     TRUST_PATH = 'module1_temp_fault'
+
     def __init__(self, dut):
         self.mock_helper = MockerHelper(dut)
 
     def get_expect_cooling_level(self, temperature, trust_state):
-        plat_name = self.mock_helper.dut.facts["platform"]
-        minimum_table = MINIMUM_TABLE[plat_name]
+        minimum_table = get_min_table(self.mock_helper.dut)
         row = minimum_table['unk_{}'.format('trust' if trust_state else 'untrust')]
         temperature = temperature / 1000
         for range_str, cooling_level in row.items():
