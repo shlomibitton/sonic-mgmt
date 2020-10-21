@@ -22,9 +22,6 @@ ARC-HOST26 ansible_host=arc-host26
 [vm_host_8]
 DEV-R730-02 ansible_host=dev-r730-02
 
-[vm_host_9]
-R-SONIC-02 ansible_host=r-sonic-02
-
 [vm_host_10]
 DEV-R730-03 ansible_host=dev-r730-03
 
@@ -61,7 +58,6 @@ vm_host_5
 vm_host_6
 vm_host_7
 vm_host_8
-vm_host_9
 vm_host_10
 vm_host_11
 vm_host_12
@@ -344,40 +340,6 @@ VM0830 ansible_host=10.75.207.71
 VM0831 ansible_host=10.75.207.72
 VM0832 ansible_host=10.75.207.73
 
-[vms_9]
-VM0901 ansible_host=10.213.88.6
-VM0902 ansible_host=10.213.88.7
-VM0903 ansible_host=10.213.88.8
-VM0904 ansible_host=10.213.88.9
-VM0905 ansible_host=10.213.88.10
-VM0906 ansible_host=10.213.88.11
-VM0907 ansible_host=10.213.88.12
-VM0908 ansible_host=10.213.88.13
-VM0909 ansible_host=10.213.88.14
-VM0910 ansible_host=10.213.88.15
-VM0911 ansible_host=10.213.88.16
-VM0912 ansible_host=10.213.88.17
-VM0913 ansible_host=10.213.88.18
-VM0914 ansible_host=10.213.88.19
-VM0915 ansible_host=10.213.88.20
-VM0916 ansible_host=10.213.88.21
-VM0917 ansible_host=10.213.88.22
-VM0918 ansible_host=10.213.88.23
-VM0919 ansible_host=10.213.88.24
-VM0920 ansible_host=10.213.88.25
-VM0921 ansible_host=10.213.88.26
-VM0922 ansible_host=10.213.88.27
-VM0923 ansible_host=10.213.88.28
-VM0924 ansible_host=10.213.88.29
-VM0925 ansible_host=10.213.88.30
-VM0926 ansible_host=10.213.88.31
-VM0927 ansible_host=10.213.88.32
-VM0928 ansible_host=10.213.88.33
-VM0929 ansible_host=10.213.88.34
-VM0930 ansible_host=10.213.88.35
-VM0931 ansible_host=10.213.88.36
-VM0932 ansible_host=10.213.88.37
-
 [vms_10]
 VM1001 ansible_host=10.75.207.6
 VM1002 ansible_host=10.75.207.7
@@ -581,7 +543,6 @@ vms_5
 vms_6
 vms_7
 vms_8
-vms_9
 vms_10
 vms_11
 vms_12
@@ -648,13 +609,6 @@ vms_8
 
 [server_8:vars]
 host_var_file=host_vars/DEV-R730-02.yml
-
-[server_9:children]
-vm_host_9
-vms_9
-
-[server_9:vars]
-host_var_file=host_vars/R-SONIC-02.yml
 
 [server_10:children]
 vm_host_10
@@ -740,7 +694,6 @@ server_5
 server_6
 server_7
 server_8
-server_9
 server_10
 server_11
 server_12
