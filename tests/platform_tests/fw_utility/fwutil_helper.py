@@ -934,21 +934,21 @@ def generate_components_file(request, fw_path, fw_version):
     duthost = request.getfixturevalue('duthost')
 
     hostname = duthost.hostname
+    chassis_name = duthost.command("decode-syseeprom -p")['stdout'].strip('\0')
     comp_name = component_object.get_name()
-    fw_status = get_fw_status(duthost)
     platform_type = duthost.facts['platform']
 
     json_data = {}
     json_data['chassis'] = {}
-    json_data['chassis'][platform_type] = {}
-    json_data['chassis'][platform_type]['component'] = {}
+    json_data['chassis'][chassis_name] = {}
+    json_data['chassis'][chassis_name]['component'] = {}
 
     for comp in platform_components:
-        json_data['chassis'][platform_type]['component'][comp] = {}
+        json_data['chassis'][chassis_name]['component'][comp] = {}
 
         if comp == comp_name:
-            json_data['chassis'][platform_type]['component'][comp]['firmware'] = fw_path
-            json_data['chassis'][platform_type]['component'][comp]['version'] = fw_version
+            json_data['chassis'][chassis_name]['component'][comp]['firmware'] = fw_path
+            json_data['chassis'][chassis_name]['component'][comp]['version'] = fw_version
 
     remote_comp_file_path = PLATFORM_COMP_PATH_TEMPLATE.format(platform_type)
     comp_file_path = "/tmp/platform_components.json"
@@ -974,23 +974,23 @@ def generate_invalid_components_file(request, chassis_key, component_key, is_val
     platform_components = request.getfixturevalue('platform_components')
 
     hostname = duthost.hostname
-    fw_status = get_fw_status(duthost)
+    chassis_name = duthost.command("decode-syseeprom -p")['stdout'].strip('\0')
     platform_type = duthost.facts['platform']
 
     json_data = {}
     json_data[chassis_key] = {}
-    json_data[chassis_key][platform_type] = {}
-    json_data[chassis_key][platform_type][component_key] = {}
+    json_data[chassis_key][chassis_name] = {}
+    json_data[chassis_key][chassis_name][component_key] = {}
 
     for comp in platform_components:
-        json_data[chassis_key][platform_type][component_key][comp] = {}
-        json_data[chassis_key][platform_type][component_key][comp]['firmware'] = 'path/to/install'
+        json_data[chassis_key][chassis_name][component_key][comp] = {}
+        json_data[chassis_key][chassis_name][component_key][comp]['firmware'] = 'path/to/install'
 
         if not is_valid_comp_structure:
-            json_data[chassis_key][platform_type][component_key][comp]['version'] = {}
-            json_data[chassis_key][platform_type][component_key][comp]['version']['version'] = 'version/to/install'
+            json_data[chassis_key][chassis_name][component_key][comp]['version'] = {}
+            json_data[chassis_key][chassis_name][component_key][comp]['version']['version'] = 'version/to/install'
         else:
-            json_data[chassis_key][platform_type][component_key][comp]['version'] = 'version/to/install'
+            json_data[chassis_key][chassis_name][component_key][comp]['version'] = 'version/to/install'
 
     remote_comp_file_path = PLATFORM_COMP_PATH_TEMPLATE.format(platform_type)
     comp_file_path = "/tmp/invalid_platform_components.json"
