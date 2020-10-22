@@ -2,15 +2,16 @@ import allure
 import logging
 import pytest
 
-from ngts.cli_wrappers.linux_mac_clis import get_mac_address
-from ngts.cli_wrappers.sonic_lldp_clis import parse_lldp_info_for_specific_interface
+from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
+from ngts.cli_wrappers.sonic.sonic_lldp_clis import SonicLldpCli
 
 logger = logging.getLogger()
 
 
+@pytest.mark.lldp
 @pytest.mark.push_gate
-@allure.title('PushGate LLDP test case')
-def test_push_gate_lldp(topology_obj):
+@allure.title('test_lldp_infromation_remote_and_local')
+def test_lldp_infromation_remote_and_local(topology_obj):
     """
     Run PushGate LLDP test case, test doing validation for LLDP peer port MAC address(we check only ports connected
     to hosts, without loopback ports
@@ -24,12 +25,13 @@ def test_push_gate_lldp(topology_obj):
             host_port_alias = host_dut_port[0]
             host_name_alias = host_port_alias.split('-')[0]
             host_engine = topology_obj.players[host_name_alias]['engine']
-            host_port_mac = get_mac_address(host_engine, topology_obj.ports[host_port_alias])
+            host_port_mac = LinuxMacCli.get_mac_address_for_interface(host_engine, topology_obj.ports[host_port_alias])
             dut_port = topology_obj.ports[host_dut_port[1]]
             with allure.step('Checking peer MAC address via LLDP in interface {}'.format(dut_port)):
-                lldp_info = parse_lldp_info_for_specific_interface(dut_engine, dut_port)
+                lldp_info = SonicLldpCli.parse_lldp_info_for_specific_interface(dut_engine, dut_port)
                 logger.info('Checking that peer device mac address in LLDP output')
-                assert host_port_mac in lldp_info['Chassis']['ChassisID']
+                assert host_port_mac in lldp_info['Chassis']['ChassisID'], \
+                    '{} was not found in {}'.format(host_port_mac, lldp_info)
 
     except Exception as err:
         raise AssertionError(err)

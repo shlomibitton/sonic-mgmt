@@ -14,6 +14,8 @@ import base64
 import time
 
 from infra.tools.topology_tools.topology_setup_utils import get_topology_by_setup_name
+from ngts.cli_wrappers.sonic.sonic_cli import SonicCli
+from ngts.cli_wrappers.linux.linux_cli import LinuxCli
 
 logger = logging.getLogger()
 
@@ -46,10 +48,20 @@ def topology_obj(setup_name):
     """
     logger.debug('Creating topology object')
     topology = get_topology_by_setup_name(setup_name, slow_cli=False)
+    update_topology_with_cli_class(topology)
     yield topology
     logger.debug('Cleaning-up the topology object')
     for player_name, player_attributes in topology.players.items():
         player_attributes['engine'].disconnect()
+
+
+def update_topology_with_cli_class(topology):
+    # TODO: determine player type by topology attribute, rather than alias
+    for player_key, player_info in topology.players.items():
+        if player_key == 'dut':
+            player_info['cli'] = SonicCli()
+        else:
+            player_info['cli'] = LinuxCli()
 
 
 def pytest_sessionfinish(session, exitstatus):
