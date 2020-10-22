@@ -1,17 +1,6 @@
 - name: Set specific HWSKU device configs
   set_fact:
     device_configs:
-      ACS-MSN2100:
-        port_config:
-          src: "roles/sonicv2/files/ssw/ACS-MSN2100/port_config.ini"
-          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2100-r0/ACS-MSN2100/port_config.ini"
-      ACS-MSN2010:
-        port_config:
-          src: "roles/sonicv2/files/ssw/ACS-MSN2010/port_config_boxer01.ini"
-          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/port_config.ini"
-        sai_xml:
-          src: "roles/sonicv2/files/ssw/ACS-MSN2010/sai_config_boxer01.xml"
-          dest: "/usr/share/sonic/device/x86_64-mlnx_msn2010-r0/ACS-MSN2010/sai_2010.xml"
       Mellanox-SN2700-D48C8:
         port_config:
           src: "roles/sonicv2/files/ssw/Mellanox-SN2700-D48C8/port_config.ini"
