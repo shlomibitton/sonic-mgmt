@@ -223,7 +223,7 @@ def test_turn_on_off_psu_and_check_psustatus(duthost, psu_controller):
         pytest.skip("Some PSU are still down, skip rest of the testing in this case")
 
     assert len(psu_test_results.keys()) == psu_num, \
-        "In consistent PSU number output by '%s' and '%s'" % (CMD_PLATFORM_PSUSTATUS, cmd_num_psu)
+        "In consistent PSU number output by '%s' and '%s'" % (CMD_PLATFORM_PSUSTATUS, "sudo psuutil numpsus")
 
     logging.info("Start testing turn off/on PSUs")
     all_psu_status = psu_ctrl.get_psu_status()
