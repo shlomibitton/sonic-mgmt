@@ -3,6 +3,7 @@
 {% set vms_number = vms | length %}
 {% if port_number is defined %}
   {% set vms_number = port_number | int %}
+{% endif %}
 {% if 'loopback' in vm_topo_config['DUT'] %}
 {% set lp_ipv4 = vm_topo_config['DUT']['loopback']['ipv4'][dut_index|int] %}
 {% set lp_ipv4_addr = lp_ipv4.split('/')[0] %}
