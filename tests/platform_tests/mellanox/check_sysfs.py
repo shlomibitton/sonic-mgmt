@@ -128,14 +128,14 @@ def check_psu_sysfs(dut, psu_id, psu_state):
         platform_data = get_platform_data(dut)
         hot_swappable = platform_data["psus"]["hot_swappable"]
         if hot_swappable:
-            psu_exist_content = dut.command("cat %s" % psu_exist)
-            logging.info("PSU state %s file %s read %s" % (psu_state, psu_exist, psu_exist_content["stdout"]))
-            assert psu_exist_content["stdout"] == "1", "CLI returns %s while %s contains %s" % \
-                                                       (psu_state, psu_exist, psu_exist_content["stdout"])
+            psu_exist_content = dut.command("cat {}".format(psu_exist))
+            logging.info("PSU state {} file {} read {}".format(psu_state, psu_exist, psu_exist_content["stdout"]))
+            assert psu_exist_content["stdout"] == "1", "CLI returns {} while {} contains {}".format(
+                                                       psu_state, psu_exist, psu_exist_content["stdout"])
 
-        psu_pwr_state = "/var/run/hw-management/thermal/psu%s_pwr_status" % psu_id
-        psu_pwr_state_content = dut.command("cat %s" % psu_pwr_state)
-        logging.info("PSU state %s file %s read %s" % (psu_state, psu_pwr_state, psu_pwr_state_content["stdout"]))
+        psu_pwr_state = "/var/run/hw-management/thermal/psu{}_pwr_status".format(psu_id)
+        psu_pwr_state_content = dut.command("cat {}".format(psu_pwr_state))
+        logging.info("PSU state {} file {} read {}".format(psu_state, psu_pwr_state, psu_pwr_state_content["stdout"]))
         assert (psu_pwr_state_content["stdout"] == "1" and psu_state == "OK") \
                or (psu_pwr_state_content["stdout"] == "0" and psu_state == "NOT OK"), \
             "sysfs content {} mismatches with psu_state {}".format(psu_pwr_state_content["stdout"], psu_state)
