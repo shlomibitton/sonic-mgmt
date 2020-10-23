@@ -90,7 +90,7 @@
     state: stopped
     delay: 10
     timeout: 300
-  connection: local
+  delegate_to: localhost
 
 - name: Wait for device to come back.
   wait_for:
@@ -99,7 +99,7 @@
     state: started
     delay: 10
     timeout: 900
-  connection: local
+  delegate_to: localhost
 
 - name: Wait until all critical services are started
   shell: bash -c 'docker ps | grep {{ item }}'
