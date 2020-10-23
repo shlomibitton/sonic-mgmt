@@ -18,7 +18,6 @@ pytestmark = [
     pytest.mark.topology('any')
 ]
 
-CMD_PLATFORM_SUMMARY = "show platform summary"
 CMD_PLATFORM_PSUSTATUS = "show platform psustatus"
 CMD_PLATFORM_FANSTATUS = "show platform fan"
 CMD_PLATFORM_TEMPER = "show platform temperature"
@@ -33,16 +32,14 @@ THERMAL_POLICY_INVALID_VALUE_FILE = 'invalid_value_policy.json'
 LOG_EXPECT_POLICY_FILE_INVALID = '.*Caught exception while initializing thermal manager.*'
 LOG_EXPECT_FAN_REMOVE_RE = '.*Fan removed warning:.*'
 LOG_EXPECT_FAN_REMOVE_CLEAR_RE = '.*Fan removed warning cleared:.*'
-LOG_EXPECT_FAN_UNDER_SPEED_RE = '.*Fan under speed warning:.*'
-LOG_EXPECT_FAN_UNDER_SPEED_CLEAR_RE = '.*Fan under speed warning cleared:.*'
-LOG_EXPECT_FAN_OVER_SPEED_RE = '.*Fan over speed warning:*'
-LOG_EXPECT_FAN_OVER_SPEED_CLEAR_RE = '.*Fan over speed warning cleared:.*'
-
-
-LOG_IGNORE_MELLANOX = ['.*Reg cmd access failed.*',
-                       '.*Could not acquire lock.*',
-                       '.*Failed to query PWM duty.*',
-                       '.*ERR pmon#sensord: Error getting sensor data.*']
+LOG_EXPECT_FAN_FAULT_RE = '.*Fan fault warning:.*'
+LOG_EXPECT_FAN_FAULT_CLEAR_RE = '.*Fan fault warning cleared:.*'
+LOG_EXPECT_FAN_UNDER_SPEED_RE = '.*Fan low speed warning:.*'
+LOG_EXPECT_FAN_UNDER_SPEED_CLEAR_RE = '.*Fan low speed warning cleared:.*'
+LOG_EXPECT_FAN_OVER_SPEED_RE = '.*Fan high speed warning:*'
+LOG_EXPECT_FAN_OVER_SPEED_CLEAR_RE = '.*Fan high speed warning cleared:.*'
+LOG_EXPECT_INSUFFICIENT_FAN_NUM_RE = '.*Insufficient number of working fans warning:.*'
+LOG_EXPECT_INSUFFICIENT_FAN_NUM_CLEAR_RE = '.*Insufficient number of working fans warning cleared:.*'
 
 
 def check_sensord_status(ans_host):
@@ -94,7 +91,7 @@ def psu_test_setup_teardown(duthost):
     logging.info("Starting psu test teardown")
     sensord_running_status, sensord_pid = check_sensord_status(duthost)
     if not sensord_running_status:
-        ans_host.command("docker exec pmon supervisorctl restart lm-sensors")
+        duthost.command("docker exec pmon supervisorctl restart lm-sensors")
         time.sleep(3)
         sensord_running_status, sensord_pid = check_sensord_status(duthost)
         if sensord_running_status:
@@ -105,40 +102,6 @@ def psu_test_setup_teardown(duthost):
         logging.info("sensord is running, pid = {}".format(sensord_pid))
 
 
-@pytest.fixture
-def customize_loganalyzer(duthost, request):
-    loganalyzer = LogAnalyzer(ansible_host=duthost, marker_prefix=request.node.name)
-    logging.info("Add start marker into DUT syslog")
-    marker = loganalyzer.init()
-    yield loganalyzer
-    logging.info("Load config and analyze log")
-    # Read existed common regular expressions located with legacy loganalyzer module
-    loganalyzer.load_common_config()
-
-    platform = duthost.facts['platform']
-
-    if 'mlnx' in platform:
-        loganalyzer.ignore_regex.extend(LOG_IGNORE_MELLANOX)
-    # Parse syslog and process result. Raise "LogAnalyzerError" exception if: total match or expected missing
-    # match is not equal to zero
-    loganalyzer.analyze(marker)
-
-
-def test_show_platform_summary(duthost):
-    """
-    @summary: Check output of 'show platform summary'
-    """
-    logging.info("Check output of '%s'" % CMD_PLATFORM_SUMMARY)
-    platform_summary = duthost.command(CMD_PLATFORM_SUMMARY)
-    expected_fields = set(["Platform", "HwSKU", "ASIC"])
-    actual_fields = set()
-    for line in platform_summary["stdout_lines"]:
-        key_value = line.split(":")
-        assert len(key_value) == 2, "output format is not 'field_name: field_value'"
-        assert len(key_value[1]) > 0, "No value for field %s" % key_value[0]
-        actual_fields.add(line.split(":")[0])
-    assert actual_fields == expected_fields, \
-        "Unexpected output fields, actual=%s, expected=%s" % (str(actual_fields), str(expected_fields))
 def get_psu_num(dut):
     cmd_num_psu = "sudo psuutil numpsus"
 
@@ -263,35 +226,6 @@ def test_turn_on_off_psu_and_check_psustatus(duthost, psu_controller):
     loganalyzer.analyze(marker)
 
 
-def parse_platform_summary(raw_input_lines):
-    """
-    @summary: Helper function for parsing the output of 'show system platform'
-    @return: Returned parsed information in a dictionary
-    """
-    res = {}
-    for line in raw_input_lines:
-        fields = line.split(":")
-        if len(fields) != 2:
-            continue
-        res[fields[0].lower()] = fields[1].strip()
-    return res
-
-
-def check_show_platform_fanstatus_output(lines):
-    """
-    @summary: Check basic output of 'show platform fan'. Expect output are:
-              "Fan Not detected" or a table of fan status data with 6 columns.
-    """
-    assert len(lines) > 0, 'There must be at least one line output for show platform fans'
-    if len(lines) == 1:
-        assert lines[0].encode('utf-8').strip() == 'Fan Not detected'
-    else:
-        assert len(lines) > 2, 'There must be at least two lines output for show platform fans if any FAN is detected'
-        second_line = lines[1]
-        field_ranges = get_field_range(second_line)
-        assert len(field_ranges) == 6, 'There must be 6 columns in output of show platform fans'
-
-
 def test_show_platform_fanstatus_mocked(duthost, mocker_factory):
     """
     @summary: Check output of 'show platform fan'.
@@ -304,27 +238,11 @@ def test_show_platform_fanstatus_mocked(duthost, mocker_factory):
     logging.info('Mock FAN status data...')
     mocker.mock_data()
     logging.info('Wait and check actual data with mocked FAN status data...')
-    result = check_cli_output_with_mocker(duthost, mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+    result = check_cli_output_with_mocker(duthost, mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
     assert result, 'FAN mock data mismatch'
 
 
-def check_show_platform_temperature_output(lines):
-    """
-    @summary: Check basic output of 'show platform temperature'. Expect output are:
-              "Thermal Not detected" or a table of thermal status data with 8 columns.
-    """
-    assert len(lines) > 0, 'There must be at least one line output for show platform temperature'
-    if len(lines) == 1:
-        assert lines[0].encode('utf-8').strip() == 'Thermal Not detected'
-    else:
-        assert len(lines) > 2, 'There must be at least two lines output for show platform temperature if any thermal is detected'
-        second_line = lines[1]
-        field_ranges = get_field_range(second_line)
-        assert len(field_ranges) == 8, 'There must be 8 columns in output of show platform temperature'
-
-
-@pytest.mark.skip(reason="3800 MSFT SKU LACK of thermal data will fail this case")
 def test_show_platform_temperature_mocked(duthost, mocker_factory):
     """
     @summary: Check output of 'show platform temperature'
@@ -374,8 +292,7 @@ def check_thermal_control_load_invalid_file(duthost, file_name):
             restart_thermal_control_daemon(duthost)
 
 
-@pytest.mark.disable_loganalyzer
-def test_thermal_control_psu_absence(duthost, psu_controller, mocker_factory, customize_loganalyzer):
+def test_thermal_control_psu_absence(duthost, psu_controller, mocker_factory):
     """
     @summary: Turn off/on PSUs, check thermal control is working as expect.
     """
@@ -463,7 +380,6 @@ def turn_off_psu_and_check_thermal_control(dut, psu_ctrl, psu, mocker):
     time.sleep(5)
 
 
-@pytest.mark.skip(reason="Bug SW #2231735")
 @pytest.mark.disable_loganalyzer
 def test_thermal_control_fan_status(duthost, mocker_factory):
     """
@@ -487,51 +403,60 @@ def test_thermal_control_fan_status(duthost, mocker_factory):
         single_fan_mocker = mocker_factory(duthost, 'SingleFanMocker')
         time.sleep(THERMAL_CONTROL_TEST_WAIT_TIME)
 
+        _fan_log_supported = duthost.command('docker exec pmon grep -E "{}" /usr/bin/thermalctld'\
+                .format(LOG_EXPECT_INSUFFICIENT_FAN_NUM_RE), module_ignore_errors=True)
+
         if single_fan_mocker.is_fan_removable():
-            loganalyzer.expect_regex = [LOG_EXPECT_FAN_REMOVE_RE]
+            loganalyzer.expect_regex = [LOG_EXPECT_FAN_REMOVE_RE, LOG_EXPECT_INSUFFICIENT_FAN_NUM_RE]
+            if _fan_log_supported.is_failed:
+                loganalyzer.expect_regex.remove(LOG_EXPECT_INSUFFICIENT_FAN_NUM_RE)
             with loganalyzer:
                 logging.info('Mocking an absence FAN...')
                 single_fan_mocker.mock_absence()
-                check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+                check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
-            loganalyzer.expect_regex = [LOG_EXPECT_FAN_REMOVE_CLEAR_RE]
+            loganalyzer.expect_regex = [LOG_EXPECT_FAN_REMOVE_CLEAR_RE, LOG_EXPECT_INSUFFICIENT_FAN_NUM_CLEAR_RE]
+            if _fan_log_supported.is_failed:
+                loganalyzer.expect_regex.remove(LOG_EXPECT_INSUFFICIENT_FAN_NUM_CLEAR_RE)
             with loganalyzer:
                 logging.info('Make the absence FAN back to presence...')
                 single_fan_mocker.mock_presence()
-                check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+                check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
-        loganalyzer.expect_regex = [LOG_EXPECT_FAN_FAULT_RE, LOG_EXPECT_INSUFFICIENT_FAN_NUM_RE]
-        with loganalyzer:
-            logging.info('Mocking a fault FAN...')
-            single_fan_mocker.mock_status(False)
-            check_cli_output_with_mocker(dut, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
+        if not _fan_log_supported.is_failed:
+            loganalyzer.expect_regex = [LOG_EXPECT_FAN_FAULT_RE, LOG_EXPECT_INSUFFICIENT_FAN_NUM_RE]
+            with loganalyzer:
+                logging.info('Mocking a fault FAN...')
+                single_fan_mocker.mock_status(False)
+                check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
-        loganalyzer.expect_regex = [LOG_EXPECT_FAN_FAULT_CLEAR_RE, LOG_EXPECT_INSUFFICIENT_FAN_NUM_CLEAR_RE]
-        with loganalyzer:
-            logging.info('Mocking the fault FAN back to normal...')
-            single_fan_mocker.mock_status(True)
-            check_cli_output_with_mocker(dut, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
+            loganalyzer.expect_regex = [LOG_EXPECT_FAN_FAULT_CLEAR_RE, LOG_EXPECT_INSUFFICIENT_FAN_NUM_CLEAR_RE]
+            with loganalyzer:
+                logging.info('Mocking the fault FAN back to normal...')
+                single_fan_mocker.mock_status(True)
+
+            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
         loganalyzer.expect_regex = [LOG_EXPECT_FAN_OVER_SPEED_RE]
         with loganalyzer:
             logging.info('Mocking an over speed FAN...')
             single_fan_mocker.mock_over_speed()
-            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
         loganalyzer.expect_regex = [LOG_EXPECT_FAN_OVER_SPEED_CLEAR_RE]
         with loganalyzer:
             logging.info('Make the over speed FAN back to normal...')
             single_fan_mocker.mock_normal_speed()
-            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
         loganalyzer.expect_regex = [LOG_EXPECT_FAN_UNDER_SPEED_RE]
         with loganalyzer:
             logging.info('Mocking an under speed FAN...')
             single_fan_mocker.mock_under_speed()
-            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
 
         loganalyzer.expect_regex = [LOG_EXPECT_FAN_UNDER_SPEED_CLEAR_RE]
         with loganalyzer:
             logging.info('Make the under speed FAN back to normal...')
             single_fan_mocker.mock_normal_speed()
-            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME)
+            check_cli_output_with_mocker(duthost, single_fan_mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)

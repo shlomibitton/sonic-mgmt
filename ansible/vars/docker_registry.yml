@@ -2,3 +2,4 @@ docker_registry_host: arc-build-server:5000
 
 docker_registry_username: admin
 docker_registry_password: admin
+

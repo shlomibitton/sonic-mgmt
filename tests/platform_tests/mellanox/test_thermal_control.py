@@ -12,6 +12,7 @@ from tabulate import tabulate
 import re
 
 pytestmark = [
+    pytest.mark.asic('mellanox'),
     pytest.mark.topology('any')
 ]
 
