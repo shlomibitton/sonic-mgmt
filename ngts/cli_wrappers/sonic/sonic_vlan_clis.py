@@ -86,3 +86,13 @@ class SonicVlanCli(VlanCliCommon):
         """
         with allure.step('{}: deleting port {} from VLAN: {}'.format(engine.ip, port, vlan)):
             return engine.run_cmd("sudo config vlan member del {} {}".format(vlan, port))
+
+    @staticmethod
+    def show_vlan_config(engine):
+        """
+        This method performs show vlan command
+        :param engine: ssh engine object
+        :return: command output
+        """
+        with allure.step('show vlan config on {}'.format(engine.ip)):
+            return engine.run_cmd("show vlan config")

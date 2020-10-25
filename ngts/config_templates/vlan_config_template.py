@@ -13,7 +13,7 @@ class VlanConfigTemplate:
         :param vlan_config_dict: configuration dictionary with all VLANs related info
         Example: {'dut': [{'vlan_id': 31, 'vlan_members': []},{'vlan_id': 500, 'vlan_members': [{dutha2: 'trunk'}]}]}
         """
-        with allure.step('Doing VLAN configuration'):
+        with allure.step('Applying VLAN configuration'):
             for player_alias, configuration in vlan_config_dict.items():
                 engine = topology_obj.players[player_alias]['engine']
                 cli_object = topology_obj.players[player_alias]['cli']
@@ -28,7 +28,7 @@ class VlanConfigTemplate:
         :param vlan_config_dict: configuration dictionary with all VLANs related info
         Example: {'dut': [{'vlan_id': 31, 'vlan_members': []},{'vlan_id': 500, 'vlan_members': [{dutha2: 'trunk'}]}]}
         """
-        with allure.step('Doing VLAN cleanup'):
+        with allure.step('Performing VLAN configuration cleanup'):
             for player_alias, configuration in vlan_config_dict.items():
                 engine = topology_obj.players[player_alias]['engine']
                 cli_object = topology_obj.players[player_alias]['cli']
