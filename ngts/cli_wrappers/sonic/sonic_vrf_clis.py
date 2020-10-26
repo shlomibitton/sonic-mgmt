@@ -7,7 +7,7 @@ class SonicVrfCli(VrfCliCommon):
     @staticmethod
     def add_vrf(engine, vrf):
         """
-        This method create VRF
+        This method creates VRF
         :param engine: ssh engine object
         :param vrf: vrf name which should be created
         :return: command output
@@ -29,7 +29,7 @@ class SonicVrfCli(VrfCliCommon):
     @staticmethod
     def add_interface_to_vrf(engine, interface, vrf):
         """
-        This method move interface from default VRF to specific
+        This method moves interface from default VRF to specific
         :param engine: ssh engine object
         :param interface: interface name which should be moved
         :param vrf: vrf name to which move interface
@@ -41,7 +41,7 @@ class SonicVrfCli(VrfCliCommon):
     @staticmethod
     def del_interface_from_vrf(engine, interface, vrf):
         """
-        This method move interface from specific VRF to default
+        This method moves interface from specific VRF to default
         :param engine: ssh engine object
         :param interface: interface name which should be moved
         :param vrf: vrf name from which move interface

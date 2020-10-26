@@ -1,9 +1,9 @@
 import allure
 
-from ngts.cli_wrappers.common.route_clis_common import RouteCliCommon
+from ngts.cli_wrappers.common.static_route_clis_common import StaticRouteCliCommon
 
 
-class SonicRouteCli(RouteCliCommon):
+class LinuxStaticRouteCli(StaticRouteCliCommon):
     @staticmethod
     def add_route(engine, dst, via, dst_mask='32', vrf=None):
         """
@@ -17,9 +17,9 @@ class SonicRouteCli(RouteCliCommon):
         """
         with allure.step('{}: creating a static IP route to {}/{} via {}'.format(engine.ip, dst, dst_mask, via)):
             if vrf:
-                return engine.run_cmd("sudo config route add prefix vrf {} {}/{} nexthop {}".format(vrf, dst, dst_mask, via))
+                raise NotImplementedError
             else:
-                return engine.run_cmd("sudo config route add prefix {}/{} nexthop {}".format(dst, dst_mask, via))
+                return engine.run_cmd("sudo ip route add {}/{} via {}".format(dst, dst_mask, via))
 
     @staticmethod
     def del_route(engine, dst, via, dst_mask='32', vrf=None):
@@ -34,6 +34,6 @@ class SonicRouteCli(RouteCliCommon):
         """
         with allure.step('{}: deleting a static IP route to {}/{} via {}'.format(engine.ip, dst, dst_mask, via)):
             if vrf:
-                return engine.run_cmd("sudo config route del prefix vrf {} {}/{} nexthop {}".format(vrf, dst, dst_mask, via))
+                raise NotImplementedError
             else:
-                return engine.run_cmd("sudo config route del prefix {}/{} nexthop {}".format(dst, dst_mask, via))
+                return engine.run_cmd("sudo ip route del {}/{} via {}".format(dst, dst_mask, via))

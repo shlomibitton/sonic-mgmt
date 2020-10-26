@@ -3,12 +3,12 @@ import allure
 
 class VrfConfigTemplate:
     """
-    This class contain 2 methods for configure and cleanup VRF related settings.
+    This class contain 2 methods for configuration and deletion of VRF related settings.
     """
     @staticmethod
     def configuration(topology_obj, vrf_config_dict):
         """
-        Method which are doing VRF configuration
+        This method applies VRF configuration
         :param topology_obj: topology object fixture
         :param vrf_config_dict: configuration dictionary with all VRF related info
         Example: {'dut': [{'vrf': 'Vrf_custom', 'vrf_interfaces': [dutlb1_2, dutlb2_2, dutlb3_2, dutlb4_2, dutlb5_2,

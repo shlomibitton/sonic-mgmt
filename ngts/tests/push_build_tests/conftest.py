@@ -1,6 +1,8 @@
 import pytest
 import logging
 
+from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
+from ngts.config_templates.interfaces_config_template import InterfaceConfigTemplate
 from ngts.config_templates.lag_lacp_config_template import LagLacpConfigTemplate
 from ngts.config_templates.vlan_config_template import VlanConfigTemplate
 from ngts.config_templates.vrf_config_template import VrfConfigTemplate
@@ -24,22 +26,32 @@ def push_gate_configuration(topology_obj):
     dutlb2_1 = topology_obj.ports['dut-lb2-1']
     dutlb3_1 = topology_obj.ports['dut-lb3-1']
     dutlb4_1 = topology_obj.ports['dut-lb4-1']
-    dutlb5_1 = topology_obj.ports['dut-lb5-1']
-    dutlb6_1 = topology_obj.ports['dut-lb6-1']
+    dutlb_splt2_p1_1 = topology_obj.ports['dut-lb-splt2-p1-1']
+    dutlb_splt2_p1_2 = topology_obj.ports['dut-lb-splt2-p1-2']
     # Custom VRF ports
     duthb1 = topology_obj.ports['dut-hb-1']
     dutlb1_2 = topology_obj.ports['dut-lb1-2']
     dutlb2_2 = topology_obj.ports['dut-lb2-2']
     dutlb3_2 = topology_obj.ports['dut-lb3-2']
     dutlb4_2 = topology_obj.ports['dut-lb4-2']
-    dutlb5_2 = topology_obj.ports['dut-lb5-2']
-    dutlb6_2 = topology_obj.ports['dut-lb6-2']
+    dutlb_splt2_p2_1 = topology_obj.ports['dut-lb-splt2-p2-1']
+    dutlb_splt2_p2_2 = topology_obj.ports['dut-lb-splt2-p2-2']
     # Hosts A ports
     hadut1 = topology_obj.ports['ha-dut-1']
     hadut2 = topology_obj.ports['ha-dut-2']
     # Hosts B ports
     hbdut1 = topology_obj.ports['hb-dut-1']
     hbdut2 = topology_obj.ports['hb-dut-2']
+
+    # variable below required for correct interfaces speed cleanup
+    dut_original_interfaces_speeds = SonicInterfaceCli.get_interfaces_speed(topology_obj.players['dut']['engine'],
+                                                                            [dutha1, duthb2])
+
+    # Interfaces config which will be used in test
+    interfaces_config_dict = {
+        'dut': [{'iface': dutha1, 'speed': '10000', 'original_speed': dut_original_interfaces_speeds[dutha1]},
+                {'iface': duthb2, 'speed': '10000', 'original_speed': dut_original_interfaces_speeds[duthb2]}]
+    }
 
     # LAG/LACP config which will be used in test
     lag_lacp_config_dict = {
@@ -55,8 +67,8 @@ def push_gate_configuration(topology_obj):
                 {'vlan_id': 32, 'vlan_members': [{dutlb2_1: 'access'}]},
                 {'vlan_id': 33, 'vlan_members': [{dutlb3_1: 'access'}]},
                 {'vlan_id': 34, 'vlan_members': [{dutlb4_1: 'access'}]},
-                {'vlan_id': 35, 'vlan_members': [{dutlb5_1: 'access'}]},
-                {'vlan_id': 36, 'vlan_members': [{dutlb6_1: 'access'}]},
+                {'vlan_id': 35, 'vlan_members': [{dutlb_splt2_p1_1: 'access'}]},
+                {'vlan_id': 36, 'vlan_members': [{dutlb_splt2_p1_2: 'access'}]},
                 {'vlan_id': 69, 'vlan_members': [{'PortChannel0002': 'trunk'}]},
                 {'vlan_id': 500, 'vlan_members': [{dutha2: 'trunk'}]},
                 {'vlan_id': 501, 'vlan_members': [{'PortChannel0002': 'trunk'}]},
@@ -75,7 +87,7 @@ def push_gate_configuration(topology_obj):
 
     # VRF config which will be used in test
     vrf_config_dict = {
-        'dut': [{'vrf': 'Vrf_custom', 'vrf_interfaces': [dutlb1_2, dutlb2_2, dutlb3_2, dutlb4_2, dutlb5_2, dutlb6_2,
+        'dut': [{'vrf': 'Vrf_custom', 'vrf_interfaces': [dutlb1_2, dutlb2_2, dutlb3_2, dutlb4_2, dutlb_splt2_p2_1, dutlb_splt2_p2_2,
                                                          duthb1]}]
     }
 
@@ -92,8 +104,8 @@ def push_gate_configuration(topology_obj):
                 {'iface': dutlb2_2, 'ips': [('32.1.1.2', '24')]},
                 {'iface': dutlb3_2, 'ips': [('33.1.1.2', '24')]},
                 {'iface': dutlb4_2, 'ips': [('34.1.1.2', '24')]},
-                {'iface': dutlb5_2, 'ips': [('35.1.1.2', '24')]},
-                {'iface': dutlb6_2, 'ips': [('36.1.1.2', '24')]},
+                {'iface': dutlb_splt2_p2_1, 'ips': [('35.1.1.2', '24')]},
+                {'iface': dutlb_splt2_p2_2, 'ips': [('36.1.1.2', '24')]},
 
                 {'iface': 'Vlan69', 'ips': [('69.0.0.1', '24')]},
                 {'iface': 'Vlan500', 'ips': [('50.0.0.1', '24')]},
@@ -113,8 +125,8 @@ def push_gate_configuration(topology_obj):
                {'iface': 'bond0.69', 'ips': [('69.0.0.2', '24')]}]
     }
 
-    # Route config which will be used in test
-    route_config_dict = {
+    # Static route config which will be used in test
+    static_route_config_dict = {
         'dut': [{'dst': '31.0.0.0', 'dst_mask': 24, 'via': ['33.1.1.2', '34.1.1.2', '35.1.1.2', '36.1.1.2']},
                 {'dst': '30.0.0.0', 'dst_mask': 24, 'via': ['33.1.1.1', '34.1.1.1', '35.1.1.1', '36.1.1.1'],
                  'vrf': 'Vrf_custom'}],
@@ -123,21 +135,23 @@ def push_gate_configuration(topology_obj):
     }
 
     logger.info('Starting PushGate configuration')
+    InterfaceConfigTemplate.configuration(topology_obj, interfaces_config_dict)
     LagLacpConfigTemplate.configuration(topology_obj, lag_lacp_config_dict)
     VlanConfigTemplate.configuration(topology_obj, vlan_config_dict)
     VrfConfigTemplate.configuration(topology_obj, vrf_config_dict)
     IpConfigTemplate.configuration(topology_obj, ip_config_dict)
-    RouteConfigTemplate.configuration(topology_obj, route_config_dict)
+    RouteConfigTemplate.configuration(topology_obj, static_route_config_dict)
     logger.info('PushGate configuration completed')
 
     yield
 
     logger.info('Starting PushGate configuration cleanup')
-    RouteConfigTemplate.cleanup(topology_obj, route_config_dict)
+    RouteConfigTemplate.cleanup(topology_obj, static_route_config_dict)
     IpConfigTemplate.cleanup(topology_obj, ip_config_dict)
     VrfConfigTemplate.cleanup(topology_obj, vrf_config_dict)
     VlanConfigTemplate.cleanup(topology_obj, vlan_config_dict)
     LagLacpConfigTemplate.cleanup(topology_obj, lag_lacp_config_dict)
+    InterfaceConfigTemplate.cleanup(topology_obj, interfaces_config_dict)
 
     # Workaround for bug: https://github.com/Azure/sonic-buildimage/issues/5347
     topology_obj.players['dut']['engine'].run_cmd('sudo config reload -y')
