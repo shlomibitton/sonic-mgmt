@@ -6,6 +6,8 @@ import random
 from drop_packets import *
 from ptf.testutils import verify_no_packet_any, simple_ip_only_packet, simple_ipv4ip_packet
 from tests.common.helpers.assertions import pytest_assert
+from collections import OrderedDict
+
 
 logger = logging.getLogger(__name__)
 pytest.CHANNEL_CONF = None
@@ -81,8 +83,8 @@ def parse_wjh_table(table):
     return entries
 
 
-def get_raw_table_output(duthost):
-    stdout = duthost.command("show what-just-happened")
+def get_raw_table_output(duthost, command="show what-just-happened"):
+    stdout = duthost.command(command)
     if stdout['rc'] != 0:
         raise Exception(stdout['stdout'] + stdout['stderr'])
     table_output = parse_wjh_table(stdout['stdout'])
@@ -187,16 +189,42 @@ def do_agg_test(discard_group, pkt, ptfadapter, duthost, ports_info, sniff_ports
 def do_test():
     def do_wjh_test(discard_group, pkt, ptfadapter, duthost, ports_info, sniff_ports, tx_dut_ports=None, comparable_pkt=None):
         try:
-            if (pytest.CHANNEL_CONF['type'].find('raw') != -1):
+            if (pytest.CHANNEL_CONF['forwarding']['type'].find('raw') != -1):
                 do_raw_test(discard_group, pkt, ptfadapter, duthost, ports_info, sniff_ports, tx_dut_ports, comparable_pkt)
         finally:
-            if (pytest.CHANNEL_CONF['type'].find('aggregate') != -1):
+            if (pytest.CHANNEL_CONF['forwarding']['type'].find('aggregate') != -1):
                 # a temporary check. there is a problem with IP header absent in aggregate
                 # TODO: remove this check when issue is fixed
                 if 'IP' in pkt or 'IPv6' in pkt:
                     do_agg_test(discard_group, pkt, ptfadapter, duthost, ports_info, sniff_ports, tx_dut_ports, comparable_pkt)
 
     return do_wjh_test
+
+
+def verify_l1_raw_drop_exists(table, port):
+    entry_exists = False
+    for entry in table:
+        if (entry['Drop Group'] == 'L1' and
+            # TODO: uncomment the port check once an SDK bug will be merged
+            # entry['sPort'] == port and
+            entry['Severity'] == 'Warn' and
+            entry['Drop reason - Recommended action'] == 'Generic L1 event - Check layer 1 aggregated information'):
+                entry_exists = True
+                break
+
+    return entry_exists
+
+
+def do_l1_raw_test(duthost, port):
+    # shut down one of the ports
+    duthost.command("config interface shutdown {}".format(port))
+
+    try:
+        table = get_raw_table_output(duthost, "show what-just-happened l1")
+        if not verify_l1_raw_drop_exists(table, port):
+            pytest.fail("Could not find L1 drop on WJH table.")
+    finally:
+        duthost.command("config interface startup {}".format(port))
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -214,18 +242,29 @@ def check_global_configuration(duthost):
         pytest.skip("Debug mode is not enabled. Skipping test.")
 
 
+def channel_conf(channel):
+    channel_conf = {}
+    channels_iter = iter(range(len(channel)))
+    for i in channels_iter:
+        channel_conf[channel[i]] = channel[i+1]
+        next(channels_iter, None)
+
+    return channel_conf
+
 @pytest.fixture(scope='module', autouse=True)
 def get_channel_configuration(duthost):
-    channel_conf = {}
+    channels = {}
+
     forwarding = duthost.shell('sonic-db-cli CONFIG_DB hgetall "WJH_CHANNEL|forwarding"', module_ignore_errors=False)['stdout_lines']
     pytest_assert(forwarding is not None, "WJH_CHANNEL|forwarding does not exist in config_db")
 
-    channels_iter = iter(range(len(forwarding)))
-    for i in channels_iter:
-        channel_conf[forwarding[i]] = forwarding[i+1]
-        next(channels_iter, None)
+    l1 = duthost.shell('sonic-db-cli CONFIG_DB hgetall "WJH_CHANNEL|l1"', module_ignore_errors=False)['stdout_lines']
+    pytest_assert(l1 is not None, "WJH_CHANNEL|l1 does not exist in config_db")
 
-    pytest.CHANNEL_CONF = channel_conf
+    channels['forwarding'] = channel_conf(forwarding)
+    channels['l1'] = channel_conf(l1)
+
+    pytest.CHANNEL_CONF = channels
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -233,6 +272,53 @@ def check_feature_enabled(duthost):
     features = duthost.feature_facts()['ansible_facts']['feature_facts']
     if 'what-just-happened' not in features or features['what-just-happened'] != 'enabled':
         pytest.skip("what-just-happened feature is not available. Skipping the test.")
+
+
+def get_interfaces_status(duthost):
+    stdout = duthost.command("show interfaces status")
+    if stdout['rc'] != 0:
+        raise Exception(stdout['stdout'] + stdout['stderr'])
+
+    interfaces = stdout['stdout']
+
+    data = OrderedDict()
+    headers = []
+    header_lines_num = 2
+    sep_index = 1
+    table_lines = interfaces.splitlines()
+    if not table_lines:
+        return None
+
+    separators = re.split(r'\s{2,}', interfaces.splitlines()[sep_index])  # separators between headers and content
+    headers_line = table_lines[0]
+    start = 0
+    # separate headers by table separators
+    for sep in separators:
+        curr_len = len(sep)
+        headers.append(headers_line[start:start+curr_len].strip())
+        start += curr_len + 2
+
+    interface_index = 0
+    admin_index = 8
+
+    for i in range(len(headers)):
+        if headers[i] == "Interface":
+            interface_index = i
+        if headers[i] == "Admin":
+            admin_index = i
+
+    interface_sep = len(separators[interface_index])
+    admin_start = 0
+    for j in range(admin_index):
+        admin_start += len(separators[j]) + 2
+    admin_end = admin_start + len(separators[admin_index])
+
+    output_lines = interfaces.splitlines()[header_lines_num:]  # Skip the header lines in output
+
+    for line in output_lines:
+        data[line[0:interface_sep].strip()] = line[admin_start:admin_end].strip()
+
+    return data
 
 
 def test_tunnel_ip_in_ip(do_test, ptfadapter, duthost, setup, pkt_fields, ports_info):
@@ -280,3 +366,17 @@ def test_tunnel_ip_in_ip(do_test, ptfadapter, duthost, setup, pkt_fields, ports_
     )
 
     do_test("L3", pkt, ptfadapter, duthost, ports_info, setup['neighbor_sniff_ports'])
+
+
+def test_l1_raw_drop(do_test, duthost):
+    if "l1" not in pytest.CHANNEL_CONF:
+        pytest.skip("L1 channel is not confiugred on WJH.")
+    if pytest.CHANNEL_CONF['l1']['type'].find('raw') == -1:
+        pytest.skip("L1 raw channel type is not confiugred on WJH.")
+
+    interfaces = get_interfaces_status(duthost)
+    for port in interfaces.keys():
+        if interfaces[port] == 'up':
+            break
+
+    do_l1_raw_test(duthost, port)
