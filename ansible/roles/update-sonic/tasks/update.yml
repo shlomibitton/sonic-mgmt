@@ -83,9 +83,12 @@
   poll: 0
   ignore_errors: true
 
+- set_fact:
+    dut_host: "{{ ansible_ssh_host }}"
+
 - name: Wait for device to go down.
   wait_for:
-    host: "{{ ansible_ssh_host }}"
+    host: "{{ dut_host }}"
     port: 22
     state: stopped
     delay: 10
@@ -94,7 +97,7 @@
 
 - name: Wait for device to come back.
   wait_for:
-    host: "{{ ansible_ssh_host }}"
+    host: "{{ dut_host }}"
     port: 22
     state: started
     delay: 10
