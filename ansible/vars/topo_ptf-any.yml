@@ -267,7 +267,7 @@ configuration:
       peers:
         65100:
         - 10.0.0.32
-        - fc00::121
+        - fc00::22
     bgp_interface:
       ipv4: 10.10.246.1/24
       ipv6: fc0a::1/64
@@ -307,7 +307,7 @@ configuration:
       peers:
         65100:
         - 10.0.0.34
-        - fc00::125
+        - fc00::27
     bgp_interface:
       ipv4: 10.10.246.5/24
       ipv6: fc0a::5/64
@@ -347,7 +347,7 @@ configuration:
       peers:
         65100:
         - 10.0.0.36
-        - fc00::129
+        - fc00::2b
     bgp_interface:
       ipv4: 10.10.246.9/24
       ipv6: fc0a::9/64
