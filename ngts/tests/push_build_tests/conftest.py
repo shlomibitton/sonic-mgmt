@@ -41,8 +41,8 @@ def push_gate_configuration(topology_obj):
 
     # Interfaces config which will be used in test
     interfaces_config_dict = {
-        'dut': [{'iface': dutha1, 'speed': '10000', 'original_speed': dut_original_interfaces_speeds[dutha1]},
-                {'iface': duthb2, 'speed': '10000', 'original_speed': dut_original_interfaces_speeds[duthb2]}]
+        'dut': [{'iface': dutha1, 'speed': '10G', 'original_speed': dut_original_interfaces_speeds.get(dutha1, '10G')},
+                {'iface': duthb2, 'speed': '10G', 'original_speed': dut_original_interfaces_speeds.get(duthb2, '10G')}]
     }
 
     # LAG/LACP config which will be used in test
