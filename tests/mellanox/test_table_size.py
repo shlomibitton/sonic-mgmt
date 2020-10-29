@@ -11,7 +11,7 @@ import time
 import pytest
 
 from tests.common.utilities import wait, wait_until
-from tests.common.mellanox_data import SWITCH_MODELS as models
+from tests.common.mellanox_data import get_platform_data
 from tests.common.errors import RunAnsibleModuleFail
 
 pytestmark = [pytest.mark.disable_loganalyzer]
@@ -121,7 +121,7 @@ def common_setup_teardown(duthost, localhost):
         reboot_required = True
 
     # For devices support warm-reboot, ensure that warm-reboot is recovered after testing
-    if models[dut_hwsku]["reboot"]["warm_reboot"]:
+    if get_platform_data(duthost)["reboot"]["warm_reboot"]:
         set_issu(duthost, issu_enabled=True)
         reboot_required = True
 
