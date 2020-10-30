@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 
-class StaticRouteCliInterface(ABC):
+class RouteCliInterface(ABC):
+
     @staticmethod
     @abstractmethod
     def add_route(engine, dst, via, dst_mask, vrf):
