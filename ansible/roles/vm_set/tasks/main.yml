@@ -264,3 +264,4 @@
   loop: "{{ duts_name.split(',') }}"
   loop_control:
     loop_var: dut_name
+  when: duts_name is defined
