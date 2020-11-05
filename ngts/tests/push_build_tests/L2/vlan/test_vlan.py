@@ -17,7 +17,7 @@ from ngts.cli_wrappers.linux.linux_ip_clis import LinuxIpCli
 
 logger = logging.getLogger()
 
-show_vlan_config_pattern = "Vlan{vid}\s+{vid}\s+{member}\s+{mode}"
+show_vlan_config_pattern = r"Vlan{vid}\s+{vid}\s+{member}\s+{mode}"
 
 
 @pytest.mark.push_gate

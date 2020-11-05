@@ -298,7 +298,7 @@ def test_lldp_after_disable_on_dut(topology_obj):
     cli_object = topology_obj.players['dut']['cli']
     cli_object.lldp.disable_lldp(dut_engine)
     logger.info("Verify lldp is disabled in \"show_feature_status\"")
-    check_lldp_feature_status(dut_engine, cli_object, expected_res="lldp\s+disabled")
+    check_lldp_feature_status(dut_engine, cli_object, expected_res=r"lldp\s+disabled")
     with allure.step("Expect test LLDP to fail after being disabled"):
         try:
             verify_lldp_info_for_dut_host_ports(topology_obj)
@@ -312,7 +312,7 @@ def test_lldp_after_disable_on_dut(topology_obj):
         retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
 
 
-def check_lldp_feature_status(dut_engine, cli_object, expected_res="lldp\s+enabled"):
+def check_lldp_feature_status(dut_engine, cli_object, expected_res=r"lldp\s+enabled"):
     with allure.step("Verifying the output of \"show feature status\" command"):
         feature_status = cli_object.general.show_feature_status(dut_engine)
         expected_output = [(expected_res, True)]
