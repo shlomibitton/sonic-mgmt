@@ -1,4 +1,5 @@
 import logging
+import re
 import allure
 from ngts.cli_wrappers.common.lldp_clis_common import LldpCliCommon
 
@@ -41,3 +42,25 @@ class LinuxLldpCli(LldpCliCommon):
         """
         with allure.step('Enable LLDP on interface {} on {}'.format(interface, engine.ip)):
             return engine.run_cmd("lldptool set-lldp -i {} adminStatus=rxtx".format(interface))
+
+    @staticmethod
+    def enable_lldp_on_host(engine):
+        """
+        This method enable LLDP on host
+        :param engine: ssh enging object
+        :return: command output
+        """
+        with allure.step('Enable LLDP on {}'.format(engine.ip)):
+            return engine.run_cmd("lldpad -d")
+
+    @staticmethod
+    def is_lldp_enabled_on_host(engine):
+        """
+        This method enable LLDP on host
+        :param engine: ssh enging object
+        :return: command output
+        """
+        with allure.step('Check if LLDP is enabled on {}'.format(engine.ip)):
+            regex_pattern = "lldpad -d"
+            output = engine.run_cmd("ps -aux | grep lldpad")
+            return bool(re.search(regex_pattern,output, re.IGNORECASE))
