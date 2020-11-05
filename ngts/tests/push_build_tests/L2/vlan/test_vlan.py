@@ -10,7 +10,7 @@ from ngts.cli_wrappers.linux.linux_ip_clis import LinuxIpCli
 """
 
  Vlan Test Cases
- 
+
  Documentation: https://wikinox.mellanox.com/display/SW/SONiC+NGTS+VLAN+Documentation
 
 """

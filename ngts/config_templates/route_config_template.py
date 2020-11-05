@@ -23,7 +23,7 @@ class RouteConfigTemplate:
                     dst_mask = route_info['dst_mask']
                     vrf = route_info.get('vrf')
                     for nexthop in route_info['via']:
-                        cli_object.static_route.add_route(engine, dst, nexthop, dst_mask, vrf)
+                        cli_object.route.add_route(engine, dst, nexthop, dst_mask, vrf)
 
     @staticmethod
     def cleanup(topology_obj, static_route_config_dict):
@@ -43,4 +43,4 @@ class RouteConfigTemplate:
                     dst_mask = route_info['dst_mask']
                     vrf = route_info.get('vrf')
                     for nexthop in route_info['via']:
-                        cli_object.static_route.del_route(engine, dst, nexthop, dst_mask, vrf)
+                        cli_object.route.del_route(engine, dst, nexthop, dst_mask, vrf)

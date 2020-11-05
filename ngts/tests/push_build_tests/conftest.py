@@ -5,9 +5,7 @@ from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
 from ngts.config_templates.interfaces_config_template import InterfaceConfigTemplate
 from ngts.config_templates.lag_lacp_config_template import LagLacpConfigTemplate
 from ngts.config_templates.vlan_config_template import VlanConfigTemplate
-from ngts.config_templates.vrf_config_template import VrfConfigTemplate
 from ngts.config_templates.ip_config_template import IpConfigTemplate
-from ngts.config_templates.route_config_template import RouteConfigTemplate
 
 logger = logging.getLogger()
 
@@ -22,17 +20,11 @@ def push_gate_configuration(topology_obj):
     dutha1 = topology_obj.ports['dut-ha-1']
     dutha2 = topology_obj.ports['dut-ha-2']
     duthb2 = topology_obj.ports['dut-hb-2']
-    dutlb1_1 = topology_obj.ports['dut-lb1-1']
-    dutlb2_1 = topology_obj.ports['dut-lb2-1']
-    dutlb3_1 = topology_obj.ports['dut-lb3-1']
-    dutlb4_1 = topology_obj.ports['dut-lb4-1']
-    dutlb_splt2_p1_1 = topology_obj.ports['dut-lb-splt2-p1-1']
-    dutlb_splt2_p1_2 = topology_obj.ports['dut-lb-splt2-p1-2']
+
     # Hosts A ports
     hadut1 = topology_obj.ports['ha-dut-1']
     hadut2 = topology_obj.ports['ha-dut-2']
     # Hosts B ports
-    hbdut1 = topology_obj.ports['hb-dut-1']
     hbdut2 = topology_obj.ports['hb-dut-2']
 
     # variable below required for correct interfaces speed cleanup
@@ -55,36 +47,20 @@ def push_gate_configuration(topology_obj):
 
     # VLAN config which will be used in test
     vlan_config_dict = {
-        'dut': [{'vlan_id': 31, 'vlan_members': [{dutlb1_1: 'access'}]},
-                {'vlan_id': 32, 'vlan_members': [{dutlb2_1: 'access'}]},
-                {'vlan_id': 33, 'vlan_members': [{dutlb3_1: 'access'}]},
-                {'vlan_id': 34, 'vlan_members': [{dutlb4_1: 'access'}]},
-                {'vlan_id': 35, 'vlan_members': [{dutlb_splt2_p1_1: 'access'}]},
-                {'vlan_id': 36, 'vlan_members': [{dutlb_splt2_p1_2: 'access'}]},
-                {'vlan_id': 69, 'vlan_members': [{'PortChannel0002': 'trunk'}]},
-                {'vlan_id': 500, 'vlan_members': [{dutha2: 'trunk'}]},
-                {'vlan_id': 501, 'vlan_members': [{'PortChannel0002': 'trunk'}]},
-                {'vlan_id': 600, 'vlan_members': [{dutha2: 'trunk'}]},
-                {'vlan_id': 601, 'vlan_members': [{'PortChannel0002': 'trunk'}]},
-                {'vlan_id': 690, 'vlan_members': [{dutha2: 'trunk'}]},
-                {'vlan_id': 691, 'vlan_members': [{dutha2: 'trunk'}]}],
-        'ha': [{'vlan_id': 500, 'vlan_members': [{hadut2: None}]},
-               {'vlan_id': 600, 'vlan_members': [{hadut2: None}]},
-               {'vlan_id': 690, 'vlan_members': [{hadut2: None}]},
-               {'vlan_id': 691, 'vlan_members': [{hadut2: None}]}],
-        'hb': [{'vlan_id': 501, 'vlan_members': [{'bond0': None}]},
-               {'vlan_id': 601, 'vlan_members': [{'bond0': None}]},
+        'dut': [{'vlan_id': 40, 'vlan_members': [{'PortChannel0002': 'trunk'}, {dutha2: 'trunk'}]},
+                {'vlan_id': 69, 'vlan_members': [{'PortChannel0002': 'trunk'}]}],
+        'ha': [{'vlan_id': 40, 'vlan_members': [{hadut2: None}]}],
+        'hb': [{'vlan_id': 40, 'vlan_members': [{'bond0': None}]},
                {'vlan_id': 69, 'vlan_members': [{'bond0': None}]}]
     }
 
     # IP config which will be used in test
     ip_config_dict = {
-        'dut': [{'iface': 'Vlan69', 'ips': [('69.0.0.1', '24')]}],
-        'ha': [{'iface': '{}.500'.format(hadut2), 'ips': [('50.0.0.2', '24')]},
-               {'iface': '{}.600'.format(hadut2), 'ips': [('60.0.0.2', '24')]}],
-        'hb': [{'iface': 'bond0.501', 'ips': [('50.1.0.2', '24')]},
-               {'iface': 'bond0.601', 'ips': [('60.1.0.2', '24')]},
-               {'iface': 'bond0.69', 'ips': [('69.0.0.2', '24')]}]
+        'dut': [{'iface': 'Vlan40', 'ips': [('40.0.0.1', '24'), ('4000::1', '64')]},
+                {'iface': 'Vlan69', 'ips': [('69.0.0.1', '24'), ('6900::1', '64')]}],
+        'ha': [{'iface': '{}.40'.format(hadut2), 'ips': [('40.0.0.2', '24'), ('4000::2', '64')]}],
+        'hb': [{'iface': 'bond0.40', 'ips': [('40.0.0.3', '24'), ('4000::3', '64')]},
+               {'iface': 'bond0.69', 'ips': [('69.0.0.2', '24'), ('6900::2', '64')]}]
     }
 
     logger.info('Starting PushGate Common configuration')

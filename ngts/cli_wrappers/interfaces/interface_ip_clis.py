@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 
 
 class IpCliInterface(ABC):
+
     @staticmethod
     @abstractmethod
-    def add_ip_to_interface(engine, interface, ip, mask=24):
+    def add_ip_to_interface(engine, interface, ip, mask):
         """
         This method is abstractmethod and should be implemented in child classes
         """
@@ -12,7 +13,7 @@ class IpCliInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def del_ip_from_interface(engine, interface, ip, mask=24):
+    def del_ip_from_interface(engine, interface, ip, mask):
         """
         This method is abstractmethod and should be implemented in child classes
         """
