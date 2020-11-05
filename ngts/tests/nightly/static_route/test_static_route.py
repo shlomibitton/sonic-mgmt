@@ -91,7 +91,7 @@ def static_route_configuration(topology_obj):
 
 
 @allure.title('Test Scale Static Route')
-def test_scale_static_route(topology_obj, static_route_configuration):
+def test_scale_static_route(topology_obj, disable_ssh_client_alive_interval, static_route_configuration):
     """
     This test will check scale for static route functionality(we will use 100 000 static routes)
     Test(fixture before) will configure on DUT 100 000 static routes for IPv4 with mask /32
@@ -105,6 +105,8 @@ def test_scale_static_route(topology_obj, static_route_configuration):
     - Test will send ICMP from HA to each IP address(IPv4 and IPv6) on HB via DUT(dut should route traffic)
 
     :param topology_obj: topology object fixture
+    :param disable_ssh_client_alive_interval: pytest fixture which will disable SSH client disconnection after 15 min
+    without activity
     :return: raise assertion error in case when test failed
     """
     hadut1 = topology_obj.ports['ha-dut-1']
