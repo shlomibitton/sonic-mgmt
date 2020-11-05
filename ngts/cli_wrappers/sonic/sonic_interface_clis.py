@@ -134,3 +134,31 @@ class SonicInterfaceCli(InterfaceCliCommon):
                     if re.match('\s*{}\s+'.format(interface), line):
                         result[interface] = line.split()[3]
             return result
+
+    @staticmethod
+    def show_interfaces_alias(engine):
+        """
+        This method return output of "show interfaces alias" command
+        :param engine: ssh enging object
+        :return: command output
+        """
+        with allure.step('show interfaces alias on {}'.format(engine.ip)):
+            return engine.run_cmd('show interfaces alias')
+
+    @staticmethod
+    def parse_ports_aliases_on_sonic(engine):
+        """
+        Method which parse "show interfaces alias" command
+        :param engine: ssh engine object
+        :return: a dictionary with port aliases, example: {'Ethernet0': 'etp1'}
+        """
+        with allure.step('parsing show interfaces alias on {}'.format(engine.ip)):
+            result = {}
+            interfaces_data = SonicInterfaceCli.show_interfaces_alias(engine)
+            regex_pattern = "(Ethernet\d+)\s*(etp\d+\w*)"
+            list_output = re.findall(regex_pattern, interfaces_data, re.IGNORECASE)
+            for port, port_sonic_alias in list_output:
+                result[port] = port_sonic_alias
+            return result
+
+
