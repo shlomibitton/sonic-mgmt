@@ -148,14 +148,24 @@ class SensorsModule(object):
     def get_raw_value(self, path):
         '''
             Get value in raw output in the path 'path'
+            Note: Expected path contains two types of value(string and regex)
+                  Regular expression is wrapped with backslash '\'
         '''
         keys = path.split('/')
 
         cur_value = self.raw
         for key in keys:
-            if key in cur_value:
-                cur_value = cur_value[key]
+            if '\\' not in key:
+                pattern = re.compile(re.escape(key))
             else:
+                key.replace('\\', '')
+                pattern = re.compile(key)
+            for cur_value in cur_values.keys():
+                res = re.match(pattern, cur_value)
+                if res is not None:
+                    cur_values = cur_values[res.group()]
+                    break
+            if res is None:
                 return None
 
         return cur_value
