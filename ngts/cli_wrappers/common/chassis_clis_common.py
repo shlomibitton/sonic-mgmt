@@ -13,5 +13,4 @@ class ChassisCliCommon(ChassisCliInterface):
         :param engine: ssh engine object
         :return: command output
         """
-        with allure.step('get {} hostname'.format(engine.ip)):
-            return engine.run_cmd("hostname")
+        return engine.run_cmd("hostname")

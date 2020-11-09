@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.common.vlan_clis_common import VlanCliCommon
 
 
@@ -43,8 +41,7 @@ class SonicVlanCli(VlanCliCommon):
         :param vlan: vlan ID
         :return: command output
         """
-        with allure.step('{}: adding VLAN {}'.format(engine.ip, vlan)):
-            return engine.run_cmd("sudo config vlan add {}".format(vlan))
+        return engine.run_cmd("sudo config vlan add {}".format(vlan))
 
     @staticmethod
     def del_vlan(engine, vlan):
@@ -54,8 +51,7 @@ class SonicVlanCli(VlanCliCommon):
         :param vlan: vlan ID
         :return: command output
         """
-        with allure.step('{}: deleting VLAN {}'.format(engine.ip, vlan)):
-            return engine.run_cmd("sudo config vlan del {}".format(vlan))
+        return engine.run_cmd("sudo config vlan del {}".format(vlan))
 
     @staticmethod
     def add_port_to_vlan(engine, port, vlan, mode='trunk'):
@@ -67,13 +63,12 @@ class SonicVlanCli(VlanCliCommon):
         :param mode: port mode - access or trunk
         :return: command output
         """
-        with allure.step('{}: adding port {} to be member of VLAN: {}'.format(engine.ip, port, vlan)):
-            if mode == 'trunk':
-                return engine.run_cmd("sudo config vlan member add {} {}".format(vlan, port))
-            elif mode == 'access':
-                return engine.run_cmd("sudo config vlan member add --untagged {} {}".format(vlan, port))
-            else:
-                raise Exception('Incorrect port mode: "{}" provided, expected "trunk" or "access"')
+        if mode == 'trunk':
+            return engine.run_cmd("sudo config vlan member add {} {}".format(vlan, port))
+        elif mode == 'access':
+            return engine.run_cmd("sudo config vlan member add --untagged {} {}".format(vlan, port))
+        else:
+            raise Exception('Incorrect port mode: "{}" provided, expected "trunk" or "access"')
 
     @staticmethod
     def del_port_from_vlan(engine, port, vlan):
@@ -84,8 +79,7 @@ class SonicVlanCli(VlanCliCommon):
         :param vlan: vlan ID
         :return: command output
         """
-        with allure.step('{}: deleting port {} from VLAN: {}'.format(engine.ip, port, vlan)):
-            return engine.run_cmd("sudo config vlan member del {} {}".format(vlan, port))
+        return engine.run_cmd("sudo config vlan member del {} {}".format(vlan, port))
 
     @staticmethod
     def show_vlan_config(engine):
@@ -94,5 +88,4 @@ class SonicVlanCli(VlanCliCommon):
         :param engine: ssh engine object
         :return: command output
         """
-        with allure.step('show vlan config on {}'.format(engine.ip)):
-            return engine.run_cmd("show vlan config")
+        return engine.run_cmd("show vlan config")
