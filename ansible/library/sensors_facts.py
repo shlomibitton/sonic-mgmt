@@ -153,7 +153,7 @@ class SensorsModule(object):
         '''
         keys = path.split('/')
 
-        cur_value = self.raw
+        cur_values = self.raw
         for key in keys:
             if '\\' not in key:
                 pattern = re.compile(re.escape(key))
