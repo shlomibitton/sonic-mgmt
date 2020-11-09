@@ -754,14 +754,8 @@ def parse_xml(filename, hostname):
         for i in range(0, 256, 8):
             port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
     else:
-        if hwsku == "ACS-MSN2100":
-            for i in range(0, 30, 1):
-                port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
-            for i in range(32, 64, 4):
-                port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
-        else:
-            for i in range(0, 128, 4):
-                port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
+        for i in range(0, 128, 4):
+            port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
 
     for child in root:
         if child.tag == str(QName(ns, "DpgDec")):
