@@ -144,7 +144,7 @@ mtbc-sonic-02-2700 ansible_host=mtbc-sonic-02-2700 ansible_ssh_user=admin ansibl
 r-panther-03 ansible_host=r-panther-03 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 r-tigris-17 ansible_host=r-tigris-17 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 r-anaconda-43 ansible_host=r-anaconda-43 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
-r-leopard-20 ansible_host=r-leopard-20 ansible_ssh_user=admin ansible_ssh_pass=admin
+r-leopard-20 ansible_host=r-leopard-20 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 mtbc-3700c-02 ansible_host=mtbc-3700c-02 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 arc-switch1003 ansible_host=arc-switch1003 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 mts-sonic-fanout ansible_host=mts-sonic-fanout ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
