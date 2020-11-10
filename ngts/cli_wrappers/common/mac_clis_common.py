@@ -16,5 +16,4 @@ class MacCliCommon(MacCliInterface):
         :param interface: interface name
         :return: mac address
         """
-        with allure.step('{}: getting MAC address for device {}'.format(engine.ip, interface)):
-            return engine.run_cmd("cat /sys/class/net/{}/address".format(interface))
+        return engine.run_cmd("cat /sys/class/net/{}/address".format(interface))

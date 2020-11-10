@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.linux.linux_interface_clis import LinuxInterfaceCli
 from ngts.cli_wrappers.common.lag_lacp_clis_common import LagLacpCliCommon
 
@@ -58,5 +56,4 @@ class LinuxLagLacpCli(LagLacpCliCommon):
         :param bond_mode: bond mode which will be set
         :return: command output
         """
-        with allure.step('{}: setting bond mode {} for interface {}'.format(engine.ip, bond_mode, bond_name)):
-            return engine.run_cmd("sudo ip link set dev {} type bond mode {}".format(bond_name, bond_mode))
+        return engine.run_cmd("sudo ip link set dev {} type bond mode {}".format(bond_name, bond_mode))

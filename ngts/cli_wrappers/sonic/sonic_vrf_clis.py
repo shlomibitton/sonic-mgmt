@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.common.vrf_clis_common import VrfCliCommon
 
 
@@ -12,8 +10,7 @@ class SonicVrfCli(VrfCliCommon):
         :param vrf: vrf name which should be created
         :return: command output
         """
-        with allure.step('{}: creating VRF name: {}'.format(engine.ip, vrf)):
-            return engine.run_cmd("sudo config vrf add {}".format(vrf))
+        return engine.run_cmd("sudo config vrf add {}".format(vrf))
 
     @staticmethod
     def del_vrf(engine, vrf):
@@ -23,8 +20,7 @@ class SonicVrfCli(VrfCliCommon):
         :param vrf: vrf name which should be deleted
         :return: command output
         """
-        with allure.step('{}: deleting VRF name: {}'.format(engine.ip, vrf)):
-            return engine.run_cmd("sudo config vrf del {}".format(vrf))
+        return engine.run_cmd("sudo config vrf del {}".format(vrf))
 
     @staticmethod
     def add_interface_to_vrf(engine, interface, vrf):
@@ -35,8 +31,7 @@ class SonicVrfCli(VrfCliCommon):
         :param vrf: vrf name to which move interface
         :return: command output
         """
-        with allure.step('{}: adding interface {} to VRF name: {}'.format(engine.ip, interface, vrf)):
-            return engine.run_cmd("sudo config interface vrf bind {} {}".format(interface, vrf))
+        return engine.run_cmd("sudo config interface vrf bind {} {}".format(interface, vrf))
 
     @staticmethod
     def del_interface_from_vrf(engine, interface, vrf):
@@ -47,5 +42,4 @@ class SonicVrfCli(VrfCliCommon):
         :param vrf: vrf name from which move interface
         :return: command output
         """
-        with allure.step('{}: deleting interface {} from VRF name: {}'.format(engine.ip, interface, vrf)):
-            return engine.run_cmd("sudo config interface vrf unbind {}".format(interface))
+        return engine.run_cmd("sudo config interface vrf unbind {}".format(interface))

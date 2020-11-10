@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.common.route_clis_common import RouteCliCommon
 
 
@@ -38,8 +36,7 @@ class SonicRouteCli(RouteCliCommon):
         :param vrf: vrf name - in case when need to add route in custom vrf
         :return: add_del_route method
         """
-        with allure.step('{}: creating a static IP route to {}/{} via {}'.format(engine.ip, dst, dst_mask, via)):
-            SonicRouteCli.add_del_route(engine, 'add', dst, via, dst_mask, vrf)
+        SonicRouteCli.add_del_route(engine, 'add', dst, via, dst_mask, vrf)
 
     @staticmethod
     def del_route(engine, dst, via, dst_mask, vrf=None):
@@ -52,8 +49,7 @@ class SonicRouteCli(RouteCliCommon):
         :param vrf: vrf name - in case when need to del route in custom vrf
         :return: add_del_route method
         """
-        with allure.step('{}: deleting a static IP route to {}/{} via {}'.format(engine.ip, dst, dst_mask, via)):
-            SonicRouteCli.add_del_route(engine, 'del', dst, via, dst_mask, vrf)
+        SonicRouteCli.add_del_route(engine, 'del', dst, via, dst_mask, vrf)
 
     @staticmethod
     def show_ip_route(engine, route_type=None, ipv6=False, route=None, vrf=None):
@@ -77,5 +73,4 @@ class SonicRouteCli(RouteCliCommon):
         if route:
             cmd += route
 
-        with allure.step('{}: getting IP routes by command: {}'.format(engine.ip, cmd)):
-            return engine.run_cmd(cmd)
+        return engine.run_cmd(cmd)

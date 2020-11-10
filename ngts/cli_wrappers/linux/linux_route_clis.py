@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.common.route_clis_common import RouteCliCommon
 
 
@@ -35,8 +33,7 @@ class LinuxRouteCli(RouteCliCommon):
         :param vrf: vrf name - in case when need to add route in custom vrf
         :return: command output
         """
-        with allure.step('{}: creating a static IP route to {}/{} via {}'.format(engine.ip, dst, dst_mask, via)):
-            LinuxRouteCli.add_del_route(engine, 'add', dst, via, dst_mask, vrf)
+        LinuxRouteCli.add_del_route(engine, 'add', dst, via, dst_mask, vrf)
 
     @staticmethod
     def del_route(engine, dst, via, dst_mask, vrf=None):
@@ -49,5 +46,4 @@ class LinuxRouteCli(RouteCliCommon):
         :param vrf: vrf name - in case when need to del route in custom vrf
         :return: command output
         """
-        with allure.step('{}: deleting a static IP route to {}/{} via {}'.format(engine.ip, dst, dst_mask, via)):
-            LinuxRouteCli.add_del_route(engine, 'del', dst, via, dst_mask, vrf)
+        LinuxRouteCli.add_del_route(engine, 'del', dst, via, dst_mask, vrf)

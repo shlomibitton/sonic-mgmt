@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.common.lag_lacp_clis_common import LagLacpCliCommon
 
 
@@ -59,8 +57,7 @@ class SonicLagLacpCli(LagLacpCliCommon):
         :param lacp_interface_name: LACP interface name which should be added
         :return: command output
         """
-        with allure.step('{}: Creating LACP interface: {}'.format(engine.ip, lacp_interface_name)):
-            return engine.run_cmd("sudo config portchannel add {}".format(lacp_interface_name))
+        return engine.run_cmd("sudo config portchannel add {}".format(lacp_interface_name))
 
     @staticmethod
     def delete_lag_interface(engine, lacp_interface_name):
@@ -70,8 +67,7 @@ class SonicLagLacpCli(LagLacpCliCommon):
         :param lacp_interface_name: LACP interface name which should be deleted
         :return: command output
         """
-        with allure.step('{}: deleting LACP interface: {}'.format(engine.ip, lacp_interface_name)):
-            return engine.run_cmd("sudo config portchannel del {}".format(lacp_interface_name))
+        return engine.run_cmd("sudo config portchannel del {}".format(lacp_interface_name))
 
     @staticmethod
     def add_port_to_port_channel(engine, interface, lacp_interface_name):
@@ -82,8 +78,7 @@ class SonicLagLacpCli(LagLacpCliCommon):
         :param lacp_interface_name: LACP interface name to which we will add interface
         :return: command output
         """
-        with allure.step('{}: adding port {} to LACP interface: {}'.format(engine.ip, interface, lacp_interface_name)):
-            return engine.run_cmd("sudo config portchannel member add {} {}".format(lacp_interface_name, interface))
+        return engine.run_cmd("sudo config portchannel member add {} {}".format(lacp_interface_name, interface))
 
     @staticmethod
     def delete_port_from_port_channel(engine, interface, lacp_interface_name):
@@ -94,5 +89,4 @@ class SonicLagLacpCli(LagLacpCliCommon):
         :param lacp_interface_name: LACP interface name from which we will remove interface
         :return: command output
         """
-        with allure.step('{}: deleting port {} from LACP interface: {}'.format(engine.ip, interface, lacp_interface_name)):
-            return engine.run_cmd("sudo config portchannel member del {} {}".format(lacp_interface_name, interface))
+        return engine.run_cmd("sudo config portchannel member del {} {}".format(lacp_interface_name, interface))

@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.linux.linux_interface_clis import LinuxInterfaceCli
 from ngts.cli_wrappers.common.vlan_clis_common import VlanCliCommon
 
@@ -46,9 +44,7 @@ class LinuxVlanCli(VlanCliCommon):
         :return: command output
         """
         vlan_interface = '{}.{}'.format(interface, vlan)
-        with allure.step('{}: creating a VLAN interface {}'.format(engine.ip, vlan_interface)):
-            return engine.run_cmd("sudo ip link add link {} name {} type vlan id {}"
-                                  .format(interface, vlan_interface, vlan))
+        return engine.run_cmd("sudo ip link add link {} name {} type vlan id {}".format(interface, vlan_interface, vlan))
 
     @staticmethod
     def del_vlan_interface(engine, interface, vlan):
@@ -60,5 +56,4 @@ class LinuxVlanCli(VlanCliCommon):
         :return: command output
         """
         vlan_interface = '{}.{}'.format(interface, vlan)
-        with allure.step('{}: deleting a VLAN interface {}'.format(engine.ip, vlan_interface)):
-            return engine.run_cmd("sudo ip link del {}".format(vlan_interface))
+        return engine.run_cmd("sudo ip link del {}".format(vlan_interface))

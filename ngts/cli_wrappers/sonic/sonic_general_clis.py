@@ -1,4 +1,3 @@
-import allure
 from ngts.cli_wrappers.common.general_clis_common import GeneralCliCommon
 
 
@@ -14,5 +13,4 @@ class SonicGeneralCli(GeneralCliCommon):
         :param engine: ssh enging object
         :return: command output
         """
-        with allure.step('show feature status on {}'.format(engine.ip)):
-            return engine.run_cmd('show feature status')
+        return engine.run_cmd('show feature status')
