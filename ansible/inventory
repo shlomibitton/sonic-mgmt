@@ -75,11 +75,17 @@ arc-switch1041-t0  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=AC
 arc-switch1041-ptf32  ansible_host=arc-switch1041  sonic_version=v2  sonic_hwsku=ACS-MSN2740 serial_console="ssh -l rcon:7020 10.224.2.81" ptf_host=ptf-1041 ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-208-0-24
 
 # MTR testbed r-tigon-04 topologies
-r-tigon-04 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=arc-switch1003 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" pdu_host=pdu-10-208-0-24
-r-tigon-04-t0 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=arc-switch1003 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
-r-tigon-04-t1 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=arc-switch1003 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
-r-tigon-04-t1-lag ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=arc-switch1003 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
-r-tigon-04-ptf32 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=arc-switch1003 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" pdu_host=pdu-10-208-0-24
+r-tigon-04-t0 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-t0-16 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-t0-52 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-t0-56 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-t0-64 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" pdu_host=pdu-10-208-0-24
+r-tigon-04-t1 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-t1-lag ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-t1-64-lag ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-ptf32 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
+r-tigon-04-ptf34 ansible_host=r-tigon-04 sonic_version=v2 sonic_hwsku=ACS-MSN4600C fanout_switch=r-tigris-22 ptf_host=ptf-r-tigon-04 ptf_portmap="roles/test/files/mlnx/ptf-map/r-tigon-04_interface_to_front_map.ini" dut_mac="0c:42:a1:60:65:d8" pdu_host=pdu-10-208-0-24
 
 # MTS testbed mts-sonic-dut topologies
 mts-sonic-dut ansible_host=mts-sonic-dut sonic_version=v2 sonic_hwsku=ACS-MSN2700 serial_console="telnet 10.9.103.13 7022" ptf_host=mts-ptf ptf_portmap="roles/test/files/mlnx/default_interface_to_front_map.ini" pdu_host=pdu-10-9-74-52
@@ -146,7 +152,7 @@ r-tigris-17 ansible_host=r-tigris-17 ansible_ssh_user=admin ansible_ssh_pass=adm
 r-anaconda-43 ansible_host=r-anaconda-43 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 r-leopard-20 ansible_host=r-leopard-20 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 mtbc-3700c-02 ansible_host=mtbc-3700c-02 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
-arc-switch1003 ansible_host=arc-switch1003 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
+r-tigris-22 ansible_host=r-tigris-22 ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 mts-sonic-fanout ansible_host=mts-sonic-fanout ansible_ssh_user=admin ansible_ssh_pass=admin os=onyx
 
 switch1  ansible_host=10.0.0.100  sonic_version=v2  sonic_hwsku=Force10-S6000 pdu_host=pdu-1
@@ -235,9 +241,15 @@ arc-switch1041-ptf32
 # MTR r-tigon-04 topologies
 r-tigon-04
 r-tigon-04-t0
+r-tigon-04-t0-16
+r-tigon-04-t0-52
+r-tigon-04-t0-56
+r-tigon-04-t0-64
 r-tigon-04-t1
 r-tigon-04-t1-lag
+r-tigon-04-t1-64-lag
 r-tigon-04-ptf32
+r-tigon-04-ptf64
 
 # MTS testbed mts-sonic-dut topologies
 mts-sonic-dut
@@ -354,9 +366,15 @@ r-leopard-01-ptf32
 # MTR r-tigon-04 topologies
 r-tigon-04
 r-tigon-04-t0
+r-tigon-04-t0-16
+r-tigon-04-t0-52
+r-tigon-04-t0-56
+r-tigon-04-t0-64
 r-tigon-04-t1
 r-tigon-04-t1-lag
+r-tigon-04-t1-64-lag
 r-tigon-04-ptf32
+r-tigon-04-ptf64
 
 # MTR arc-switch1041 topologies
 arc-switch1041
