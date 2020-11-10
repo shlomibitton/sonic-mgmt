@@ -22,8 +22,9 @@ def test_show_lldp_table_output(topology_obj):
         dut_engine = topology_obj.players['dut']['engine']
         cli_object = topology_obj.players['dut']['cli']
         dut_ports_interconnects = get_dut_ports_interconnects(topology_obj.ports_interconnects)
+        retry_call(verify_lldp_ports_match_topology_ports, fargs=[dut_ports_interconnects, topology_obj], tries=6,
+                   delay=5, logger=logger)
         lldp_table_info = cli_object.lldp.parse_lldp_table_info(dut_engine)
-        verify_lldp_ports_match_topology_ports(lldp_table_info, dut_ports_interconnects, topology_obj)
         port_aliases_dict = cli_object.interface.parse_ports_aliases_on_sonic(dut_engine)
         dut_hostname = cli_object.chassis.get_hostname(dut_engine)
         for port_noga_alias, neighbor_port_noga_alias in dut_ports_interconnects.items():
@@ -55,18 +56,15 @@ def get_dut_ports_interconnects(ports_interconnects):
     return dut_ports_interconnects
 
 
-def verify_lldp_ports_match_topology_ports(lldp_table_info, dut_ports_interconnects, topology_obj):
+def verify_lldp_ports_match_topology_ports(dut_ports_interconnects, topology_obj):
     """
-    :param lldp_table_info: a dictionary with the parsed info from "show lldp table" command
-    for Example:
-      { 'Ethernet232':  ('r-tigris-06','etp58','Ethernet228'), ..
-          'Ethernet252':  ('r-sonic-11-006', '0c:42:a1:46:55:8a', 'Interface   8 as enp5s0f0')
-          }
     :param dut_ports_interconnects: a filtered dictionary with all the connectivity only on the dut side, i.e. {'dut-ha-1': 'ha-dut-1'}
     :param topology_obj: topology object fixture
     :return: None, raise assertion error if the topology ports list is not same as lldp ports list
     """
     with allure.step("Verifying topology ports list is same as lldp ports list"):
+        cli_object = topology_obj.players['dut']['cli']
+        lldp_table_info = cli_object.lldp.parse_lldp_table_info(topology_obj.players['dut']['engine'])
         logger.info("Verify topology ports list is same as lldp ports list")
         dut_ports = list(map(lambda x: topology_obj.ports[x], dut_ports_interconnects.keys()))
         lldp_ports = list(lldp_table_info.keys())
