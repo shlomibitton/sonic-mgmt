@@ -11,3 +11,6 @@ r, ".* telemetry#supervisord: start.sh dialout: ERROR \(abnormal termination\).*
 r, ".* ERR pmon#xcvrd.*initializeGlobalConfig.*"
 r, ".* ERR route_check.py.*"
 r, ".* INFO mgmt-framework#supervisord: rest-server.*"
+r, ".* WARNING syncd#SDK.*Not implemented attribute"
+r, ".* WARNING syncd#SDK.*check_rate: Set max rate to 0"
+r, ".* WARNING syncd#SDK.*sai_set_attribute: Failed attribs check, key:Switch ID 1"
