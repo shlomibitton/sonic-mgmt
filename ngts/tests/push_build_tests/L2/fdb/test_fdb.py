@@ -2,8 +2,10 @@ import allure
 import logging
 import pytest
 
+from retry.api import retry_call
 from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
 from ngts.cli_wrappers.sonic.sonic_mac_clis import SonicMacCli
+from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
 
 logger = logging.getLogger()
@@ -22,6 +24,9 @@ def test_push_gate_fdb(topology_obj):
         host_engine = topology_obj.players[host_name]['engine']
         src_iface = 'bond0.69'
         dst_ip = '69.0.0.1'
+        with allure.step('Check that PortChannel0002 link in UP state'):
+            retry_call(SonicInterfaceCli.check_ports_status, fargs=[dut_engine, ['PortChannel0002']], tries=12, delay=5,
+                       logger=logger)
 
         with allure.step('Sending 3 ping packets to {} from iface {}'.format(dst_ip, src_iface)):
             validation = {'sender': host_name, 'args': {'iface': src_iface, 'count': 3, 'dst': dst_ip}}
