@@ -1,7 +1,10 @@
 import re
+import logging
 
 from ngts.cli_wrappers.common.interface_clis_common import InterfaceCliCommon
+from ngts.cli_util.cli_parsers import generic_sonic_output_parser
 
+logger = logging.getLogger()
 
 class SonicInterfaceCli(InterfaceCliCommon):
 
@@ -69,6 +72,19 @@ class SonicInterfaceCli(InterfaceCliCommon):
         return engine.run_cmd("sudo show interfaces status")
 
     @staticmethod
+    def parse_interfaces_status(engine):
+        """
+        Method which getting parsed interfaces status
+        :param engine: ssh engine object
+        :return: dictionary, example: {'Ethernet0': {'Lanes': '0,1,2,3,4,5,6,7', 'Speed': '100G', 'MTU': '9100',
+        'FEC': 'N/A', 'Alias': 'etp1', 'Vlan': 'routed', 'Oper': 'up', 'Admin': 'up', 'Type': 'QSFP28 or later',
+        'Asym PFC': 'N/A'}, 'Ethernet8': {'Lanes'.......
+        """
+        ifaces_status = SonicInterfaceCli.show_interfaces_status(engine)
+        return generic_sonic_output_parser(ifaces_status, headers_ofset=0, len_ofset=1, data_ofset_from_start=2,
+                                           data_ofset_from_end=None, column_ofset=2, output_key='Interface')
+
+    @staticmethod
     def get_interface_speed(engine, interface):
         """
         Method which getting interface speed
@@ -76,10 +92,7 @@ class SonicInterfaceCli(InterfaceCliCommon):
         :param interface: interface name
         :return: interface speed, example: 200G
         """
-        interfaces_data = SonicInterfaceCli.show_interfaces_status(engine)
-        for line in interfaces_data.splitlines():
-            if re.match('\s*{}\s+'.format(interface), interfaces_data):
-                return line.split()[2]
+        return SonicInterfaceCli.parse_interfaces_status(engine)[interface]['Speed']
 
     @staticmethod
     def get_interfaces_speed(engine, interfaces_list):
@@ -90,11 +103,9 @@ class SonicInterfaceCli(InterfaceCliCommon):
         :return: interface speed dict, example: {'eth1': 200G, 'eth2': '100G'}
         """
         result = {}
-        interfaces_data = SonicInterfaceCli.show_interfaces_status(engine)
+        interfaces_data = SonicInterfaceCli.parse_interfaces_status(engine)
         for interface in interfaces_list:
-            for line in interfaces_data.splitlines():
-                if re.match('\s*{}\s+'.format(interface), line):
-                    result[interface] = line.split()[2]
+            result[interface] = interfaces_data[interface]['Speed']
         return result
 
     @staticmethod
@@ -105,10 +116,7 @@ class SonicInterfaceCli(InterfaceCliCommon):
         :param interface: interface name
         :return: interface MTU, example: 9100
         """
-        interfaces_data = SonicInterfaceCli.show_interfaces_status(engine)
-        for line in interfaces_data.splitlines():
-            if re.match('\s*{}\s+'.format(interface), interfaces_data):
-                return line.split()[3]
+        return SonicInterfaceCli.parse_interfaces_status(engine)[interface]['MTU']
 
     @staticmethod
     def get_interfaces_mtu(engine, interfaces_list):
@@ -119,11 +127,9 @@ class SonicInterfaceCli(InterfaceCliCommon):
         :return: interface MTU, example: interface mtu dict, example: {'eth1': 9100, 'eth2': '1500'}
         """
         result = {}
-        interfaces_data = SonicInterfaceCli.show_interfaces_status(engine)
+        interfaces_data = SonicInterfaceCli.parse_interfaces_status(engine)
         for interface in interfaces_list:
-            for line in interfaces_data.splitlines():
-                if re.match('\s*{}\s+'.format(interface), line):
-                    result[interface] = line.split()[3]
+            result[interface] = interfaces_data[interface]['MTU']
         return result
 
     @staticmethod
@@ -149,3 +155,18 @@ class SonicInterfaceCli(InterfaceCliCommon):
         for port, port_sonic_alias in list_output:
             result[port] = port_sonic_alias
         return result
+
+    @staticmethod
+    def check_ports_status(engine, ports_list, expected_status='up'):
+        """
+        This method verifies that each iinterface is in expected oper state
+        :param engine: ssh engine object
+        :param ports_list: list with port names which should be in UP state
+        :param expected_status_up: 'up' if expected UP, or 'down' if expected DOWN
+        :return Assertion exception in case of failure
+        """
+        logger.info('Checking that ifaces: {} in expected state: {}'.format(ports_list, expected_status))
+        ports_status = SonicInterfaceCli.parse_interfaces_status(engine)
+
+        for port in ports_list:
+            assert ports_status[port]['Oper'] == expected_status

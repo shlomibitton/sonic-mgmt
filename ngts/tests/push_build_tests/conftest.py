@@ -1,8 +1,8 @@
 import pytest
 import logging
+import allure
 
 from retry.api import retry_call
-from ngts.cli_util.verify_cli_show_cmd import verify_show_cmd
 from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
 from ngts.config_templates.interfaces_config_template import InterfaceConfigTemplate
 from ngts.config_templates.lag_lacp_config_template import LagLacpConfigTemplate
@@ -21,6 +21,7 @@ def push_gate_configuration(topology_obj):
     # Ports which will be used in test
     dutha1 = topology_obj.ports['dut-ha-1']
     dutha2 = topology_obj.ports['dut-ha-2']
+    duthb1 = topology_obj.ports['dut-hb-1']
     duthb2 = topology_obj.ports['dut-hb-2']
 
     # Hosts A ports
@@ -29,12 +30,14 @@ def push_gate_configuration(topology_obj):
     # Hosts B ports
     hbdut2 = topology_obj.ports['hb-dut-2']
 
-    # TODO: remove this workaround - which checks that ifaces in UP state
-    retry_call(check_that_ports_up, fargs=[topology_obj], tries=10, delay=10, logger=logger)
+    dut_engine = topology_obj.players['dut']['engine']
+
+    with allure.step('Check that links in UP state'.format()):
+        ports_list = [dutha1, dutha2, duthb1, duthb2]
+        retry_call(SonicInterfaceCli.check_ports_status, fargs=[dut_engine, ports_list], tries=10, delay=10, logger=logger)
 
     # variable below required for correct interfaces speed cleanup
-    dut_original_interfaces_speeds = SonicInterfaceCli.get_interfaces_speed(topology_obj.players['dut']['engine'],
-                                                                            [dutha1, duthb2])
+    dut_original_interfaces_speeds = SonicInterfaceCli.get_interfaces_speed(dut_engine, [dutha1, duthb2])
 
     # Interfaces config which will be used in test
     interfaces_config_dict = {
@@ -87,21 +90,3 @@ def push_gate_configuration(topology_obj):
     topology_obj.players['dut']['engine'].run_cmd('sudo config reload -y')
 
     logger.info('PushGate Common cleanup completed')
-
-
-def check_that_ports_up(topology_obj):
-    """
-    This is temporary method whihc checks that ifaces in UP state
-    Workarund for issue with ifaces in DOWN state after config reload -y
-    TODO: remove this once issue fixed
-    """
-    logger.info('Checking that ifaces in UP state before run test')
-    reg_exp = r'\s+{}\s+.*routed\s+up\s+up'
-    ifaces = [topology_obj.ports['dut-ha-1'], topology_obj.ports['dut-ha-2'], topology_obj.ports['dut-hb-1'],
-              topology_obj.ports['dut-hb-2']]
-
-    cli_object = topology_obj.players['dut']['cli']
-    ifaces_status = cli_object.interface.show_interfaces_status(topology_obj.players['dut']['engine'])
-
-    for iface in ifaces:
-        verify_show_cmd(ifaces_status, expected_output_list=[(reg_exp.format(iface), True)])
