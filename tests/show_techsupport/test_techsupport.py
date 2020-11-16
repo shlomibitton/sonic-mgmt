@@ -1,6 +1,7 @@
 import pytest
 import os
 import pprint
+import json
 from tests.common.plugins.loganalyzer.loganalyzer import LogAnalyzer, LogAnalyzerError
 import time
 from random import randint
@@ -248,7 +249,18 @@ def execute_command(duthost, since):
     :param duthost: DUT
     :param since: since string enterd by user
     """
-    stdout = duthost.command("show techsupport --since={}".format('"' + since + '"'))
+
+    logger.info('##### Copy generate_dump script with debug timestamps')
+    duthost.copy(src="show_techsupport/files/generate_dump", dest="/usr/bin")
+    logger.info('##### Running command: $show techsupport --verbose --since={}'.format('"' + since + '"'))
+    stdout = duthost.command("show techsupport --verbose --since={}".format('"' + since + '"'))
+    logger.info('##### Output of $show techsupport {}'.format(json.dumps(stdout, indent=4)))
+
+    logger.info("##### output[stderr] start")
+    for line in stdout["stderr"].splitlines():
+        logger.info('# {}'.format(line))
+    logger.info("##### output[stderr] finish")
+
     if stdout['rc'] == SUCCESS_CODE:
         pytest.tar_stdout = stdout['stdout']
     return stdout['rc'] == SUCCESS_CODE
@@ -262,7 +274,7 @@ def test_techsupport(request, config, duthost):
     """
     loop_range = request.config.getoption("--loop_num") or DEFAULT_LOOP_RANGE
     loop_delay = request.config.getoption("--loop_delay") or DEFAULT_LOOP_DELAY
-    since = request.config.getoption("--logs_since") or str(randint(1, 23)) + " minute ago"
+    since = request.config.getoption("--logs_since") or "1 minute ago"
 
     logger.debug("Loop_range is {} and loop_delay is {}".format(loop_range, loop_delay))
 
