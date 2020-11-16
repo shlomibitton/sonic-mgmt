@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+import re
 import subprocess
 from ansible.module_utils.basic import *
 
@@ -25,7 +25,6 @@ EXAMPLES = '''
    sensors_facts: checks={{ sensors['Force10-S6000'] }}
  - name: Output of sensors information
    debug: var=vars['sensors']
-
 '''
 
 # Example of the source data
@@ -154,6 +153,7 @@ class SensorsModule(object):
         keys = path.split('/')
 
         cur_values = self.raw
+        res = None
         for key in keys:
             if '\\' not in key:
                 pattern = re.compile(re.escape(key))
@@ -168,7 +168,7 @@ class SensorsModule(object):
             if res is None:
                 return None
 
-        return cur_value
+        return cur_values
 
     def check_alarms(self):
         '''
