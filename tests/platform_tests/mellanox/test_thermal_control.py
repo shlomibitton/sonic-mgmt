@@ -28,7 +28,9 @@ PSU_SPEED_TOLERANCE = 0.25
 
 
 @pytest.mark.disable_loganalyzer
-def test_dynamic_minimum_table(duthost, mocker_factory):
+def test_dynamic_minimum_table(duthosts, rand_one_dut_hostname, mocker_factory):
+    duthost = duthosts[rand_one_dut_hostname]
+    air_flow_dirs = ['p2c', 'c2p', 'unk']
     max_temperature = 45000 # 45 C
     cooling_cur_state = get_cooling_cur_state(duthost)
     if cooling_cur_state >= COOLING_CUR_STATE_THRESHOLD:
@@ -55,7 +57,8 @@ def test_dynamic_minimum_table(duthost, mocker_factory):
 
 
 @pytest.mark.disable_loganalyzer
-def test_set_psu_fan_speed(duthost, mocker_factory):
+def test_set_psu_fan_speed(duthosts, rand_one_dut_hostname, mocker_factory):
+    duthost = duthosts[rand_one_dut_hostname]
     platform_data = get_platform_data(duthost)
     psu_num = platform_data['psus']['number']
     hot_swappable = platform_data['psus']['hot_swappable']
