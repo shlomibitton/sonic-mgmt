@@ -347,6 +347,29 @@ class SonicHost(AnsibleHostBase):
                 result[fields[0]] = fields[1]
         return result
 
+    def is_supervisor_node(self):
+        """Check if the current node is a supervisor node in case of multi-DUT.
+
+        Returns:
+            Currently, we are using 'type' in the inventory to make the decision. If 'type' for the node is defined in
+            the inventory, and it is 'supervisor', then return True, else return False. In future, we can change this
+            logic if possible to derive it from the DUT.
+        """
+        if 'type' in self.host.options["inventory_manager"].get_host(self.hostname).get_vars():
+            node_type = self.host.options["inventory_manager"].get_host(self.hostname).get_vars()["type"]
+            if node_type is not None and node_type == 'supervisor':
+                return True
+        return False
+
+    def is_frontend_node(self):
+        """Check if the current node is a frontend node in case of multi-DUT.
+
+        Returns:
+            True if it is not any other type of node. Currently, the only other type of node supported is 'supervisor'
+            node. If we add more types of nodes, then we need to exclude them from this method as well.
+        """
+        return not self.is_supervisor_node()
+
     def is_service_fully_started(self, service):
         """
         @summary: Check whether a SONiC specific service is fully started.
@@ -1649,8 +1672,8 @@ class DutHosts(object):
         """
         # TODO: Initialize the nodes in parallel using multi-threads?
         self.nodes = self._Nodes([MultiAsicSonicHost(ansible_adhoc, hostname) for hostname in tbinfo["duts"]])
-        self.supervisor_nodes = self._Nodes([node for node in self.nodes if self.is_supervisor_node(node)])
-        self.frontend_nodes = self._Nodes([node for node in self.nodes if self.is_frontend_node(node)])
+        self.supervisor_nodes = self._Nodes([node for node in self.nodes if node.is_supervisor_node()])
+        self.frontend_nodes = self._Nodes([node for node in self.nodes if node.is_frontend_node()])
 
     def __getitem__(self, index):
         """To support operations like duthosts[0] and duthost['sonic1_hostname']
@@ -1706,35 +1729,6 @@ class DutHosts(object):
             on that MultiAsicSonicHost
         """
         return getattr(self.nodes, attr)
-
-    def is_supervisor_node(self, node):
-        """ Is node a supervisor node
-
-        Args:
-            node: MultiAsicSonicHost object represent a DUT in the testbed.
-
-        Returns:
-            Currently, we are using 'type' in the inventory to make the decision.
-                if 'type' for the node is defined in the inventory, and it is 'supervisor', then return True, else return False
-            In future, we can change this logic if possible to derive it from the DUT.
-        """
-        if 'type' in node.host.options["inventory_manager"].get_host(node.hostname).get_vars():
-            card_type = node.host.options["inventory_manager"].get_host(node.hostname).get_vars()["type"]
-            if card_type is not None and card_type == 'supervisor':
-                return True
-        return False
-
-    def is_frontend_node(self, node):
-        """ Is not a frontend node
-        Args:
-            node: MultiAsicSonicHost object represent a DUT in the testbed.
-
-        Returns:
-            True if it is not any other type of node.
-            Currently, the only other type of node supported is 'supervisor' node. If we add more types of nodes, then
-            we need to exclude them from this method as well.
-        """
-        return node not in self.supervisor_nodes
 
 
 class FanoutHost(object):
