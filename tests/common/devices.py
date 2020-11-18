@@ -16,6 +16,7 @@ import ipaddress
 import copy
 from multiprocessing.pool import ThreadPool
 from datetime import datetime
+import time
 
 from ansible import constants
 from ansible.plugins.loader import connection_loader
@@ -454,7 +455,7 @@ class SonicHost(AnsibleHostBase):
             return result
 
         # get process status for the service
-        output = self.command("docker exec {} supervisorctl status".format(service))
+        output = self.command("docker exec {} supervisorctl status".format(service), module_ignore_errors=True)
         logging.info("====== supervisor process status for service {} ======".format(service))
 
         for l in output['stdout_lines']:
@@ -1047,7 +1048,7 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
 
     def get_extended_minigraph_facts(self, tbinfo):
         mg_facts = self.minigraph_facts(host = self.hostname)['ansible_facts']
-        mg_facts['minigraph_ptf_indeces'] = mg_facts['minigraph_port_indices'].copy()
+        mg_facts['minigraph_ptf_indices'] = mg_facts['minigraph_port_indices'].copy()
 
         # Fix the ptf port index for multi-dut testbeds. These testbeds have
         # multiple DUTs sharing a same PTF host. Therefore, the indeces from
@@ -1056,13 +1057,155 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
             dut_index = tbinfo['duts'].index(self.hostname)
             map = tbinfo['topo']['ptf_map'][dut_index]
             if map:
-                for port, index in mg_facts['minigraph_ptf_indeces'].items():
+                for port, index in mg_facts['minigraph_ptf_indices'].items():
                     if index in map:
                         mg_facts['minigraph_ptf_indeces'][port] = map[index]
         except (ValueError, KeyError):
             pass
 
         return mg_facts
+
+
+class K8sMasterHost(AnsibleHostBase):
+    """
+    @summary: Class for Ubuntu KVM that hosts Kubernetes master
+
+    For running ansible module on the K8s Ubuntu KVM host
+    """
+
+    def __init__(self, ansible_adhoc, hostname, is_haproxy):
+        """ Initialize an object for interacting with Ubuntu KVM using ansible modules
+
+        Args:
+            ansible_adhoc (): The pytest-ansible fixture
+            hostname (string): hostname of the Ubuntu KVM
+            is_haproxy (boolean): True if node is haproxy load balancer, False if node is backend master server
+
+        """
+        self.hostname = hostname
+        self.is_haproxy = is_haproxy
+        super(K8sMasterHost, self).__init__(ansible_adhoc, hostname)
+        evars = {
+            'ansible_become_method': 'enable'
+        }
+        self.host.options['variable_manager'].extra_vars.update(evars)
+
+    def check_k8s_master_ready(self):
+        """
+        @summary: check if all Kubernetes master node statuses reflect target state "Ready"
+
+        """
+        k8s_nodes_statuses = self.shell('kubectl get nodes | grep master', module_ignore_errors=True)["stdout_lines"]
+        logging.info("k8s master node statuses: {}".format(k8s_nodes_statuses))
+
+        for line in k8s_nodes_statuses:
+            if "NotReady" in line:
+                return False
+        return True
+
+    def shutdown_api_server(self):
+        """
+        @summary: Shuts down API server container on one K8sMasterHost server
+
+        """
+        self.shell('sudo systemctl stop kubelet')
+        logging.info("Shutting down API server on backend master server hostname: {}".format(self.hostname))
+        api_server_container_ids = self.shell('sudo docker ps -qf "name=apiserver"')["stdout_lines"]
+        for id in api_server_container_ids:
+            self.shell('sudo docker kill {}'.format(id))
+        api_server_container_ids = self.shell('sudo docker ps -qf "name=apiserver"')["stdout"]
+        assert not api_server_container_ids
+
+    def start_api_server(self):
+        """
+        @summary: Starts API server container on one K8sMasterHost server
+
+        """
+        self.shell('sudo systemctl start kubelet')
+        logging.info("Starting API server on backend master server hostname: {}".format(self.hostname))
+        timeout_wait_secs = 60
+        poll_wait_secs = 5
+        api_server_container_ids = self.shell('sudo docker ps -qf "name=apiserver"')["stdout_lines"]
+        while ((len(api_server_container_ids) < 2) and (timeout_wait_secs > 0)):
+            logging.info("Waiting for Kubernetes API server to start")
+            time.sleep(poll_wait_secs)
+            timeout_wait_secs -= poll_wait_secs
+            api_server_container_ids = self.shell('sudo docker ps -qf "name=apiserver"')["stdout_lines"]
+        assert len(api_server_container_ids) > 1
+
+    def ensure_kubelet_running(self):
+        """
+        @summary: Ensures kubelet is running on one K8sMasterHost server
+
+        """
+        logging.info("Ensuring kubelet is started on {}".format(self.hostname))
+        kubelet_status = self.shell("sudo systemctl status kubelet | grep 'Active: '", module_ignore_errors=True)
+        for line in kubelet_status["stdout_lines"]:
+            if not "running" in line:
+                self.shell("sudo systemctl start kubelet")
+
+
+class K8sMasterCluster():
+    """
+    @summary: Class that encapsulates Kubernetes master cluster
+
+    For operating on a group of K8sMasterHost objects that compose one HA Kubernetes master cluster
+    """
+
+    def __init__(self, k8smasters):
+        """Initialize a list of backend master servers, and identify the HAProxy load balancer node
+
+        Args:
+            k8smasters: fixture that allows retrieval of K8sMasterHost objects
+
+        """
+        self.backend_masters = []
+        for hostname, k8smaster in k8smasters.items():
+            if k8smaster['host'].is_haproxy:
+                self.haproxy = k8smaster['host']
+            else:
+                self.backend_masters.append(k8smaster)
+
+    def get_master_vip(self):
+        """
+        @summary: Retrieve VIP of Kubernetes master cluster
+
+        """
+        return self.haproxy.mgmt_ip
+
+    def shutdown_all_api_server(self):
+        """
+        @summary: shut down API server on all backend master servers
+
+        """
+        for k8smaster in self.backend_masters:
+            logger.info("Shutting down API Server on master node {}".format(k8smaster['host'].hostname))
+            k8smaster['host'].shutdown_api_server()
+
+    def start_all_api_server(self):
+        """
+        @summary: Start API server on all backend master servers
+
+        """
+        for k8smaster in self.backend_masters:
+            logger.info("Starting API server on master node {}".format(k8smaster['host'].hostname))
+            k8smaster['host'].start_api_server()
+
+    def check_k8s_masters_ready(self):
+        """
+        @summary: Ensure that Kubernetes master is in healthy state
+
+        """
+        for k8smaster in self.backend_masters:
+            assert k8smaster['host'].check_k8s_master_ready()
+
+    def ensure_all_kubelet_running(self):
+        """
+        @summary: Ensures kubelet is started on all backend masters, start kubelet if necessary
+
+        """
+        for k8smaster in self.backend_masters:
+            k8smaster['host'].ensure_kubelet_running()
 
 
 class EosHost(AnsibleHostBase):
@@ -1140,7 +1283,18 @@ class EosHost(AnsibleHostBase):
         out = self.eos_config(
             lines=['lacp rate %s' % mode],
             parents='interface %s' % interface_name)
-        logging.info("Set interface [%s] lacp rate to [%s]" % (interface_name, mode))
+        if out['changed'] == False:
+            # new eos deprecate lacp rate and use lacp timer command
+            out = self.eos_config(
+                lines=['lacp timer %s' % mode],
+                parents='interface %s' % interface_name)
+            if out['changed'] == False:
+                logging.warning("Unable to set interface [%s] lacp timer to [%s]" % (interface_name, mode))
+                raise Exception("Unable to set interface [%s] lacp timer to [%s]" % (interface_name, mode))
+            else:
+                logging.info("Set interface [%s] lacp timer to [%s]" % (interface_name, mode))
+        else:
+            logging.info("Set interface [%s] lacp rate to [%s]" % (interface_name, mode))
         return out
 
     def kill_bgpd(self):
@@ -1288,20 +1442,20 @@ class IxiaHost (AnsibleHostBase):
             os (str): The os type of Ixia Fanout.
             hostname (str): The Ixia fanout host-name
             device_type (str): The Ixia fanout device type.
-        """ 
+        """
 
         self.ansible_adhoc = ansible_adhoc
         self.os            = os
         self.hostname      = hostname
         self.device_type   = device_type
         super().__init__(IxiaHost, self)
-   
+
     def get_host_name (self):
         """Returns the Ixia hostname
 
         Args:
             This function takes no argument.
-        """    
+        """
         return self.hostname
 
     def get_os (self) :
@@ -1309,15 +1463,15 @@ class IxiaHost (AnsibleHostBase):
 
         Args:
             This function takes no argument.
-        """    
+        """
         return self.os
 
     def execute (self, cmd) :
         """Execute a given command on ixia fanout host.
-         
-        Args: 
+
+        Args:
            cmd (str): Command to be executed.
-        """ 
+        """
         if (self.os == 'ixia') :
             eval(cmd)
 
@@ -1494,8 +1648,8 @@ class DutHosts(object):
         """
         # TODO: Initialize the nodes in parallel using multi-threads?
         self.nodes = self._Nodes([MultiAsicSonicHost(ansible_adhoc, hostname) for hostname in tbinfo["duts"]])
-        self.supervisor_nodes = self._Nodes([node for node in self.nodes if self._is_supervisor_node(node)])
-        self.frontend_nodes = self._Nodes([node for node in self.nodes if self._is_frontend_node(node)])
+        self.supervisor_nodes = self._Nodes([node for node in self.nodes if self.is_supervisor_node(node)])
+        self.frontend_nodes = self._Nodes([node for node in self.nodes if self.is_frontend_node(node)])
 
     def __getitem__(self, index):
         """To support operations like duthosts[0] and duthost['sonic1_hostname']
@@ -1552,7 +1706,7 @@ class DutHosts(object):
         """
         return getattr(self.nodes, attr)
 
-    def _is_supervisor_node(self, node):
+    def is_supervisor_node(self, node):
         """ Is node a supervisor node
 
         Args:
@@ -1569,7 +1723,7 @@ class DutHosts(object):
                 return True
         return False
 
-    def _is_frontend_node(self, node):
+    def is_frontend_node(self, node):
         """ Is not a frontend node
         Args:
             node: MultiAsicSonicHost object represent a DUT in the testbed.

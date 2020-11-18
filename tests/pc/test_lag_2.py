@@ -134,7 +134,7 @@ class LagTest:
         iface_behind_lag_member = []
         for neighbor_intf in self.vm_neighbors.keys():
             if peer_device == self.vm_neighbors[neighbor_intf]['name']:
-                iface_behind_lag_member.append(self.mg_facts['minigraph_ptf_indeces'][neighbor_intf])
+                iface_behind_lag_member.append(self.mg_facts['minigraph_ptf_indices'][neighbor_intf])
 
         neighbor_lag_intfs = []
         for po_intf in po_interfaces:
@@ -236,10 +236,10 @@ class LagTest:
 @pytest.mark.parametrize("testcase", ["single_lag",
                                       "lacp_rate",
                                       "fallback"])
-def test_lag(common_setup_teardown, duthosts, tbinfo, nbrhosts, fanouthosts, conn_graph_facts, all_pcs, testcase):
+def test_lag(common_setup_teardown, duthosts, tbinfo, nbrhosts, fanouthosts, conn_graph_facts, enum_dut_portchannel, testcase):
     ptfhost = common_setup_teardown
 
-    dut_name, dut_lag = decode_dut_port_name(all_pcs)
+    dut_name, dut_lag = decode_dut_port_name(enum_dut_portchannel)
 
     some_test_ran = False
     for duthost in duthosts:

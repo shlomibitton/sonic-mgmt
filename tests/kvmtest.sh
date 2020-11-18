@@ -48,6 +48,7 @@ mkdir -p logs
 tgname=1vlan
 tests="\
 monit/test_monit_status.py \
+platform_tests/test_advanced_reboot.py \
 test_interfaces.py \
 bgp/test_bgp_fact.py \
 bgp/test_bgp_gr_helper.py \
@@ -59,6 +60,8 @@ ntp/test_ntp.py \
 pc/test_po_cleanup.py \
 pc/test_po_update.py \
 route/test_default_route.py \
+arp/test_neighbor_mac.py \
+arp/test_neighbor_mac_noptf.py \
 snmp/test_snmp_cpu.py \
 snmp/test_snmp_interfaces.py \
 snmp/test_snmp_lldp.py \

@@ -9,7 +9,6 @@ import docker
 from ansible.module_utils.basic import *
 import traceback
 import hashlib
-from pprint import pprint
 
 DOCUMENTATION = '''
 ---
@@ -240,8 +239,7 @@ class VMTopology(object):
         return
 
     def create_ovs_bridge(self, bridge_name, mtu):
-        if bridge_name not in self.host_ifaces:
-            VMTopology.cmd('ovs-vsctl add-br %s' % bridge_name)
+        VMTopology.cmd('ovs-vsctl --may-exist add-br %s' % bridge_name)
 
         if mtu != DEFAULT_MTU:
             VMTopology.cmd('ifconfig %s mtu %d' % (bridge_name, mtu))
@@ -251,17 +249,16 @@ class VMTopology(object):
         return
 
     def destroy_bridges(self):
+        host_ifaces = VMTopology.ifconfig('ifconfig -a')
         for vm in self.vm_names:
-            for ifname in self.host_ifaces:
+            for ifname in host_ifaces:
                 if re.compile(OVS_FP_BRIDGE_REGEX % vm).match(ifname):
                     self.destroy_ovs_bridge(ifname)
 
         return
 
     def destroy_ovs_bridge(self, bridge_name):
-        if bridge_name in self.host_ifaces:
-            VMTopology.cmd('ifconfig %s down' % bridge_name)
-            VMTopology.cmd('ovs-vsctl del-br %s' % bridge_name)
+        VMTopology.cmd('ovs-vsctl --if-exists del-br %s' % bridge_name)
 
         return
 
@@ -376,6 +373,11 @@ class VMTopology(object):
         self.update()
 
         t_int_if = hashlib.md5((PTF_NAME_TEMPLATE % self.vm_set_name).encode("utf-8")).hexdigest()[0:6] + int_if + '_t'
+
+        if t_int_if in self.host_ifaces:
+            VMTopology.cmd("ip link del dev %s" % t_int_if)
+
+        self.update()
 
         if ext_if not in self.host_ifaces:
             VMTopology.cmd("ip link add %s type veth peer name %s" % (ext_if, t_int_if))
@@ -682,7 +684,7 @@ class VMTopology(object):
     @staticmethod
     def cmd(cmdline):
         with open(cmd_debug_fname, 'a') as fp:
-            pprint("CMD: %s" % cmdline, fp)
+            fp.write("CMD: %s\n" % cmdline)
         cmd = cmdline.split(' ')
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
@@ -692,7 +694,7 @@ class VMTopology(object):
             raise Exception("ret_code=%d, error message=%s. cmd=%s" % (ret_code, stderr, cmdline))
 
         with open(cmd_debug_fname, 'a') as fp:
-            pprint("OUTPUT: %s" % stdout, fp)
+            fp.write("OUTPUT: \n%s" % stdout.decode('utf-8'))
         return stdout.decode('utf-8')
 
     @staticmethod
