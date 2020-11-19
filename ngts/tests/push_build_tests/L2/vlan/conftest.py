@@ -34,10 +34,13 @@ def vlan_configuration(topology_obj):
         'ha': [{'iface': 'bond0', 'ips': [('70.0.0.2', '24')]},
                {'iface': 'bond0.700', 'ips': [('70.0.0.3', '24')]},
                {'iface': 'bond0.800', 'ips': [('80.0.0.3', '24')]},
+               {'iface': 'bond0.4094', 'ips': [('70.0.0.5', '24')]},
                {'iface': '{}.700'.format(hadut2), 'ips': [('70.0.0.4', '24')]},
                {'iface': '{}.800'.format(hadut2), 'ips': [('80.0.0.4', '24')]}],
         'hb': [{'iface': "{}.700".format(hbdut1), 'ips': [('70.0.0.1', '24')]},
-               {'iface': "{}.800".format(hbdut1), 'ips': [('80.0.0.1', '24')]}]
+               {'iface': "{}.800".format(hbdut1), 'ips': [('80.0.0.1', '24')]},
+               {'iface': '{}.4095'.format(hbdut1), 'ips': [('70.0.0.6', '24')]},
+               {'iface': '{}.4094'.format(hbdut1), 'ips': [('70.0.0.7', '24')]}]
     }
 
     logger.info('Starting vlan configuration')

@@ -1,7 +1,8 @@
 import re
 import logging
-
+import allure
 from ngts.cli_wrappers.common.lldp_clis_common import LldpCliCommon
+from ngts.cli_util.cli_constants import SonicDockersConstant
 
 logger = logging.getLogger()
 
@@ -65,6 +66,22 @@ class SonicLldpCli(LldpCliCommon):
         :return: command output
         """
         return engine.run_cmd('show lldp neighbors {}'.format(interface_name))
+
+    @staticmethod
+    def change_lldp_tx_interval(engine, interval=30):
+        """
+        This method change transmit delay to the specified value in seconds. The transmit delay is the
+        delay between two transmissions of LLDP PDU. The default value is 30 seconds.
+        :param engine: ssh enging object
+        :param interval: value of interval in seconds
+        :return: command output
+        """
+        enter_docker_cmd = 'docker exec -it {} bash'.format(SonicDockersConstant.LLDP)
+        configure_lldp_interval_cmd = 'lldpcli configure lldp tx-interval {}'.format(interval)
+        exit_docker_cmd = 'exit'
+        cmd_set = [enter_docker_cmd, configure_lldp_interval_cmd, exit_docker_cmd]
+        with allure.step('Enter lldp docker, change lldp transmit delay to {} seconds and exit'.format(interval)):
+            engine.run_cmd_set(cmd_set=cmd_set)
 
     @staticmethod
     def parse_lldp_info_for_specific_interface(engine, interface_name):

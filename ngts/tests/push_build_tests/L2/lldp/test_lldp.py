@@ -351,8 +351,8 @@ def verify_lldp_info_for_dut_host_ports(topology_obj):
 @allure.title('test LLDP after disable on host')
 def test_lldp_after_disable_on_host(topology_obj):
     """
-    :param topology_obj:
-    :return:
+    :param topology_obj: topology object fixture
+    :return: None, raise AssertionError in case of validation fails
     """
     ha_engine = topology_obj.players['ha']['engine']
     cli_object = topology_obj.players['ha']['cli']
@@ -368,3 +368,75 @@ def test_lldp_after_disable_on_host(topology_obj):
     cli_object.lldp.enable_lldp_on_interface(ha_engine, ha_dut_1)
     with allure.step("Expect test LLDP to pass after LLDP is enabled on host interface"):
         retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
+
+@pytest.mark.skip(reason="skipped due bug 2253609")
+@pytest.mark.lldp
+@pytest.mark.push_gate
+@allure.title('test LLDP when changing tx-interval on dut')
+def test_lldp_change_transmit_delay(topology_obj):
+    """
+    this test changes the lldp transmit interval and
+    verify lldp information update on neigbor host within the configuered interval.
+    :param topology_obj: topology object fixture
+    :return: None, raise AssertionError in case of validation fails
+    """
+    dut_engine = topology_obj.players['dut']['engine']
+    cli_object = topology_obj.players['dut']['cli']
+    checked_intervals = [120, 60, 30]
+    for interval in checked_intervals:
+        cli_object.lldp.change_lldp_tx_interval(dut_engine, interval=interval)
+        cli_object.lldp.disable_lldp(dut_engine)
+        logger.info("Verify lldp is disabled in \"show_feature_status\"")
+        check_lldp_feature_status(dut_engine, cli_object, expected_res=r"lldp\s+disabled")
+        cli_object.lldp.enable_lldp(dut_engine)
+        logger.info("Verify lldp is enabled in \"show_feature_status\"")
+        check_lldp_feature_status(dut_engine, cli_object)
+        logger.info("Verify LLDP service start within {} seconds".format(interval))
+        with allure.step("Expect test LLDP to pass within {} seconds after LLDP is enabled".format(interval)):
+            retry_call(verify_lldp_info_for_host_dut_ports, fargs=[topology_obj],
+                       tries=int(interval/10), delay=10, logger=logger)
+
+
+def verify_lldp_info_for_host_dut_ports(topology_obj):
+    """
+    verify lldp information for dut-host ports with "show lldp neighbors" command.
+    :param topology_obj: topology object fixture
+    :return: None, raise AssertionError in case of validation fails
+    """
+    try:
+        ports_for_validation = {'host_ports': ['ha-dut-1', 'ha-dut-2', 'hb-dut-1', 'hb-dut-2'],
+                                'dut_ports': ['dut-ha-1', 'dut-ha-2', 'dut-hb-1', 'dut-hb-2']}
+        dut_engine = topology_obj.players['dut']['engine']
+        cli_object = topology_obj.players['dut']['cli']
+        dut_hostname = cli_object.chassis.get_hostname(dut_engine)
+        for host_port_alias, dut_host_port_alias in zip(ports_for_validation['host_ports'], ports_for_validation['dut_ports']):
+            host_name_alias = host_port_alias.split('-')[0]
+            dut_port = topology_obj.ports[dut_host_port_alias]
+            host_port = topology_obj.ports[host_port_alias]
+            host_engine = topology_obj.players[host_name_alias]['engine']
+            host_cli_object = topology_obj.players[host_name_alias]['cli']
+            host_hostname = cli_object.chassis.get_hostname(host_engine)
+            port_lldp_output = host_cli_object.lldp.show_lldp_info_for_specific_interface(host_engine, host_port)
+            parsed_lldp_output_dict = host_cli_object.lldp.parse_lldp_info_for_specific_interface(port_lldp_output)
+            with allure.step('Checking LLDP Info in host {} for interface {}'.format(host_hostname, host_port)):
+                neighbor_port = parsed_lldp_output_dict["neighbor_port"]
+                neighbor_hostname = parsed_lldp_output_dict["neighbor_hostname"]
+                neighbor_mgmt_ip = parsed_lldp_output_dict["neighbor_mgmt_ip"]
+                verify_port_descr(dut_port, neighbor_port)
+                verify_hostname(dut_hostname, neighbor_hostname)
+                verify_mgmt_ip(dut_engine.ip, neighbor_mgmt_ip)
+
+    except Exception as err:
+        raise AssertionError(err)
+
+
+def verify_mgmt_ip(topo_remote_device_mgmt_ip, lldp_remote_device_mgmt_ip):
+    """
+    Verify the remote neighbor device mgmt ip match in LLDP and on topology
+    :param topo_remote_device_mgmt_ip: switch/host device mgmt ip from topology
+    :param lldp_remote_device_mgmt_ip: switch/host device mgmt ip from lldp
+    :return: None, raise AssertionError in case of mismatch
+    """
+    assert topo_remote_device_mgmt_ip == lldp_remote_device_mgmt_ip, \
+        "Assertion Error: Expected Remote Device Management Address is {}, LLDP Remote Device Management Address is {}"\
+        .format(topo_remote_device_mgmt_ip, lldp_remote_device_mgmt_ip)
