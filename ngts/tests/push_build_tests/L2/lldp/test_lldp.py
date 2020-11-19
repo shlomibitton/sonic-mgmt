@@ -11,7 +11,7 @@ logger = logging.getLogger()
 
 @pytest.mark.lldp
 @pytest.mark.push_gate
-@allure.title('test show lldp table information')
+@allure.title('test show LLDP table information')
 def test_show_lldp_table_output(topology_obj):
     """
     Compare the LLDP info in the "show lldp table" to the topology expected connectivity
@@ -190,7 +190,7 @@ def verify_port_capability(topo_neighbor_port_capability, lldp_neighbor_port_cap
 
 @pytest.mark.lldp
 @pytest.mark.build
-@allure.title('test show lldp neighbors information')
+@allure.title('test show LLDP neighbors information')
 def test_show_lldp_neighbors_output(topology_obj):
     """
     Compare the LLDP info in the "show lldp neighbors" command to the topology expected connectivity
