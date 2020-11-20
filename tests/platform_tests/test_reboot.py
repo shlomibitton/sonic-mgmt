@@ -117,10 +117,11 @@ def test_fast_reboot(duthosts, rand_one_dut_hostname, localhost, conn_graph_fact
     """
     @summary: This test case is to perform cold reboot and check platform status
     """
+    duthost = duthosts[rand_one_dut_hostname]
+
     if duthost.facts["hwsku"] not in sku_supporting_fast_reboot:
         pytest.skip("Fast reboot skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
-    duthost = duthosts[rand_one_dut_hostname]
     reboot_and_check(localhost, duthost, conn_graph_facts["device_conn"][duthost.hostname], reboot_type=REBOOT_TYPE_FAST)
 
 
@@ -168,10 +169,11 @@ def test_power_off_reboot(duthosts, rand_one_dut_hostname, localhost, conn_graph
     @param psu_controller: The python object of psu controller
     @param power_off_delay: Pytest parameter. The delay between turning off and on the PSU
     """
+    duthost = duthosts[rand_one_dut_hostname]
+
     if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
-    duthost = duthosts[rand_one_dut_hostname]
     psu_ctrl = psu_controller
     if psu_ctrl is None:
         pytest.skip("No PSU controller for %s, skip rest of the testing in this case" % duthost.hostname)
@@ -205,10 +207,11 @@ def test_watchdog_reboot(duthosts, rand_one_dut_hostname, localhost, conn_graph_
     """
     @summary: This test case is to perform reboot via watchdog and check platform status
     """
+    duthost = duthosts[rand_one_dut_hostname]
+
     if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
-    duthost = duthosts[rand_one_dut_hostname]
     test_watchdog_supported = "python -c \"import sonic_platform.platform as P; P.Platform().get_chassis().get_watchdog(); exit()\""
 
     watchdog_supported = duthost.command(test_watchdog_supported,module_ignore_errors=True)["stderr"]
