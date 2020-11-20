@@ -1368,7 +1368,7 @@
         <InterfaceVlan mode="Access" portname="ethernet 1/29/2" vlanids="162"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/30" vlanids="163"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/31" vlanids="164"/>
-        <InterfaceVlan mode="Access" portname="ethernet 1/32" vlanids="101-164"/>
+        <InterfaceVlan mode="Trunk" portname="ethernet 1/32" vlanids="101-164"/>
     </DevicesL2Info>
     <DevicesL2Info Hostname="r-leopard-20">
         <InterfaceVlan mode="Access" portname="ethernet 1/1" vlanids="101"/>
