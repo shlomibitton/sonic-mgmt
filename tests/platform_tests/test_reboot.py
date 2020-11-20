@@ -205,13 +205,10 @@ def test_watchdog_reboot(duthosts, rand_one_dut_hostname, localhost, conn_graph_
     """
     @summary: This test case is to perform reboot via watchdog and check platform status
     """
-<<<<<<< HEAD
     if duthost.facts["hwsku"] not in sku_supporting_reboot_cause_test:
         pytest.skip("Reboot-cause check skipped because %s doesn't support it" % duthost.facts["hwsku"])
 
-=======
     duthost = duthosts[rand_one_dut_hostname]
->>>>>>> sonic-mgmt/master
     test_watchdog_supported = "python -c \"import sonic_platform.platform as P; P.Platform().get_chassis().get_watchdog(); exit()\""
 
     watchdog_supported = duthost.command(test_watchdog_supported,module_ignore_errors=True)["stderr"]
