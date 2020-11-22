@@ -55,7 +55,7 @@ def test_deploy_sonic_image(topology_obj, base_version):
                 SonicGeneralCli.set_default_image(dut_engine, image_binary)
 
         with allure.step('Rebooting the dut'):
-            dut_engine.reload(['reboot'])
+            dut_engine.reload(['sudo reboot'])
 
         with allure.step('Verifying installation'):
             with allure.step('Verifying dut booted with correct image'):
