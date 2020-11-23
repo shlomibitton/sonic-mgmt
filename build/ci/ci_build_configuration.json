@@ -1,0 +1,306 @@
+{
+  "author": "system-sw-dev-ops-support@mellanox.com",
+  "notify1": "GERRIT_PATCHSET_UPLOADER_EMAIL,GERRIT_CHANGE_OWNER_EMAIL,NBU-sw-ci-sonic@nvidia.com",
+  "notify": "GERRIT_PATCHSET_UPLOADER_EMAIL,GERRIT_CHANGE_OWNER_EMAIL,roysr@nvidia.com,petrop@nvidia.com",
+  "timeout": "3",
+  "control_file": "/auto/sw_system_project/devops/sw-r2d2-bot/ngci_control_files/sonic_mgmt_control_file.yaml",
+  "properties": [
+    "default_propertiesFile=/auto/sw_system_release/ci/general/ngci_properties/swfw_default_params.properties",
+    "gerrit_propertiesFile=/auto/sw_system_release/ci/general/ngci_properties/swgerrit.properties",
+    "build_propertiesFile=build/common/build.properties",
+    "PIPELINE_FORCE_CLEAN=true",
+    "PRIORITY_NUMBER=4"
+  ],
+  "phases": [
+    {
+      "phase_1": [
+        {
+          "name": "Pre Gerrit Validation",
+          "module": "com.mellanox.jenkins.generic_modules.GerritValidation",
+          "category": "Pre Build Check",
+          "parameters": {
+            "BRANCH_LOCK_CHECK": "${BRANCH_LOCK_CHECK}",
+            "RELATED_CHANGES": "${RELATED_CHANGES}",
+            "COMMIT_MSG_MANDATORY_WORDS": "${COMMIT_MSG_MANDATORY_WORDS}"
+          },
+          "node": "SONIC_LITE",
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        }
+      ]
+    },
+    {
+      "phase_2": [
+        {
+          "name": "Clone",
+          "module": "com.mellanox.jenkins.generic_modules.Checkout",
+          "category": "Pre Build",
+          "node": "SONIC_LITE",
+          "parameters": {
+            "CLONE_PATH": "${PROJECT_NAME}",
+            "GIT_REPOSITORY": "${GIT_REPOSITORY}"
+          },
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Validation",
+          "module": "build/ci/pre_ci_validation.groovy",
+          "category": "Pre BAT",
+          "node": "SONIC_LITE",
+          "parameters": {},
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Components Match",
+          "module": "com.mellanox.jenkins.generic_modules.ComponentMatch",
+          "category": "Pre Build",
+          "node": "SONIC_LITE",
+          "parameters": {
+            "MAP_FILE": "${PROJECT_NAME}/build/ci/file_mapping.yaml",
+            "VERBOSE": true
+          },
+          "skip": false,
+          "on_failure": "stop"
+        },
+        {
+          "name": "Handle Components Match",
+          "module": "${nfs_dir}/build/ci/handle_component.groovy",
+          "category": "Pre Build",
+          "node": "SONIC_LITE",
+          "parameters": {},
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": false
+        }
+      ]
+    },
+    {
+      "phase_3": [
+        {
+          "name": "Allocate setup SPC",
+          "module": "com.mellanox.jenkins.generic_modules.AllocateSetups",
+          "category": "Allocate setups",
+          "node": "MINI_MARS@SPC",
+          "parameters": {
+            "queue_id": "devops_sonic_ci_spc",
+            "priority": "${PRIORITY_NUMBER}",
+            "setup_type": "CI_SONIC_SPC",
+            "setup_var": "CI_SONIC_SPC_SETUP",
+            "device_var": "SWITCH_PANTHER1",
+            "setup_requirements": "group_name:Sagi,sub_group:SONIC_CI,setup_status:enable"
+          },
+          "skip": "${SKIP_BAT}",
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Allocate setup SPC2",
+          "module": "com.mellanox.jenkins.generic_modules.AllocateSetups",
+          "category": "Allocate setups",
+          "node": "MINI_MARS@SPC2",
+          "parameters": {
+            "queue_id": "devops_sonic_ci_spc2",
+            "priority": "${PRIORITY_NUMBER}",
+            "setup_type": "CI_SONIC_SPC2",
+            "setup_var": "CI_SONIC_SPC2_SETUP",
+            "device_var": "SWITCH_ANACONDA1",
+            "setup_requirements": "group_name:Sagi,sub_group:SONIC_CI,setup_status:enable"
+          },
+          "skip": "${SKIP_BAT}",
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Allocate setup SPC3",
+          "module": "com.mellanox.jenkins.generic_modules.AllocateSetups",
+          "category": "Allocate setups",
+          "node": "MINI_MARS@SPC3",
+          "parameters": {
+            "queue_id": "devops_sonic_ci_spc3",
+            "priority": "${PRIORITY_NUMBER}",
+            "setup_type": "CI_SONIC_SPC3",
+            "setup_var": "CI_SONIC_SPC3_SETUP",
+            "device_var": "SWITCH_LEOPARD1",
+            "setup_requirements": "group_name:Sagi,sub_group:SONIC_CI,setup_status:enable"
+          },
+          "skip": "${SKIP_BAT}",
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "BAT SPC",
+          "module": "/auto/sw_system_release/ci/sonic_devops/build/ci/bat.groovy",
+          "category": "BAT",
+          "node": "MINI_MARS@SPC",
+          "parameters": {
+            "matrix_row": "ETH",
+            "matrix_col": "SPC",
+            "global_conf": "${MARS_GLOBAL_CONF}",
+            "setup_id": "${CI_SONIC_SPC_SETUP}",
+            "setup_conf_file_path": "${MARS_CONF_BASE}/${CI_SONIC_SPC_SETUP}/",
+            "base_version": "${BASE_VERSION}",
+            "test_type" : "CI",
+            "sonic_mgmt_repo_url": "${nfs_dir}"
+          },
+          "skip": "${SKIP_BAT}",
+          "on_failure": "stop",
+          "out_of_mail": false
+        },
+        {
+          "name": "BAT SPC2",
+          "module": "/auto/sw_system_release/ci/sonic_devops/build/ci/bat.groovy",
+          "category": "BAT",
+          "node": "MINI_MARS@SPC2",
+          "parameters": {
+            "matrix_row": "ETH",
+            "matrix_col": "SPC2",
+            "global_conf": "${MARS_GLOBAL_CONF}",
+            "setup_id": "${CI_SONIC_SPC2_SETUP}",
+            "setup_conf_file_path": "${MARS_CONF_BASE}/${CI_SONIC_SPC2_SETUP}/",
+            "base_version": "${BASE_VERSION}",
+            "test_type" : "CI",
+            "sonic_mgmt_repo_url": "${nfs_dir}"
+          },
+          "skip": "${SKIP_BAT}",
+          "on_failure": "stop",
+          "out_of_mail": false
+        },
+        {
+          "name": "BAT SPC3",
+          "module": "/auto/sw_system_release/ci/sonic_devops/build/ci/bat.groovy",
+          "category": "BAT",
+          "node": "MINI_MARS@SPC3",
+          "parameters": {
+            "matrix_row": "ETH",
+            "matrix_col": "SPC3",
+            "global_conf": "${MARS_GLOBAL_CONF}",
+            "setup_id": "${CI_SONIC_SPC3_SETUP}",
+            "setup_conf_file_path": "${MARS_CONF_BASE}/${CI_SONIC_SPC3_SETUP}/",
+            "base_version": "${BASE_VERSION}",
+            "test_type" : "CI",
+            "sonic_mgmt_repo_url": "${nfs_dir}"
+          },
+          "skip": "${SKIP_BAT}",
+          "on_failure": "stop",
+          "out_of_mail": false
+        },
+        {
+          "name": "Free SPC setup",
+          "module": "com.mellanox.jenkins.generic_modules.FreeSetup",
+          "category": "Clean",
+          "node": "MINI_MARS@SPC",
+          "parameters": {
+            "setup_name": "${CI_SONIC_SPC_SETUP}"
+          },
+          "skip": false,
+          "finally": true,
+          "on_failure": "ignore",
+          "out_of_mail": true
+        },
+        {
+          "name": "Free SPC2 setup",
+          "module": "com.mellanox.jenkins.generic_modules.FreeSetup",
+          "category": "Clean",
+          "node": "MINI_MARS@SPC2",
+          "parameters": {
+            "setup_name": "${CI_SONIC_SPC2_SETUP}"
+          },
+          "skip": false,
+          "finally": true,
+          "on_failure": "ignore",
+          "out_of_mail": true
+        },
+        {
+          "name": "Free SPC3 setup",
+          "module": "com.mellanox.jenkins.generic_modules.FreeSetup",
+          "category": "Clean",
+          "node": "MINI_MARS@SPC3",
+          "parameters": {
+            "setup_name": "${CI_SONIC_SPC3_SETUP}"
+          },
+          "skip": false,
+          "finally": true,
+          "on_failure": "ignore",
+          "out_of_mail": true
+        }
+      ]
+    },
+    {
+      "phase_4": [
+        {
+          "name": "Create Tests Matrix",
+          "module": "com.mellanox.jenkins.generic_modules.CreateTestsMatrix",
+          "category": "Create Tests Matrix",
+          "node": "SONIC_LITE",
+          "parameters": {
+            "EXPECTED_RESULTS": [
+              {
+                "ETH": [
+                  "SPC",
+                  "SPC2",
+                  "SPC3"
+                ]
+              }
+            ]
+          },
+          "skip": false,
+          "on_failure": "ignore",
+          "out_of_mail": true,
+          "finally": true
+        },
+        {
+          "name": "Gerrit Update",
+          "module": "com.mellanox.jenkins.generic_modules.GerritVerification",
+          "category": "Gerrit Update",
+          "parameters": {
+            "RELATED_CHANGES": "${RELATED_CHANGES}"
+          },
+          "node": "SONIC_LITE",
+          "skip": false,
+          "on_failure": "stop",
+          "finally": true
+        },
+        {
+          "name": "Gerrit Validation",
+          "module": "com.mellanox.jenkins.generic_modules.GerritValidation",
+          "category": "Merge",
+          "parameters": {
+            "BRANCH_LOCK_CHECK": "${BRANCH_LOCK_CHECK}",
+            "RELATED_CHANGES": "${RELATED_CHANGES}"
+          },
+          "node": "SONIC_LITE",
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Merge",
+          "module": "com.mellanox.jenkins.generic_modules.Merge",
+          "category": "Merge",
+          "parameters": {},
+          "node": "SONIC_LITE",
+          "skip": false,
+          "on_failure": "stop"
+        },
+        {
+          "name": "Clean env",
+          "module": "com.mellanox.jenkins.generic_modules.RunCmd",
+          "category": "Clean env",
+          "node": "SONIC_LITE",
+          "parameters": {
+            "cmd": "if [[ -d \"\\${nfs_dir}\" ]] ; then find \\${nfs_dir}/* -maxdepth 0 ! -name 'LOGS' -exec rm -rf {} +; fi"
+          },
+          "skip": false,
+          "finally": true,
+          "on_failure": "ignore",
+          "out_of_mail": true
+        }
+      ]
+    }
+  ]
+}

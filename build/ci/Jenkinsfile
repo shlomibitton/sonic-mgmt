@@ -1,0 +1,23 @@
+pipeline {
+    agent none
+    options {
+        timestamps()
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '30', numToKeepStr: '150')
+    }
+    environment {
+        GENERIC_CI_GIT_BRANCH = 'ci_version-3.1'
+        MAIN_NODE = 'MGMT_CI_MAIN'
+        JSON_FILE = 'build/ci/ci_build_configuration.json'
+    }
+    stages {
+        stage("Main") {
+            agent { label "${MAIN_NODE}" }
+            steps {
+                script {
+                    library changelog: false, identifier: "ci_framework@$GENERIC_CI_GIT_BRANCH"
+                    LoadNGCI()
+                }
+            }
+        }
+    }
+}

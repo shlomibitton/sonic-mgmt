@@ -1,0 +1,3 @@
+BAT_ONLY:
+  - Tests/platform_tests
+  - ngts
