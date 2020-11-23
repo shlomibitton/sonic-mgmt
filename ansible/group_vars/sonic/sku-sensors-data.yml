@@ -3623,7 +3623,7 @@ sensors_checks:
       - dps460-i2c-4-59/PSU-2(R) Temp 1/temp1_crit_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 1/temp1_max_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 2/temp2_crit_alarm
-      - dps460-i2c-4-59/PSU-2(R) Temp 2/temp2_max_alarm
+      #- dps460-i2c-4-59/PSU-2(R) Temp 2/temp2_max_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 3/temp3_crit_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 3/temp3_max_alarm
     compares:
