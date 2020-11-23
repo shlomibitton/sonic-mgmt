@@ -3623,6 +3623,7 @@ sensors_checks:
       - dps460-i2c-4-59/PSU-2(R) Temp 1/temp1_crit_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 1/temp1_max_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 2/temp2_crit_alarm
+      # Temporary commented the line beyond in order to test_sensors.py passing for SN4410 (Redmine bug - 2327108)
       #- dps460-i2c-4-59/PSU-2(R) Temp 2/temp2_max_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 3/temp3_crit_alarm
       - dps460-i2c-4-59/PSU-2(R) Temp 3/temp3_max_alarm
