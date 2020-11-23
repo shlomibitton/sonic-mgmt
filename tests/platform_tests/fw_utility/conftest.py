@@ -11,6 +11,12 @@ from fwutil_helper import set_default_boot, set_next_boot, reboot_to_image, gene
 logger = logging.getLogger(__name__)
 
 
+def pytest_addoption(parser):
+    parser.addoption("--config_file", action="store", default=None, help="name of configuration file (per each vendor)")
+    parser.addoption("--binaries_path", action="store", default=None, help="path to binaries files")
+    parser.addoption("--second_image_path", action="store", default=None, help="path to second image to be installed if there is no image available")
+
+
 @pytest.fixture(scope='module')
 def platform_components(request, duthost):
     """
