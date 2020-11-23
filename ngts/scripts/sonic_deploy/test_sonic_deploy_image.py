@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import allure
 import pytest
 from pathlib import Path
