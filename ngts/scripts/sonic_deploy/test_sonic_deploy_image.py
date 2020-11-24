@@ -28,6 +28,7 @@ def base_version(request):
     """
     return request.config.getoption('--base_version')
 
+
 @allure.title('Deploy sonic image')
 def test_deploy_sonic_image(topology_obj, base_version):
     """
@@ -43,24 +44,27 @@ def test_deploy_sonic_image(topology_obj, base_version):
         target_path = '/tmp'
         image_target_path = target_path + '/' + image_name
         dut_engine = topology_obj.players['dut']['engine']
+        delimiter = SonicGeneralCli.get_installer_delimiter(dut_engine)
 
         with allure.step('Deploying image'):
             with allure.step('Copying image to dut'):
                 dut_engine.copy_file(image_path, image_name, '/tmp')
 
             with allure.step('Installing the image'):
-                SonicGeneralCli.install_image(dut_engine, image_target_path)
+                SonicGeneralCli.install_image(dut_engine, image_target_path, delimiter)
 
             with allure.step('Setting image as default'):
-                image_binary = SonicGeneralCli.get_image_binary_version(dut_engine, image_target_path)
-                SonicGeneralCli.set_default_image(dut_engine, image_binary)
+                image_binary = SonicGeneralCli.get_image_binary_version(dut_engine, image_target_path, delimiter)
+                SonicGeneralCli.set_default_image(dut_engine, image_binary, delimiter)
 
         with allure.step('Rebooting the dut'):
             dut_engine.reload(['sudo reboot'])
 
         with allure.step('Verifying installation'):
             with allure.step('Verifying dut booted with correct image'):
-                image_list = SonicGeneralCli.get_sonic_image_list(dut_engine)
+                # installer flavor might change after loading a different version
+                delimiter = SonicGeneralCli.get_installer_delimiter(dut_engine)
+                image_list = SonicGeneralCli.get_sonic_image_list(dut_engine, delimiter)
                 assert 'Current: {}'.format(image_binary) in image_list
 
             with allure.step('Verifying all dockers are up'):

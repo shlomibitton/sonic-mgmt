@@ -16,26 +16,35 @@ class SonicGeneralCli(GeneralCliCommon):
         return engine.run_cmd('show feature status')
 
     @staticmethod
-    def install_image(engine, image_path):
-        output = engine.run_cmd('sudo sonic_installer install {} -y'.format(image_path))
+    def get_installer_delimiter(engine):
+        dash_installer = 'sonic-installer'
+        delimiter = '_'
+        output = engine.run_cmd('which {}'.format(dash_installer))
+        if dash_installer in output:
+            delimiter = '-'
+        return delimiter
+
+    @staticmethod
+    def install_image(engine, image_path, delimiter='-'):
+        output = engine.run_cmd('sudo sonic{}installer install {} -y'.format(delimiter, image_path))
         SonicGeneralCli.verify_cmd_rc(engine, 'Unable to install image {}'.format(image_path))
         return output
 
     @staticmethod
-    def get_image_binary_version(engine, image_path):
-        output = engine.run_cmd('sudo sonic_installer binary_version {}'.format(image_path))
+    def get_image_binary_version(engine, image_path, delimiter='-'):
+        output = engine.run_cmd('sudo sonic{}installer binary{}version {}'.format(delimiter, delimiter, image_path))
         SonicGeneralCli.verify_cmd_rc(engine, 'Unable to get binary version for: {}'.format(image_path))
         return output
 
     @staticmethod
-    def set_default_image(engine, image_binary):
-        output = engine.run_cmd('sudo sonic_installer set_default {}'.format(image_binary))
+    def set_default_image(engine, image_binary, delimiter='-'):
+        output = engine.run_cmd('sudo sonic{}installer set{}default {}'.format(delimiter, delimiter, image_binary))
         SonicGeneralCli.verify_cmd_rc(engine, 'Unable to set default image: {}'.format(image_binary))
         return output
 
     @staticmethod
-    def get_sonic_image_list(engine):
-        output = engine.run_cmd('sudo sonic_installer list')
+    def get_sonic_image_list(engine, delimiter='_'):
+        output = engine.run_cmd('sudo sonic{}installer list'.format(delimiter))
         SonicGeneralCli.verify_cmd_rc(engine, 'Unable to get image list')
         return output
 
