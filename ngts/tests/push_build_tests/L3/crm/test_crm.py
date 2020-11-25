@@ -2,6 +2,7 @@ import allure
 import logging
 import pytest
 import time
+from retry.api import retry_call
 
 
 logger = logging.getLogger()
@@ -15,16 +16,17 @@ def set_polling_interval(topology_obj):
     polling_1_sec = 1
     dut_engine = topology_obj.players['dut']['engine']
     sonic_cli = topology_obj.players['dut']['cli']
-    legacy_polling_interval = sonic_cli.crm.get_polling_interval(dut_engine)
+    original_poll_interval = sonic_cli.crm.get_polling_interval(dut_engine)
 
     with allure.step('Set CRM polling interval to {}'.format(polling_1_sec)):
         sonic_cli.crm.set_polling_interval(dut_engine, polling_1_sec)
-    time.sleep(wait_time)
+    retry_call(ensure_crm_updated, fargs=[polling_1_sec, sonic_cli, dut_engine], tries=5, delay=1, logger=None)
 
     yield
 
-    with allure.step('Restore CRM polling interval to {}'.format(legacy_polling_interval)):
-        sonic_cli.crm.set_polling_interval(dut_engine, legacy_polling_interval)
+    with allure.step('Restore CRM polling interval to {}'.format(original_poll_interval)):
+        sonic_cli.crm.set_polling_interval(dut_engine, original_poll_interval)
+    retry_call(ensure_crm_updated, fargs=[original_poll_interval, sonic_cli, dut_engine], tries=5, delay=1, logger=None)
 
 
 @pytest.fixture
@@ -48,7 +50,14 @@ def get_crm_stat(dut_engine, sonic_cli, ip_ver):
     crm_res_all = sonic_cli.crm.parse_resources_table(dut_engine)
     route_res = crm_res_all['main_resources']['ipv{}_route'.format(ip_ver)]
 
-    return route_res['used'], route_res['available']
+    return int(route_res['Used Count']), int(route_res['Available Count'])
+
+
+def ensure_crm_updated(expected_interval, sonic_cli, dut_engine):
+    """
+    Function checks that crm polling interval was configured
+    """
+    assert (sonic_cli.crm.get_polling_interval(dut_engine) == expected_interval), "CRM polling interval was not updated"
 
 
 @pytest.mark.push_gate
@@ -63,11 +72,11 @@ def test_crm_show_res(topology_obj):
 
     with allure.step('Verify crm show commands'):
         for res_type, value in crm_res_all['main_resources'].items():
-            assert isinstance(value['used'], int), "Used counter of {} resource is not integer: {}".format(
-                res_type, value['used']
+            assert value['Used Count'].isdigit(), "Used counter of {} resource is not integer: {}".format(
+                res_type, value['Used Count']
             )
-            assert isinstance(value['available'], int), "Available counter of {} resource is not integer: {}".format(
-                res_type, value['available']
+            assert value['Available Count'].isdigit(), "Available counter of {} resource is not integer: {}".format(
+                res_type, value['Available Count']
             )
 
 
@@ -76,7 +85,7 @@ def test_crm_show_res(topology_obj):
 @allure.title('PushGate CRM test case')
 def test_crm_route(topology_obj, cleanup, ip_ver, dst, mask):
     """
-    Run PushGate CRM test case, test doing verification of 'used' and 'available' CRM counters for IPv4/6 route
+    Run PushGate CRM test case, test doing verification of 'Used Count' and 'Available Count' CRM counters for IPv4/6 route
     """
     dut_engine = topology_obj.players['dut']['engine']
     sonic_cli = topology_obj.players['dut']['cli']
@@ -85,7 +94,6 @@ def test_crm_route(topology_obj, cleanup, ip_ver, dst, mask):
     route_used, route_available = get_crm_stat(dut_engine, sonic_cli, ip_ver)
 
     with allure.step('Add route: {}/{} {}'.format(dst, mask, vlan_iface)):
-        # Add route
         sonic_cli.route.add_route(dut_engine, dst, vlan_iface, mask)
 
     # Make sure CRM counters updated
@@ -106,7 +114,6 @@ def test_crm_route(topology_obj, cleanup, ip_ver, dst, mask):
                         route_available, new_route_available))
 
     with allure.step('Remove route: {}/{} {}'.format(dst, mask, vlan_iface)):
-        # Remove route
         sonic_cli.route.del_route(dut_engine, dst, vlan_iface, mask)
 
     # Make sure CRM counters updated
