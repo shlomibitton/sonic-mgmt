@@ -92,12 +92,6 @@
 
   - name: find interface name mapping and individual interface speed if defined from dut
     port_alias: hwsku="{{ hwsku }}"
-    when: deploy is defined and deploy|bool == true
-
-  - name: find interface name mapping and individual interface speed if defined with local data
-    port_alias: hwsku="{{ hwsku }}"
-    delegate_to: localhost
-    when: deploy is not defined or deploy|bool == false
 
   - name: find all enabled host_interfaces
     set_fact:
