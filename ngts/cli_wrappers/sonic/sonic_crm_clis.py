@@ -1,7 +1,6 @@
 import re
 import logging
 
-from ngts.cli_wrappers.common.crm_clis_common import CrmCliCommon
 from ngts.cli_util.cli_parsers import generic_sonic_output_parser
 
 logger = logging.getLogger()
@@ -57,7 +56,7 @@ class CRMHelper:
             CRMHelper.set_threshold_value(engine, template, 'high', high)
 
 
-class SonicCrmCli(CrmCliCommon):
+class SonicCrmCli:
     thresholds_cmd = 'crm config thresholds'
 
     @staticmethod
@@ -184,18 +183,13 @@ class SonicCrmCli(CrmCliCommon):
         Parse output of 'crm show thresholds all'
         :param engine: ssh engine object
         """
-        result = {}
-        values_started = False
-        output = engine.run_cmd("crm show thresholds all").split('\n')
-        lines = [line for line in output if line != '']
-        for line in lines:
-            if "---" in line:
-                values_started = True
-                continue
-            elif values_started:
-                res_name, th_type, low, high = line.split()
-                result[res_name] = {'type': th_type, 'low': low, 'high': high}
-
+        output = engine.run_cmd("crm show thresholds all")
+        result = generic_sonic_output_parser(output, headers_ofset=2,
+                                             len_ofset=3,
+                                             data_ofset_from_start=4,
+                                             data_ofset_from_end=-1,
+                                             column_ofset=2,
+                                             output_key='Resource Name')
         return result
 
     @staticmethod
@@ -204,29 +198,22 @@ class SonicCrmCli(CrmCliCommon):
         Run output of 'crm show resources all'
         :param engine: ssh engine object
         """
-        result = {"main_resources": {}, "acl_resources": [], "table_resources": []}
-        output = engine.run_cmd("crm show resources all").split('\n')
-
-        current_table = 0   # Totally 3 tables in the command output
-        for line in output:
-            if len(line.strip()) == 0:
-                continue
-            if "---" in line:
-                current_table += 1
-                continue
-            if current_table == 1:      # content of first table, main resources
-                fields = line.split()
-                if len(fields) == 3:
-                    result["main_resources"][fields[0]] = {"used": int(fields[1]), "available": int(fields[2])}
-            if current_table == 2:      # content of the second table, acl resources
-                fields = line.split()
-                if len(fields) == 5:
-                    result["acl_resources"].append({"stage": fields[0], "bind_point": fields[1],
-                        "resource_name": fields[2], "used_count": int(fields[3]), "available_count": int(fields[4])})
-            if current_table == 3:      # content of the third table, table resources
-                fields = line.split()
-                if len(fields) == 4:
-                    result["table_resources"].append({"table_id": fields[0], "resource_name": fields[1],
-                        "used_count": int(fields[2]), "available_count": int(fields[3])})
-
+        result = {'main_resources': {}, 'acl_resources': [], 'table_resources': []}
+        output = engine.run_cmd("crm show resources all")
+        result['main_resources'] = generic_sonic_output_parser(output, headers_ofset=2,
+                                                               len_ofset=3,
+                                                               data_ofset_from_start=4,
+                                                               data_ofset_from_end=-33,
+                                                               column_ofset=2,
+                                                               output_key='Resource Name')
+        result['acl_resources'] = generic_sonic_output_parser(output, headers_ofset=17, len_ofset=18,
+                                                              data_ofset_from_start=19,
+                                                              data_ofset_from_end=-7,
+                                                              column_ofset=2,
+                                                              output_key=None)
+        result['table_resources'] = generic_sonic_output_parser(output, headers_ofset=44, len_ofset=45,
+                                                                data_ofset_from_start=46,
+                                                                data_ofset_from_end=-1,
+                                                                column_ofset=2,
+                                                                output_key=None)
         return result
