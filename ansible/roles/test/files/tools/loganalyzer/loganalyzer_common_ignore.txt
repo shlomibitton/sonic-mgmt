@@ -25,3 +25,6 @@ r, ".* ERR syncd#SDK: :- process_on_fdb_event: invalid OIDs in fdb notifications
 r, ".* ERR syncd#SDK: :- process_on_fdb_event: FDB notification was not sent since it contain invalid OIDs, bug.*"
 r, ".* ERR syncd#SDK: :- check_fdb_event_notification_data: bv_id RID.*is not present on local ASIC DB.*"
 r, ".* WARNING syncd#SDK:.*mlnx_sai_tunnel.c.*mlnx_sdk_fill_tunnel_ttl_data: TTL uniform model is not supported, using default settings in switch.*"
+r, ".* ERR syncd#SDK: :- redisPutFdbEntryToAsicView: received a flush port fdb event, port_oid.*"
+r, ".* ERR swss#orchagent: :- update: FdbOrch notification: not supported flush port fdb action.*"
+r, ".* WARNING syncd#SDK:.*add_const_table_entries_control_out_rif_table_meta_tunnel:.*"
