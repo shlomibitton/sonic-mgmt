@@ -22,8 +22,8 @@ def test_push_gate_fdb(topology_obj):
         host_name = 'hb'
         dut_engine = topology_obj.players['dut']['engine']
         host_engine = topology_obj.players[host_name]['engine']
-        src_iface = 'bond0.69'
-        dst_ip = '69.0.0.1'
+        src_iface = 'bond0.40'
+        dst_ip = '40.0.0.1'
         with allure.step('Check that PortChannel0002 link in UP state'):
             retry_call(SonicInterfaceCli.check_ports_status, fargs=[dut_engine, ['PortChannel0002']], tries=12, delay=5,
                        logger=logger)

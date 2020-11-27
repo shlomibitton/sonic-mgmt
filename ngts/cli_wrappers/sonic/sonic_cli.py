@@ -11,8 +11,7 @@ from ngts.cli_wrappers.sonic.sonic_route_clis import SonicRouteCli
 from ngts.cli_wrappers.sonic.sonic_vrf_clis import SonicVrfCli
 from ngts.cli_wrappers.sonic.sonic_chassis_clis import SonicChassisCli
 from ngts.cli_wrappers.sonic.sonic_general_clis import SonicGeneralCli
-from ngts.cli_wrappers.sonic.sonic_crm_clis import SonicCrmCli
-
+from ngts.cli_wrappers.sonic.sonic_dhcp_relay_clis import SonicDhcpRelayCli
 logger = logging.getLogger()
 
 
@@ -28,4 +27,4 @@ class SonicCli:
         self.vrf = SonicVrfCli()
         self.chassis = SonicChassisCli()
         self.general = SonicGeneralCli()
-        self.crm = SonicCrmCli()
+        self.dhcp_relay = SonicDhcpRelayCli()

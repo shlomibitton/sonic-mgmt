@@ -55,20 +55,16 @@ def push_gate_configuration(topology_obj):
 
     # VLAN config which will be used in test
     vlan_config_dict = {
-        'dut': [{'vlan_id': 40, 'vlan_members': [{'PortChannel0002': 'trunk'}, {dutha2: 'trunk'}]},
-                {'vlan_id': 69, 'vlan_members': [{'PortChannel0002': 'trunk'}]}],
+        'dut': [{'vlan_id': 40, 'vlan_members': [{'PortChannel0002': 'trunk'}, {dutha2: 'trunk'}]}],
         'ha': [{'vlan_id': 40, 'vlan_members': [{hadut2: None}]}],
-        'hb': [{'vlan_id': 40, 'vlan_members': [{'bond0': None}]},
-               {'vlan_id': 69, 'vlan_members': [{'bond0': None}]}]
+        'hb': [{'vlan_id': 40, 'vlan_members': [{'bond0': None}]}]
     }
 
     # IP config which will be used in test
     ip_config_dict = {
-        'dut': [{'iface': 'Vlan40', 'ips': [('40.0.0.1', '24'), ('4000::1', '64')]},
-                {'iface': 'Vlan69', 'ips': [('69.0.0.1', '24'), ('6900::1', '64')]}],
+        'dut': [{'iface': 'Vlan40', 'ips': [('40.0.0.1', '24'), ('4000::1', '64')]}],
         'ha': [{'iface': '{}.40'.format(hadut2), 'ips': [('40.0.0.2', '24'), ('4000::2', '64')]}],
-        'hb': [{'iface': 'bond0.40', 'ips': [('40.0.0.3', '24'), ('4000::3', '64')]},
-               {'iface': 'bond0.69', 'ips': [('69.0.0.2', '24'), ('6900::2', '64')]}]
+        'hb': [{'iface': 'bond0.40', 'ips': [('40.0.0.3', '24'), ('4000::3', '64')]}]
     }
 
     logger.info('Starting PushGate Common configuration')
