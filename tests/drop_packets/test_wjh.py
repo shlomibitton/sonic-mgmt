@@ -86,8 +86,19 @@ def parse_wjh_table(table):
     return entries
 
 
+def check_for_daemon_error(stderr_lines):
+    if not stderr_lines:
+        return
+
+    for err in stderr_lines:
+        if 'failed to connect to daemon' in err:
+            pytest.fail("{} error has appeared.\n\
+            Please check if SDK version in WJH and Syncd containers is the same.".format(err))
+
+
 def get_raw_table_output(duthost, command="show what-just-happened"):
     stdout = duthost.command(command)
+    check_for_daemon_error(stdout['stderr_lines'])
     if stdout['rc'] != 0:
         raise Exception(stdout['stdout'] + stdout['stderr'])
     table_output = parse_wjh_table(stdout['stdout'])
@@ -96,6 +107,7 @@ def get_raw_table_output(duthost, command="show what-just-happened"):
 
 def get_agg_table_output(duthost, command="show what-just-happened --aggregate"):
     stdout = duthost.command(command)
+    check_for_daemon_error(stdout['stderr_lines'])
     if stdout['rc'] != 0:
         raise Exception(stdout['stdout'] + stdout['stderr'])
     splitted_table = stdout['stdout'].splitlines()[3:]
