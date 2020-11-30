@@ -305,10 +305,10 @@ def test_tunnel_ip_in_ip(do_test, ptfadapter, duthost, setup, pkt_fields, ports_
 
 
 def check_if_l1_enabled(type):
-    if "l1" not in pytest.CHANNEL_CONF:
-        pytest.skip("L1 channel is not confiugred on WJH.")
-    if pytest.CHANNEL_CONF['l1']['type'].find(type) == -1:
-        pytest.skip("L1 raw channel type is not confiugred on WJH.")
+    if "layer-1" not in pytest.CHANNEL_CONF:
+        pytest.skip("layer-1 channel is not confiugred on WJH.")
+    if pytest.CHANNEL_CONF['layer-1']['type'].find(type) == -1:
+        pytest.skip("layer-1 {} channel type is not confiugred on WJH.".format(type))
 
 
 def get_active_port(duthost):
@@ -332,7 +332,7 @@ def test_l1_raw_drop(duthost):
     duthost.command("config interface shutdown {}".format(port))
 
     try:
-        table = get_raw_table_output(duthost, "show what-just-happened l1")
+        table = get_raw_table_output(duthost, "show what-just-happened layer-1")
         if not verify_l1_raw_drop_exists(table, port):
             pytest.fail("Could not find L1 drop on WJH table.")
     finally:
@@ -366,7 +366,7 @@ def test_l1_agg_port_up(duthost):
 
     duthost.command("config interface startup {}".format(port))
     try:
-        table = get_agg_table_output(duthost, command="show what-just-happened l1 --aggregate")
+        table = get_agg_table_output(duthost, command="show what-just-happened layer-1 --aggregate")
         entry = verify_l1_agg_drop_exists(table, port, 'Up')
         if entry['Down Reason - Recommended Action'] != 'N/A':
             pytest.fail("Could not find L1 drop on WJH aggregated table.")
@@ -380,7 +380,7 @@ def test_l1_agg_port_down(duthost):
 
     duthost.command("config interface shutdown {}".format(port))
     try:
-        table = get_agg_table_output(duthost, command="show what-just-happened l1 --aggregate")
+        table = get_agg_table_output(duthost, command="show what-just-happened layer-1 --aggregate")
         entry = verify_l1_agg_drop_exists(table, port, 'Down')
         if entry['Down Reason - Recommended Action'] != 'Port admin down - Validate port configuration':
             pytest.fail("Could not find L1 drop on WJH aggregated table.")
@@ -396,7 +396,7 @@ def test_l1_agg_fanout_port_down(duthost, fanouthosts):
     fanout.shutdown(fanout_port)
     wait(15, 'Wait for fanout port to shutdown')
     try:
-        table = get_agg_table_output(duthost, command="show what-just-happened l1 --aggregate")
+        table = get_agg_table_output(duthost, command="show what-just-happened layer-1 --aggregate")
         entry = verify_l1_agg_drop_exists(table, port, 'Down')
         if entry['Down Reason - Recommended Action'] != 'Auto-negotiation failure - Set port speed manually, disable auto-negotiation':
             pytest.fail("Could not find L1 drop on WJH aggregated table.")
