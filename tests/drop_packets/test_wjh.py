@@ -208,8 +208,7 @@ def verify_l1_raw_drop_exists(table, port):
     entry_exists = False
     for entry in table:
         if (entry['Drop Group'] == 'L1' and
-            # TODO: uncomment the port check once an SDK bug will be merged
-            # entry['sPort'] == port and
+            entry['sPort'] == port and
             entry['Severity'] == 'Warn' and
             entry['Drop reason - Recommended action'] == 'Generic L1 event - Check layer 1 aggregated information'):
                 entry_exists = True
@@ -332,7 +331,7 @@ def verify_l1_agg_drop_exists(table, port, state):
     entry_exists = False
     for entry in table:
         if (entry['State'] == state and
-            #entry['Port'] == port and TODO: uncomment when sdk bug merged
+            entry['Port'] == port and
             entry['State Change'] > 0):
                 entry_exists = True
                 break
