@@ -1,0 +1,24 @@
+pipeline {
+    agent none
+    options {
+        timestamps()
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '30', numToKeepStr: '150')
+    }
+    environment {
+        GENERIC_CI_GIT_BRANCH = 'ci_version-3.1'
+        MAIN_NODE = 'SONIC_LITE'
+        JSON_FILE = 'build/merge/merge_build_configuration.json'
+    }
+    stages {
+        stage("Main") {
+        agent { label "${MAIN_NODE}" }
+            steps {
+                script {
+                    library changelog: false, identifier: "ci_framework@$GENERIC_CI_GIT_BRANCH"
+                            LoadNGCI()
+                }
+            }
+        }
+
+    }
+}

@@ -1,0 +1,63 @@
+{
+  "author": "NBU-system-sw-dev-ops-support@nvidia.com",
+  "notify": "BUILD_USER_ID,NBU-sw-ci-sonic@nvidia.com",
+  "timeout": "1",
+  "durability_mode": "MAX_SURVIVABILITY",
+  "properties": [
+    "default_propertiesFile=/auto/sw_system_release/ci/general/ngci_properties/swfw_default_params.properties",
+    "gerrit_propertiesFile=/auto/sw_system_release/ci/general/ngci_properties/swgerrit.properties",
+    "build_propertiesFile=build/common/build.properties",
+    "PIPELINE_FORCE_CLEAN=true",
+    "JOB_PARAMS_TO_MAIL=true",
+    "JOB_PARAMS_TO_MAIL_EXCLUDES=Summary"
+  ],
+  "phases": [
+    {
+      "phase_1": [
+        {
+          "name": "Clone",
+          "module": "com.mellanox.jenkins.generic_modules.Checkout",
+          "category": "Pre Merge",
+          "node": "SONIC_LITE",
+          "parameters": {
+            "CLONE_PATH": "${PROJECT_NAME}",
+            "GIT_REPOSITORY": "${GIT_REPOSITORY}",
+            "BRANCH_NAME": "${MGMT_GERRIT_BRANCH}"
+          },
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Validation",
+          "module": "build/merge/validation.groovy",
+          "category": "Pre Merge",
+          "node": "SONIC_LITE",
+          "parameters": {},
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
+          "name": "Merge",
+          "module": "build/merge/merge_from_github.groovy",
+          "category": "Merge",
+          "node": "SONIC_LITE",
+          "parameters": {},
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": false
+        },
+        {
+          "name": "Push and trigger CI",
+          "module": "build/merge/push_and_code_review.groovy",
+          "category": "Push",
+          "node": "SONIC_LITE",
+          "parameters": {},
+          "skip": false,
+          "on_failure": "stop"
+        }
+      ]
+    }
+  ]
+}

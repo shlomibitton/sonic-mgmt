@@ -7,7 +7,9 @@ def pre(name, ci_tools) {
 
 def run_step(name, ci_tools) {
     try {
-        if (env.CHANGED_COMPONENTS && env.CHANGED_COMPONENTS.contains("NoMatch")) {
+        if (env.RUN_REGRESSION && env.RUN_REGRESSION.toBoolean() == true) {
+            print "Regression test are defined to run with topic \"RUN_REGRESSION=true\""
+        } else if (env.CHANGED_COMPONENTS && env.CHANGED_COMPONENTS.contains("NoMatch")) {
             print "Changed files triggered regression tests"
         } else {
             env.SKIP_MINI_REGRESSION = true
