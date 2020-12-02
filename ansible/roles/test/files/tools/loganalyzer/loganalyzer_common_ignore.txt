@@ -28,3 +28,4 @@ r, ".* WARNING syncd#SDK:.*mlnx_sai_tunnel.c.*mlnx_sdk_fill_tunnel_ttl_data: TTL
 r, ".* ERR syncd#SDK: :- redisPutFdbEntryToAsicView: received a flush port fdb event, port_oid.*"
 r, ".* ERR swss#orchagent: :- update: FdbOrch notification: not supported flush port fdb action.*"
 r, ".* WARNING syncd#SDK:.*add_const_table_entries_control_out_rif_table_meta_tunnel:.*"
+r, ".* ERR radv#radvd.* Exiting, privsep_read_loop.*"

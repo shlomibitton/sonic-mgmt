@@ -26,7 +26,7 @@ BGP_MONITOR_NAME = "bgp_monitor"
 BGP_ANNOUNCE_TIME = 30 #should be enough to receive and parse bgp updates
 
 # TODO: remove me
-BGPMON_TEMPLATE_FILE = 'bgp/templates/bgpmon.j2'
+BGPMON_TEMPLATE_FILE = 'bgp/templates/bgp_template.j2'
 BGPMON_CONFIG_FILE = '/tmp/bgpmon.json'
 
 @pytest.fixture
@@ -44,6 +44,7 @@ def common_setup_teardown(ptfhost, duthost, localhost):
     # TODO: Add a common method to load BGPMON config for test_bgpmon and test_traffic_shift
     logger.info("Configuring bgp monitor session on DUT")
     bgpmon_args = {
+        'db_table_name': 'BGP_MONITORS',
         'peer_addr': peer_addr,
         'asn': asn,
         'local_addr': dut_lo_addr,
@@ -145,13 +146,13 @@ def parse_routes_on_eos(dut_host, neigh_hosts, ip_ver):
             cmd = "show ipv6 bgp peers {} received-routes detail | grep -E \"{}|{}\"".format(peer_ip_v6, BGP_ENTRY_HEADING, BGP_COMMUNITY_HEADING)
             # For compatibility on EOS of old version
             cmd_backup = "show ipv6 bgp neighbors {} received-routes detail | grep -E \"{}|{}\"".format(peer_ip_v6, BGP_ENTRY_HEADING, BGP_COMMUNITY_HEADING)
-        output_lines = host.eos_command(commands=[cmd])['stdout_lines'][0]
-        if len(output_lines) == 0 and cmd_backup != "":
-            output_lines = host.eos_command(commands=[cmd])['stdout_lines'][0]
-        pytest_assert(len(output_lines) != 0, "Failed to retrieve routes from VM {}".format(hostname))
+        res = host.eos_command(commands=[cmd], module_ignore_errors=True)
+        if res['failed'] and cmd_backup != "":
+            res = host.eos_command(commands=[cmd_backup], module_ignore_errors=True)
+        pytest_assert(not res['failed'], "Failed to retrieve routes from VM {}".format(hostname))
         routes = {}
         entry = None
-        for line in output_lines:
+        for line in res['stdout_lines'][0]:
             addr = re.findall(BGP_ENTRY_HEADING + r"(.+)", line)
             if addr:
                 if entry:

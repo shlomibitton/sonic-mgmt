@@ -1117,6 +1117,10 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
 
         return mg_facts
 
+    def get_route(self, prefix):
+        cmd = 'show bgp ipv4' if ipaddress.ip_network(unicode(prefix)).version == 4 else 'show bgp ipv6'
+        return json.loads(self.shell('vtysh -c "{} {} json"'.format(cmd, prefix))['stdout'])
+
 
 class K8sMasterHost(AnsibleHostBase):
     """
@@ -1197,7 +1201,7 @@ class K8sMasterHost(AnsibleHostBase):
                 self.shell("sudo systemctl start kubelet")
 
 
-class K8sMasterCluster():
+class K8sMasterCluster(object):
     """
     @summary: Class that encapsulates Kubernetes master cluster
 
@@ -1218,7 +1222,8 @@ class K8sMasterCluster():
             else:
                 self.backend_masters.append(k8smaster)
 
-    def get_master_vip(self):
+    @property
+    def vip(self):
         """
         @summary: Retrieve VIP of Kubernetes master cluster
 
@@ -1414,6 +1419,13 @@ class EosHost(AnsibleHostBase):
 
         if res["localhost"]["rc"] != 0:
             raise Exception("Unable to execute template\n{}".format(res["stdout"]))
+
+    def get_route(self, prefix):
+        cmd = 'show ip bgp' if ipaddress.ip_network(unicode(prefix)).version == 4 else 'show ipv6 bgp'
+        return self.eos_command(commands=[{
+            'command': '{} {}'.format(cmd, prefix),
+            'output': 'json'
+        }])['stdout'][0]
 
 
 class OnyxHost(AnsibleHostBase):

@@ -9,7 +9,6 @@ import copy
 import ipaddr as ipaddress
 from collections import defaultdict
 from natsort import natsorted
-from sonic_py_common import multi_asic
 
 from lxml import etree as ET
 from lxml.etree import QName
@@ -61,7 +60,12 @@ def parse_png(png, hname):
     console_port = ''
     mgmt_dev = ''
     mgmt_port = ''
-    namespace_list = multi_asic.get_namespace_list()
+    try:
+        from sonic_py_common import multi_asic
+        namespace_list = multi_asic.get_namespace_list()
+    except ImportError:
+        namespace_list = ['']
+
     for child in png:
         if child.tag == str(QName(ns, "DeviceInterfaceLinks")):
             for link in child.findall(str(QName(ns, "DeviceLinkBase"))):
