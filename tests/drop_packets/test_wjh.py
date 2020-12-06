@@ -392,7 +392,7 @@ def test_l1_agg_fanout_port_down(duthost, fanouthosts):
     check_if_l1_enabled('aggregate')
     port = get_active_port(duthost)
 
-    fanout, fanout_port = fanout_switch_port_lookup(fanouthosts, port)
+    fanout, fanout_port = fanout_switch_port_lookup(fanouthosts, duthost.hostname, port)
     fanout.shutdown(fanout_port)
     wait(15, 'Wait for fanout port to shutdown')
     try:
