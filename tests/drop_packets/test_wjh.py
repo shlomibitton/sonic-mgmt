@@ -8,7 +8,7 @@ from ptf.testutils import verify_no_packet_any, simple_ip_only_packet, simple_ip
 from tests.common.helpers.assertions import pytest_assert
 from collections import OrderedDict
 from tests.common.platform.device_utils import fanout_switch_port_lookup
-from tests.common.utilities import wait
+from tests.common.utilities import wait, wait_until
 import json
 
 
@@ -331,6 +331,13 @@ def get_inactive_phy_port(duthost):
     pytest.skip("Could not find port in Down state. Skipping the test.")
 
 
+def check_if_port_is_active(duthost, port):
+    intf_facts = duthost.interface_facts()['ansible_facts']['ansible_interface_facts']
+    if intf_facts[port]['active']:
+        return True
+    return False
+
+
 def test_l1_raw_drop(duthost):
     check_if_l1_enabled('raw')
 
@@ -344,6 +351,8 @@ def test_l1_raw_drop(duthost):
             pytest.fail("Could not find L1 drop on WJH table.")
     finally:
         duthost.command("config interface startup {}".format(port))
+        if not wait_until(60, 5, check_if_port_is_active, duthost, port):
+            pytest.fail("Could not start up {} port.\nAborting.".format(port))
 
 
 def verify_l1_agg_drop_exists(table, port, state):
@@ -366,6 +375,8 @@ def test_l1_agg_port_up(duthost):
 
     duthost.command("config interface startup {}".format(port))
     try:
+        if not wait_until(60, 5, check_if_port_is_active, duthost, port):
+            pytest.fail("Could not start up {} port.\nAborting.".format(port))
         table = get_agg_table_output(duthost, command="show what-just-happened layer-1 --aggregate")
         entry = verify_l1_agg_drop_exists(table, port, 'Up')
         if entry['Down Reason - Recommended Action'] != 'N/A':
@@ -386,6 +397,8 @@ def test_l1_agg_port_down(duthost):
             pytest.fail("Could not find L1 drop on WJH aggregated table.")
     finally:
         duthost.command("config interface startup {}".format(port))
+        if not wait_until(60, 5, check_if_port_is_active, duthost, port):
+            pytest.fail("Could not start up {} port.\nAborting.".format(port))
 
 
 def test_l1_agg_fanout_port_down(duthost, fanouthosts):
