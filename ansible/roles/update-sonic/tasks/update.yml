@@ -208,3 +208,47 @@
       delay: 10
 
   when: topo == "t0"
+
+- block:
+
+  - name: Init telemetry keys
+    set_fact:
+      server_key: "/etc/sonic/telemetry/streamingtelemetryserver.key"
+      server_cer: "/etc/sonic/telemetry/streamingtelemetryserver.cer"
+      dsmsroot_key: "/etc/sonic/telemetry/dsmsroot.key"
+      dsmsroot_cer: "/etc/sonic/telemetry/dsmsroot.cer"
+      client_key: "/etc/sonic/telemetry/streamingtelemetryclient.key"
+      client_cer: "/etc/sonic/telemetry/streamingtelemetryclient.cer"
+      dir_path: "/etc/sonic/telemetry"
+
+  - name: Create telemetry directory
+    file:
+      path: "{{ dir_path }}"
+      state: directory
+      mode: '0755'
+    become: true
+
+  # {{ server_cer }}/ streamingtelemetryserver.cer need to be copied on PTFDocker and renamed as dsmsroot.cer
+  - name: Generate server cert using openssl.
+    command: openssl req \
+        -x509 \
+        -sha256 \
+        -nodes \
+        -newkey rsa:2048 \
+        -keyout "{{ server_key }}"
+        -subj "/CN=ndastreamingservertest"
+        -out "{{ server_cer }}"
+    become: true
+
+  # {{ dsmsroot_cer }}/ dsmsroot.cer need to be copied on PTFDocker and renamed as streamingtelemetryclient.cer
+  # {{ dsms_key }}/ dsmsroot.key need to be copied and renamed as streamingtelemetryclient.key
+  - name: Generate dsmsroot cert using openssl.
+    command: openssl req \
+        -x509 \
+        -sha256 \
+        -nodes \
+        -newkey rsa:2048 \
+        -keyout "{{ dsmsroot_key }}"
+        -subj "/CN=ndastreamingclienttest"
+        -out "{{ dsmsroot_cer }}"
+    become: true
