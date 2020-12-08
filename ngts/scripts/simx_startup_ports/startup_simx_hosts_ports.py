@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import allure
 import os
+import pathlib
 from os.path import join
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 import logging
@@ -16,7 +17,7 @@ def test_startup_simx_hosts_ports(topology_obj):
     :param topology_obj: topology object fixture
     :return: raise assertion error in case of script failure
     """
-    pcap_file_path = join(os.getcwd(), "simx_signal_peer_oper_up.pcap")
+    pcap_file_path = join(str(pathlib.Path(__file__).parent.absolute()), "simx_signal_peer_oper_up.pcap")
     ha_dut_1 = topology_obj.ports['ha-dut-1']
     ha_dut_2 = topology_obj.ports['ha-dut-2']
     hb_dut_1 = topology_obj.ports['hb-dut-1']
