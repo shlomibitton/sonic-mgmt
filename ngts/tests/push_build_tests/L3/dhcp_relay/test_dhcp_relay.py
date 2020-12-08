@@ -1,7 +1,6 @@
 import allure
 import logging
 import pytest
-import re
 
 from ngts.cli_wrappers.linux.linux_dhcp_clis import LinuxDhcpCli
 from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
@@ -100,11 +99,11 @@ class TestDHCPRelay:
         try:
             with allure.step('Validate RELEASE message from DHCP client'):
                 validation = {'sender': 'ha', 'send_args': {'interface': self.dhclient_iface, 'packets': release_pkt,
-                                                            'count': 1},
+                                                            'count': 3},
                               'receivers':
                                   [
                                       {'receiver': 'hb', 'receive_args': {'interface': self.dhcp_server_iface,
-                                                                          'filter': tcpdump_filter_release}}
+                                                                          'filter': tcpdump_filter_release, 'count': 1}}
                                   ]
                               }
                 ScapyChecker(self.topology.players, validation).run_validation()
@@ -126,12 +125,12 @@ class TestDHCPRelay:
                 validation_nak_default_vrf = {'sender': 'ha',
                                               'send_args': {'interface': self.dhclient_iface,
                                                             'packets': dhcp_options_request_out_of_range_ip_pkt,
-                                                            'count': 1},
+                                                            'count': 3},
                                               'receivers':
                                                   [
                                                        {'receiver': 'ha', 'receive_args':
                                                            {'interface': self.dhclient_iface,
-                                                            'filter': tcpdump_filter_nak}}
+                                                            'filter': tcpdump_filter_nak, 'count': 1}}
                                                   ]
                                               }
                 ScapyChecker(self.topology.players, validation_nak_default_vrf).run_validation()
@@ -150,12 +149,13 @@ class TestDHCPRelay:
             with allure.step('Validate that DHCPDECLINE message from DHCP client received on DHCP server'):
                 validation_decline_default_vrf = {'sender': 'ha',
                                                   'send_args': {'interface': self.dhclient_iface,
-                                                                'packets': decline_pkt, 'count': 1},
+                                                                'packets': decline_pkt, 'count': 3},
                                                   'receivers':
                                                       [
                                                           {'receiver': 'hb',
                                                            'receive_args': {'interface': self.dhcp_server_iface,
-                                                                            'filter': tcpdump_filter_decline}}
+                                                                            'filter': tcpdump_filter_decline,
+                                                                            'count': 1}}
                                                       ]
                                                   }
                 ScapyChecker(self.topology.players, validation_decline_default_vrf).run_validation()
@@ -174,12 +174,12 @@ class TestDHCPRelay:
             with allure.step('Validate that DHCPINFORM message from DHCP client received on DHCP server'):
                 validation_inform_default_vrf = {'sender': 'ha',
                                                  'send_args': {'interface': self.dhclient_iface,
-                                                               'packets': inform_pkt, 'count': 1},
+                                                               'packets': inform_pkt, 'count': 3},
                                                  'receivers':
                                                      [
                                                          {'receiver': 'hb',
                                                           'receive_args': {'interface': self.dhcp_server_iface,
-                                                                           'filter': tcpdump_filter_inform}}
+                                                                           'filter': tcpdump_filter_inform, 'count': 1}}
                                                      ]
                                                  }
                 ScapyChecker(self.topology.players, validation_inform_default_vrf).run_validation()
@@ -223,15 +223,17 @@ class TestDHCPRelay:
                              'server and server replied'):
                 validation_custom_request_src_prt = {'sender': 'ha',
                                                      'send_args': {'interface': self.dhclient_iface,
-                                                                   'packets': request_from_custom_port_pkt, 'count': 1},
+                                                                   'packets': request_from_custom_port_pkt, 'count': 3},
                                                      'receivers':
                                                          [
                                                              {'receiver': 'hb',
                                                               'receive_args': {'interface': self.dhcp_server_iface,
-                                                                               'filter': tcpdump_filter_ak}},
+                                                                               'filter': tcpdump_filter_ak,
+                                                                               'count': 1}},
                                                              {'receiver': 'ha',
                                                               'receive_args': {'interface': self.dhclient_iface,
-                                                                               'filter': tcpdump_filter_ak_on_client}}
+                                                                               'filter': tcpdump_filter_ak_on_client,
+                                                                               'count': 1}}
                                                          ]
                                                      }
                 ScapyChecker(self.topology.players, validation_custom_request_src_prt).run_validation()
@@ -259,12 +261,13 @@ class TestDHCPRelay:
             with allure.step('Validate that empty DHCPREQUEST message from DHCP client received on DHCP server'):
                 validation_empty_dhcp_request = {'sender': 'ha',
                                                  'send_args': {'interface': self.dhclient_iface,
-                                                               'packets': empty_dhcp_request, 'count': 1},
+                                                               'packets': empty_dhcp_request, 'count': 3},
                                                  'receivers':
                                                      [
                                                          {'receiver': 'hb',
                                                           'receive_args': {'interface': self.dhcp_server_iface,
-                                                                           'filter': tcpdump_filter_empty_request}}
+                                                                           'filter': tcpdump_filter_empty_request,
+                                                                           'count': 1}}
                                                      ]
                                                  }
                 ScapyChecker(self.topology.players, validation_empty_dhcp_request).run_validation()
@@ -284,12 +287,12 @@ class TestDHCPRelay:
                 PingChecker(self.topology.players, validation_ping).run_validation()
 
                 validation_udp_packet = {'sender': 'ha', 'send_args': {'interface': self.dhclient_iface,
-                                                                       'packets': udp_pkt, 'count': 1},
+                                                                       'packets': udp_pkt, 'count': 3},
                                          'receivers':
                                              [
                                                  {'receiver': 'ha',
                                                   'receive_args': {'interface': 'bond0',
-                                                                   'filter': tcpdump_filter_src_1_2_3_4}},
+                                                                   'filter': tcpdump_filter_src_1_2_3_4, 'count': 1}},
                                                  {'receiver': 'hb',
                                                   'receive_args': {'interface': self.dhcp_server_iface,
                                                                    'filter': tcpdump_filter_src_1_2_3_4, 'count': 0}}
@@ -316,12 +319,13 @@ class TestDHCPRelay:
             with allure.step('Send bootp packet with invalid payload'):
                 validation_invalid_payload = {'sender': 'ha',
                                               'send_args': {'interface': self.dhclient_iface,
-                                                            'packets': pkt_with_random_payload, 'count': 1},
+                                                            'packets': pkt_with_random_payload, 'count': 3},
                                               'receivers':
                                                   [
                                                       {'receiver': 'hb',
                                                        'receive_args': {'interface': self.dhcp_server_iface,
-                                                                        'filter': tcpdump_filter_random_payload}}
+                                                                        'filter': tcpdump_filter_random_payload,
+                                                                        'count': 1}}
                                                   ]
                                               }
                 ScapyChecker(self.topology.players, validation_invalid_payload).run_validation()

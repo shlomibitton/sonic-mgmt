@@ -84,7 +84,8 @@ def test_basic_static_route(topology_obj):
                             'receivers':
                                 [
                                     {'receiver': 'ha', 'receive_args': {'interface': receiver_interface_ha,
-                                                                        'filter': tcpdump_filter}}
+                                                                        'filter': tcpdump_filter,
+                                                                        'count': 1}}
                                 ]
                             }
             ScapyChecker(topology_obj.players, validation_1).run_validation()
@@ -101,7 +102,8 @@ def test_basic_static_route(topology_obj):
                                     {'receiver': 'ha', 'receive_args': {'interface': receiver_interface_ha,
                                                                         'filter': tcpdump_filter, 'count': 0}},
                                     {'receiver': 'hb', 'receive_args': {'interface': receiver_interface_hb,
-                                                                        'filter': tcpdump_filter}}
+                                                                        'filter': tcpdump_filter,
+                                                                        'count': 1}}
                                 ]
                             }
             ScapyChecker(topology_obj.players, validation_1).run_validation()
@@ -116,7 +118,7 @@ def test_basic_static_route(topology_obj):
                             'receivers':
                                 [
                                     {'receiver': 'ha', 'receive_args': {'interface': receiver_interface_ha,
-                                                                        'filter': tcpdump_filter}}
+                                                                        'filter': tcpdump_filter, 'count': 1}}
                                 ]
                             }
             ScapyChecker(topology_obj.players, validation_2).run_validation()
@@ -132,7 +134,7 @@ def test_basic_static_route(topology_obj):
                             'receivers':
                                 [
                                     {'receiver': 'hb', 'receive_args': {'interface': receiver_interface_hb,
-                                                                        'filter': tcpdump_filter}}
+                                                                        'filter': tcpdump_filter, 'count': 1}}
                                 ]
                             }
             ScapyChecker(topology_obj.players, validation_4).run_validation()
@@ -149,7 +151,7 @@ def test_basic_static_route(topology_obj):
                                     {'receiver': 'ha', 'receive_args': {'interface': receiver_interface_ha,
                                                                         'filter': tcpdump_filter, 'count': 0}},
                                     {'receiver': 'hb', 'receive_args': {'interface': receiver_interface_hb,
-                                                                        'filter': tcpdump_filter}}
+                                                                        'filter': tcpdump_filter, 'count': 1}}
                                 ]
                             }
             ScapyChecker(topology_obj.players, validation_3).run_validation()
@@ -164,7 +166,7 @@ def test_basic_static_route(topology_obj):
                             'receivers':
                                 [
                                     {'receiver': 'ha', 'receive_args': {'interface': receiver_interface_ha,
-                                                                        'filter': tcpdump_filter}}
+                                                                        'filter': tcpdump_filter, 'count': 1}}
                                 ]
                             }
             ScapyChecker(topology_obj.players, validation_4).run_validation()
