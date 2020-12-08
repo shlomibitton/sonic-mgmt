@@ -13,7 +13,7 @@ logger = logging.getLogger()
 
 
 @pytest.fixture(scope='package', autouse=True)
-def push_gate_configuration(topology_obj):
+def push_gate_configuration(topology_obj, is_simx):
     """
     Pytest fixture which are doing configuration fot test case based on push gate config
     :param topology_obj: topology object fixture
@@ -82,7 +82,7 @@ def push_gate_configuration(topology_obj):
     LagLacpConfigTemplate.cleanup(topology_obj, lag_lacp_config_dict)
     InterfaceConfigTemplate.cleanup(topology_obj, interfaces_config_dict)
 
-    # Workaround for bug: https://github.com/Azure/sonic-buildimage/issues/5347
-    topology_obj.players['dut']['engine'].run_cmd('sudo config reload -y')
+    if not is_simx:
+        topology_obj.players['dut']['engine'].run_cmd('sudo config reload -y')
 
     logger.info('PushGate Common cleanup completed')

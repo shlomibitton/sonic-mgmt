@@ -13,8 +13,18 @@ from infra.tools.topology_tools.topology_setup_utils import get_topology_by_setu
 from ngts.cli_wrappers.sonic.sonic_cli import SonicCli
 from ngts.cli_wrappers.linux.linux_cli import LinuxCli
 from ngts.scripts.allure_report.allure_server import AllureServer
-
+from  distutils.dist import strtobool
 logger = logging.getLogger()
+
+
+@pytest.fixture(scope='session')
+def is_simx(request):
+    """
+    Method for getting base version from pytest arguments
+    :param request: pytest builtin
+    :return: setup name
+    """
+    return strtobool(request.config.getoption('--simx'))
 
 
 def pytest_addoption(parser):
@@ -25,6 +35,8 @@ def pytest_addoption(parser):
     logger.info('Parsing pytest options')
     parser.addoption('--setup_name', action='store', required=True, default=None,
                      help='Setup name, example: sonic_tigris_r-tigris-06')
+    logger.info("Parsing if simx setup")
+    parser.addoption('--simx', default="False", help='value indicating if the setup is a simx setup')
 
 
 @pytest.fixture(scope='session')
