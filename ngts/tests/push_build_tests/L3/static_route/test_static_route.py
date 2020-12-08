@@ -66,6 +66,13 @@ def test_basic_static_route(topology_obj):
         pkt_ipv4 = 'Ether(dst="{}")/IP(dst="{}", src="1.2.3.4")/TCP()'
         pkt_ipv6 = 'Ether(dst="{}")/IPv6(dst="{}", src="1234::5678")/TCP()'
 
+        # TODO: cmd below for debug - need to remove later
+        dut_engine.run_cmd('show interfaces status')
+        dut_engine.run_cmd('show dropcounters configuration')
+        dut_engine.run_cmd('show arp')
+        dut_engine.run_cmd('show ip interfaces')
+        dut_engine.run_cmd('sudo tail -n 100 /var/log/syslog')
+
         with allure.step('Functional check IPv4 static route via Interface'):
             logger.info('Functional checking IPv4 static route via Interface')
             dst_ip = '20.0.0.1'
@@ -164,3 +171,10 @@ def test_basic_static_route(topology_obj):
 
     except Exception as err:
         raise AssertionError(err)
+    # TODO: cmd below for debug - need to remove later
+    finally:
+        dut_engine.run_cmd('sudo tail -n 200 /var/log/syslog')
+        dut_engine.run_cmd('show interfaces status')
+        dut_engine.run_cmd('show dropcounters configuration')
+        dut_engine.run_cmd('show arp')
+        dut_engine.run_cmd('show ip interfaces')
