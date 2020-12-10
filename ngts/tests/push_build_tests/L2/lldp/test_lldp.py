@@ -369,7 +369,7 @@ def test_lldp_after_disable_on_host(topology_obj):
     with allure.step("Expect test LLDP to pass after LLDP is enabled on host interface"):
         retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
 
-@pytest.mark.skip(reason="skipped due bug 2253609")
+
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP when changing tx-interval on dut')
@@ -384,17 +384,15 @@ def test_lldp_change_transmit_delay(topology_obj):
     cli_object = topology_obj.players['dut']['cli']
     checked_intervals = [120, 60, 30]
     for interval in checked_intervals:
-        cli_object.lldp.change_lldp_tx_interval(dut_engine, interval=interval)
-        cli_object.lldp.disable_lldp(dut_engine)
-        logger.info("Verify lldp is disabled in \"show_feature_status\"")
-        check_lldp_feature_status(dut_engine, cli_object, expected_res=r"lldp\s+disabled")
-        cli_object.lldp.enable_lldp(dut_engine)
-        logger.info("Verify lldp is enabled in \"show_feature_status\"")
-        check_lldp_feature_status(dut_engine, cli_object)
-        logger.info("Verify LLDP service start within {} seconds".format(interval))
-        with allure.step("Expect test LLDP to pass within {} seconds after LLDP is enabled".format(interval)):
-            retry_call(verify_lldp_info_for_host_dut_ports, fargs=[topology_obj],
-                       tries=int(interval/10), delay=10, logger=logger)
+        with allure.step("Check lldp when changing transmit delay to {} seconds.".format(interval)):
+            cli_object.lldp.change_lldp_tx_interval(dut_engine, interval=interval)
+            cli_object.lldp.verify_lldp_tx_interval(dut_engine, expected_transmit_interval=interval)
+            cli_object.lldp.pause_lldp(dut_engine)
+            cli_object.lldp.resume_lldp(dut_engine)
+            logger.info("Verify LLDP service resume within {} seconds".format(interval))
+            with allure.step("Expect test LLDP to pass within {} seconds after LLDP is resume".format(interval)):
+                retry_call(verify_lldp_info_for_host_dut_ports, fargs=[topology_obj],
+                           tries=int(interval/10)+1, delay=10, logger=logger)
 
 
 def verify_lldp_info_for_host_dut_ports(topology_obj):

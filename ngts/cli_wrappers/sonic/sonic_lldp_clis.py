@@ -76,12 +76,50 @@ class SonicLldpCli(LldpCliCommon):
         :param interval: value of interval in seconds
         :return: command output
         """
-        enter_docker_cmd = 'docker exec -it {} bash'.format(SonicDockersConstant.LLDP)
-        configure_lldp_interval_cmd = 'lldpcli configure lldp tx-interval {}'.format(interval)
-        exit_docker_cmd = 'exit'
-        cmd_set = [enter_docker_cmd, configure_lldp_interval_cmd, exit_docker_cmd]
-        with allure.step('Enter lldp docker, change lldp transmit delay to {} seconds and exit'.format(interval)):
-            engine.run_cmd_set(cmd_set=cmd_set)
+        configure_lldp_interval_cmd = 'docker exec {}  /bin/bash -c \"lldpcli configure lldp tx-interval {}\"'.format(SonicDockersConstant.LLDP, interval)
+        with allure.step("change lldp transmit delay to {} seconds on player {}".format(interval, engine.ip)):
+            engine.run_cmd(configure_lldp_interval_cmd)
+
+    @staticmethod
+    def verify_lldp_tx_interval(engine, expected_transmit_interval=30):
+        """
+        This method verify the transmit delay is the specified interval value in seconds.
+        :param engine: ssh enging object
+        :param expected_transmit_interval: value of the expected interval in seconds
+        :return: command output
+        """
+        show_lldp_interval_cmd = "docker exec {}  /bin/bash -c \"lldpcli show running-configuration\""\
+            .format(SonicDockersConstant.LLDP)
+        with allure.step('Check lldp transmit delay is {} seconds on player {}'
+                                 .format(expected_transmit_interval, engine.ip)):
+            output = engine.run_cmd(show_lldp_interval_cmd)
+            actual_transmit_delay = re.search("Transmit delay: (\d+)", output, re.IGNORECASE).group(1)
+            assert int(actual_transmit_delay) == int(expected_transmit_interval), \
+                "The expected transmit delay for lldp is {}, the actual transmit is {}."\
+                    .format(expected_transmit_interval, actual_transmit_delay)
+
+    @staticmethod
+    def pause_lldp(engine):
+        """
+        pause lldp demon.
+        :param engine: ssh enging object
+        :return: command output
+        """
+        pause_lldp_demon = "docker exec {}  /bin/bash -c \"lldpcli pause\""\
+            .format(SonicDockersConstant.LLDP)
+        with allure.step('Pause lldp demon on {}'.format(engine.ip)):
+            engine.run_cmd(pause_lldp_demon)
+
+    @staticmethod
+    def resume_lldp(engine):
+        """
+        resume lldp demon.
+        :param engine: ssh enging object
+        :return: command output
+        """
+        resume_lldp_demon = "docker exec {}  /bin/bash -c \"lldpcli resume\"".format(SonicDockersConstant.LLDP)
+        with allure.step('Resume lldp demon on player {}'.format(engine.ip)):
+            engine.run_cmd(resume_lldp_demon)
 
     @staticmethod
     def parse_lldp_info_for_specific_interface(engine, interface_name):
