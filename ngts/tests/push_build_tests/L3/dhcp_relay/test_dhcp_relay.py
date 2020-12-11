@@ -9,6 +9,7 @@ from ngts.cli_wrappers.sonic.sonic_dhcp_relay_clis import SonicDhcpRelayCli
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
 from ngts.cli_util.stub_engine import StubEngine
+from ngts.tools.skip_test.skip import ngts_skip
 
 
 """
@@ -86,9 +87,9 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
             self.dut_engine.run_cmd_set(cleanup_engine.commands_list)
 
-    @pytest.mark.skip(reason='https://github.com/Azure/sonic-buildimage/issues/6053')
     @pytest.mark.build
-    def test_dhcp_relay_release_message(self):
+    def test_dhcp_relay_release_message(self, current_platform):
+        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'])
         dhcp_release = '0x7'
         bootp_body = 'chaddr={},ciaddr="{}"'.format(self.chaddr, self.expected_ip)
         dhcp_options = '("message-type","release"),"end"'
@@ -186,9 +187,9 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    @pytest.mark.skip(reason='https://github.com/Azure/sonic-buildimage/issues/6053')
     @pytest.mark.build
-    def test_dhcp_relay_unicast_request_message(self):
+    def test_dhcp_relay_unicast_request_message(self, current_platform):
+        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'])
         try:
             with allure.step('Getting IP address from DHCP server via DHCP relay functionality'):
                 assert self.expected_ip in self.dhcp_client_engine.run_cmd(run_dhcp_client.format(self.dhclient_iface))
@@ -206,7 +207,8 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
 
     @pytest.mark.build
-    def test_dhcp_relay_request_message_with_custom_src_port(self):
+    def test_dhcp_relay_request_message_with_custom_src_port(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2398571])
         dhcp_ack = '0x5'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         # ACK on server side - dst port 67
@@ -241,14 +243,14 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     @pytest.mark.build
-    @pytest.mark.skip(reason='https://github.com/Azure/sonic-buildimage/issues/6052')
-    def test_dhcp_relay_request_message_with_empty_payload(self):
+    def test_dhcp_relay_request_message_with_empty_payload(self, current_platform):
         """
         This test case check that if we send DHCP request packet with empty payload - packet forwarded to DHCP
         server and no more field were added by the DHCP relay other than option 82, by checking packet size is less
         thank 330 bytes
         Test related to GitHub issue: https://github.com/Azure/sonic-buildimage/issues/6052
         """
+        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6052'])
         bootp_body = 'chaddr={}'.format(self.chaddr)
 
         # REQUEST message on server side - should be less than 330 bytes

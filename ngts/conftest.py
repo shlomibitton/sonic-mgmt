@@ -12,8 +12,8 @@ import logging
 from infra.tools.topology_tools.topology_setup_utils import get_topology_by_setup_name
 from ngts.cli_wrappers.sonic.sonic_cli import SonicCli
 from ngts.cli_wrappers.linux.linux_cli import LinuxCli
-from ngts.scripts.allure_report.allure_server import AllureServer
-from  distutils.dist import strtobool
+from ngts.tools.allure_report.allure_server import AllureServer
+from distutils.dist import strtobool
 logger = logging.getLogger()
 
 
@@ -71,6 +71,11 @@ def update_topology_with_cli_class(topology):
             player_info['cli'] = SonicCli()
         else:
             player_info['cli'] = LinuxCli()
+
+
+@pytest.fixture(scope='session', autouse=True)
+def current_platform(topology_obj):
+    return topology_obj.players['dut']['engine'].run_cmd('show platform summary')
 
 
 def pytest_sessionfinish(session, exitstatus):
