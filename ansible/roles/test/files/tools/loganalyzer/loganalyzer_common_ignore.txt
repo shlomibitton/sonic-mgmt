@@ -29,3 +29,4 @@ r, ".* ERR syncd#SDK: :- redisPutFdbEntryToAsicView: received a flush port fdb e
 r, ".* ERR swss#orchagent: :- update: FdbOrch notification: not supported flush port fdb action.*"
 r, ".* WARNING syncd#SDK:.*add_const_table_entries_control_out_rif_table_meta_tunnel:.*"
 r, ".* ERR radv#radvd.* Exiting, privsep_read_loop.*"
+r, ".* ERR pmon#sensord: Error getting sensor data: dps460.*Can't read.*"
