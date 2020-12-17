@@ -7,6 +7,7 @@ from ngts.cli_wrappers.sonic.sonic_route_clis import SonicRouteCli
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 from ngts.cli_util.verify_cli_show_cmd import verify_show_cmd
+from ngts.tools.skip_test.skip import ngts_skip
 
 """
 
@@ -21,12 +22,13 @@ logger = logging.getLogger()
 
 @pytest.mark.push_gate
 @allure.title('Test Basic Static Route')
-def test_basic_static_route(topology_obj):
+def test_basic_static_route(topology_obj, current_platform):
     """
     This test will check basic static route functionality.
     :param topology_obj: topology object fixture
     :return: raise assertion error in case when test failed
     """
+    ngts_skip(current_platform, rm_ticket_list=[2399954])
     hadut2 = topology_obj.ports['ha-dut-2']
     dut_engine = topology_obj.players['dut']['engine']
 
