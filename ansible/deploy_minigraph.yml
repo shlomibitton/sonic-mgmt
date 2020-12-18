@@ -1,0 +1,52 @@
+# Deploy minigraph on SONiC device
+# Command example:
+#  ansible-playbook -i inventory --limit r-anaconda-51-ptf-any deploy_minigraph.yml -e dut_minigraph=r-anaconda-51.ptf-any.xml -b -vvv
+
+- hosts: sonic
+  gather_facts: no
+  tasks:
+    - name: Wait until all critical services are started
+      shell: bash -c 'docker ps | grep {{ item }}'
+      register: result
+      until: result.rc == 0
+      with_items:
+        - swss
+        - syncd
+        - bgp
+        - teamd
+        - pmon
+        - lldp
+        - snmp
+        - dhcp_relay
+      retries: 10
+      delay: 30
+
+    - block:
+
+      - name: Get current running firmware version
+        shell: bash -c 'mlxfwmanager --query'
+        register: result
+
+      - name: Show firmware version
+        debug: msg="{{ result.stdout_lines }}"
+
+    - block:
+
+        - name: Deploy minigraph file.
+          copy:
+            src: "minigraph/{{ dut_minigraph }}"
+            dest: "/etc/sonic/minigraph.xml"
+
+        - name: Deploy specific device configuration files
+          include: deploy_device_configs.yml
+          vars:
+            dut_hwsku: "{{ sonic_hwsku }}"
+            dut_hostname: "{{ ansible_ssh_host }}"
+
+        - name: Reload minigraph.
+          shell: config load_minigraph -y
+
+        - name: Save config.
+          shell: config save -y
+
+      when: dut_minigraph is defined

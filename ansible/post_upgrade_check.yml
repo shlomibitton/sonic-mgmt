@@ -1,0 +1,132 @@
+# Do post upgrade check - check dockers status, ifaces status etc.
+# Command example:
+#  ansible-playbook -i inventory --limit r-anaconda-51-ptf-any post_upgrade_check.yml -e topo=ptf-any -b -vvv
+
+- hosts: sonic
+  gather_facts: no
+  tasks:
+    - name: Wait until all critical services are started
+      shell: bash -c 'docker ps | grep {{ item }}'
+      register: result
+      until: result.rc == 0
+      with_items:
+        - swss
+        - syncd
+        - bgp
+        - teamd
+        - pmon
+        - lldp
+        - snmp
+        - dhcp_relay
+      retries: 10
+      delay: 30
+
+    - block:
+
+      - name: Get current running firmware version
+        shell: bash -c 'mlxfwmanager --query'
+        register: result
+
+      - name: Show firmware version
+        debug: msg="{{ result.stdout_lines }}"
+
+    - name: Remove old ssh keys by address
+      shell: ssh-keygen -R {{ minigraph_mgmt_interface.addr }}
+      delegate_to: localhost
+      ignore_errors: yes
+
+    - name: Remove old ssh keys by hostname
+      shell: ssh-keygen -R {{ inventory_hostname }}
+      delegate_to: localhost
+      ignore_errors: yes
+
+    - name: Gathering minigraph facts about the device
+      minigraph_facts: host={{ inventory_hostname }}
+      tags: always
+
+
+    - block:
+
+        - set_fact:
+            intfs: "{% if minigraph_ports|length > 1 %}{{ '{' }}{% endif %}{{ minigraph_ports.keys() | join(',') }}{% if minigraph_ports|length > 1 %}{{ '}' }}{% endif %}"
+
+        - name: Verify interfaces are up correctly
+          command: bash -c "cat /sys/class/net/{{ intfs }}/operstate"
+          register: out
+          until: (out.rc == 0) and (out.stdout.find("down") == -1)
+          retries: 30
+          delay: 10
+
+
+    - block:
+
+        - set_fact:
+            pc_intfs: "{% if minigraph_portchannels|length > 1 %}{{ '{' }}{% endif %}{{ minigraph_portchannels.keys() | join(',') }}{% if minigraph_portchannels|length > 1 %}{{ '}' }}{% endif %}"
+
+        - name: Verify PortChannel interfaces are up correctly
+          command: bash -c "cat /sys/class/net/{{ pc_intfs }}/operstate"
+          register: out
+          until: (out.rc == 0) and (out.stdout.find("down") == -1)
+          retries: 30
+          delay: 10
+
+      when: (topo == "t0") or (topo == "t1-lag")
+
+    - block:
+
+        - set_fact:
+            vlan_intfs: "{% if minigraph_vlans|length > 1 %}{{ '{' }}{% endif %}{{ minigraph_vlans.keys() | join(',') }}{% if minigraph_vlans|length > 1 %}{{ '}' }}{% endif %}"
+
+        - name: Verify VLAN interfaces are up correctly
+          command: bash -c "cat /sys/class/net/{{ vlan_intfs }}/operstate"
+          register: out
+          until: (out.rc == 0) and (out.stdout.find("down") == -1)
+          retries: 30
+          delay: 10
+
+      when: topo == "t0"
+
+
+    - block:
+
+      - name: Init telemetry keys
+        set_fact:
+          server_key: "/etc/sonic/telemetry/streamingtelemetryserver.key"
+          server_cer: "/etc/sonic/telemetry/streamingtelemetryserver.cer"
+          dsmsroot_key: "/etc/sonic/telemetry/dsmsroot.key"
+          dsmsroot_cer: "/etc/sonic/telemetry/dsmsroot.cer"
+          client_key: "/etc/sonic/telemetry/streamingtelemetryclient.key"
+          client_cer: "/etc/sonic/telemetry/streamingtelemetryclient.cer"
+          dir_path: "/etc/sonic/telemetry"
+
+      - name: Create telemetry directory
+        file:
+          path: "{{ dir_path }}"
+          state: directory
+          mode: '0755'
+        become: true
+
+      # {{ server_cer }}/ streamingtelemetryserver.cer need to be copied on PTFDocker and renamed as dsmsroot.cer
+      - name: Generate server cert using openssl.
+        command: openssl req \
+            -x509 \
+            -sha256 \
+            -nodes \
+            -newkey rsa:2048 \
+            -keyout "{{ server_key }}"
+            -subj "/CN=ndastreamingservertest"
+            -out "{{ server_cer }}"
+        become: true
+
+      # {{ dsmsroot_cer }}/ dsmsroot.cer need to be copied on PTFDocker and renamed as streamingtelemetryclient.cer
+      # {{ dsms_key }}/ dsmsroot.key need to be copied and renamed as streamingtelemetryclient.key
+      - name: Generate dsmsroot cert using openssl.
+        command: openssl req \
+            -x509 \
+            -sha256 \
+            -nodes \
+            -newkey rsa:2048 \
+            -keyout "{{ dsmsroot_key }}"
+            -subj "/CN=ndastreamingclienttest"
+            -out "{{ dsmsroot_cer }}"
+        become: true
