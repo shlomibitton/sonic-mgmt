@@ -304,6 +304,8 @@ def do_checks(duthosts, check_items):
             elif item == "bgp":
                 if dut in duthosts.frontend_nodes:
                     results[dut.hostname].append(check_bgp_status(dut))
+            elif item == "monit":
+                results[dut.hostname].append(check_monit(dut))
 
             # check_monit take a lot of time because of telemetry service failure.
             # Here we disable it as a WA to faster the regression run. Once the telemtry issue fix, 
