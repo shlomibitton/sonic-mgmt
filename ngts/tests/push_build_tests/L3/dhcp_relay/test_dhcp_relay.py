@@ -250,7 +250,7 @@ class TestDHCPRelay:
         thank 330 bytes
         Test related to GitHub issue: https://github.com/Azure/sonic-buildimage/issues/6052
         """
-        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6052'])
+        ngts_skip(current_platform, rm_ticket_list=[2400523])
         bootp_body = 'chaddr={}'.format(self.chaddr)
 
         # REQUEST message on server side - should be less than 330 bytes
