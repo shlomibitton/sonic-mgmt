@@ -57,6 +57,7 @@
           retries: 30
           delay: 10
 
+      when: (topo != "ptf-any")
 
     - block:
 
