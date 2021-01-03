@@ -91,7 +91,7 @@ def check_for_daemon_error(stderr_lines):
         return
 
     for err in stderr_lines:
-        if 'failed to connect to daemon' in err:
+        if ('failed to connect to daemon' in err or 'Timeout waiting for daemon to send data' in err):
             pytest.fail("{} error has appeared.\n\
             Please check if SDK version in WJH and Syncd containers is the same.".format(err))
 
