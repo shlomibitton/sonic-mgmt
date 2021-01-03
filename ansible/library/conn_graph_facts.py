@@ -188,7 +188,7 @@ class Parse_Lab_Graph():
         """
         ranges = []
         sl = sorted(set(l))
-        for k,g in groupby(enumerate(sl), lambda (i,x): i-x):
+        for k,g in groupby(enumerate(sl), lambda i, x: i-x):
             group = list(map(itemgetter(1), g))
             if len(group) == 1:
                 ranges.append(str(group[0]))
@@ -291,10 +291,10 @@ def find_graph(hostnames):
     return lab_graph
 
 
-def get_port_name_list(hwsku):
+def get_port_name_list(hostname, hwsku):
     # Create a map of SONiC port name to physical port index
     # Start by creating a list of all port names
-    port_alias_to_name_map = get_port_alias_to_name_map(hwsku)
+    port_alias_to_name_map = get_port_alias_to_name_map(hostname, hwsku)
 
     # Create a map of SONiC port name to physical port index
     # Start by creating a list of all port names
@@ -365,7 +365,7 @@ def main():
                 port_vlans = lab_graph.get_host_port_vlans(hostname)
                 device_vlan_map_list[hostname] = {}
 
-                port_name_list_sorted = get_port_name_list(dev['HwSku'])
+                port_name_list_sorted = get_port_name_list(hostname, dev['HwSku'])
                 print_debug_msg(debug_fname,"For %s with hwsku %s, port_name_list is %s" % (hostname, dev['HwSku'], port_name_list_sorted))
                 for a_host_vlan in host_vlan["VlanList"]:
                     # Get the corresponding port for this vlan from the port vlan list for this hostname

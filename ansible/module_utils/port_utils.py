@@ -12,7 +12,8 @@ def _port_alias_to_name_map_50G(all_ports, s100G_ports):
 
     return new_map
 
-def get_port_alias_to_name_map(hwsku):
+
+def get_port_alias_to_name_map(hostname, hwsku):
     port_alias_to_name_map = {}
     if hwsku == "Force10-S6000":
         for i in range(0, 128, 4):
