@@ -466,7 +466,7 @@ def parse_xml(filename, hostname):
 
     global port_alias_to_name_map
 
-    port_alias_to_name_map = get_port_alias_to_name_map(hwsku)
+    port_alias_to_name_map = get_port_alias_to_name_map(hostname, hwsku)
 
     for child in root:
         if child.tag == str(QName(ns, "DpgDec")):

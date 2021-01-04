@@ -188,7 +188,7 @@ class Parse_Lab_Graph():
         """
         ranges = []
         sl = sorted(set(l))
-        for k,g in groupby(enumerate(sl), lambda i, x: i-x):
+        for k,g in groupby(enumerate(sl), lambda (i,x): i-x):
             group = list(map(itemgetter(1), g))
             if len(group) == 1:
                 ranges.append(str(group[0]))
