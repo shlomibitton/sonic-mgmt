@@ -10,6 +10,7 @@ from infra.tools.validations.traffic_validations.scapy.scapy_runner import Scapy
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
 from ngts.cli_util.stub_engine import StubEngine
 from ngts.tools.skip_test.skip import ngts_skip
+from retry.api import retry_call
 
 
 """
@@ -255,7 +256,7 @@ class TestDHCPRelay:
         thank 330 bytes
         Test related to GitHub issue: https://github.com/Azure/sonic-buildimage/issues/6052
         """
-        ngts_skip(current_platform, rm_ticket_list=[2400523])
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         bootp_body = 'chaddr={}'.format(self.chaddr)
 
         # REQUEST message on server side - should be less than 330 bytes
@@ -277,7 +278,8 @@ class TestDHCPRelay:
                                                                            'count': 1}}
                                                      ]
                                                  }
-                ScapyChecker(self.topology.players, validation_empty_dhcp_request).run_validation()
+                scapy_checker = ScapyChecker(self.topology.players, validation_empty_dhcp_request)
+                retry_call(scapy_checker.run_validation, fargs=[], tries=3, delay=5, logger=logger)
         except BaseException as err:
             raise AssertionError(err)
 
