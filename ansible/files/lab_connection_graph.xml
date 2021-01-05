@@ -3,7 +3,7 @@
     <Devices>
       <Device Hostname="arc-switch1038" HwSku="ACS-MSN3700" Type="DevSonic"/>
       <Device Hostname="arc-switch1025" HwSku="Mellanox-2700" Type="DevSonic"/>
-      <Device Hostname="arc-switch1004" HwSku="Mellanox-2700-D48C8" Type="DevSonic"/>
+      <Device Hostname="arc-switch1004" HwSku="Mellanox-SN2700-D48C8" Type="DevSonic"/>
       <Device Hostname="arc-switch1041" HwSku="Mellanox-2740" Type="DevSonic"/>
       <Device Hostname="mts-sonic-dut" HwSku="Mellanox-2700" Type="DevSonic"/>
       <Device Hostname="arc-mtbc-1001" HwSku="Mellanox-2410" Type="DevSonic"/>
