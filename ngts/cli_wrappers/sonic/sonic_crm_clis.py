@@ -4,6 +4,7 @@ import logging
 from ngts.cli_util.cli_parsers import generic_sonic_output_parser
 
 logger = logging.getLogger()
+CRM_DEFAULT_INTERVAL = 300
 
 
 class CrmThresholdTypeError(Exception):
@@ -166,7 +167,12 @@ class SonicCrmCli:
         Return configured CRM polling interval
         :param engine: ssh engine object
         """
-        return int(engine.run_cmd('crm show summary | awk \'{print $3}\'').strip())
+        output = engine.run_cmd('crm show summary')
+        if 'error' in output.lower():
+            logger.warning('CRM was not enabled yet, returning default {} sec. interval'.foramt(CRM_DEFAULT_INTERVAL))
+            return CRM_DEFAULT_INTERVAL
+        else:
+            return int(engine.run_cmd('crm show summary | awk \'{print $3}\'').strip())
 
     @staticmethod
     def set_polling_interval(engine, interval):
@@ -200,20 +206,20 @@ class SonicCrmCli:
         """
         result = {'main_resources': {}, 'acl_resources': [], 'table_resources': []}
         output = engine.run_cmd("crm show resources all")
-        result['main_resources'] = generic_sonic_output_parser(output, headers_ofset=2,
-                                                               len_ofset=3,
-                                                               data_ofset_from_start=4,
-                                                               data_ofset_from_end=-33,
+        result['main_resources'] = generic_sonic_output_parser(output, headers_ofset=1,
+                                                               len_ofset=2,
+                                                               data_ofset_from_start=3,
+                                                               data_ofset_from_end=-28,
                                                                column_ofset=2,
                                                                output_key='Resource Name')
-        result['acl_resources'] = generic_sonic_output_parser(output, headers_ofset=17, len_ofset=18,
-                                                              data_ofset_from_start=19,
-                                                              data_ofset_from_end=-7,
+        result['acl_resources'] = generic_sonic_output_parser(output, headers_ofset=14, len_ofset=15,
+                                                              data_ofset_from_start=16,
+                                                              data_ofset_from_end=-4,
                                                               column_ofset=2,
                                                               output_key=None)
-        result['table_resources'] = generic_sonic_output_parser(output, headers_ofset=44, len_ofset=45,
-                                                                data_ofset_from_start=46,
-                                                                data_ofset_from_end=-1,
+        result['table_resources'] = generic_sonic_output_parser(output, headers_ofset=38, len_ofset=39,
+                                                                data_ofset_from_start=40,
+                                                                data_ofset_from_end=0,
                                                                 column_ofset=2,
                                                                 output_key=None)
         return result

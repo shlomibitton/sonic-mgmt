@@ -1,5 +1,3 @@
-import allure
-
 from ngts.cli_wrappers.interfaces.interface_mac_clis import MacCliInterface
 
 
