@@ -57,7 +57,8 @@ class TestDHCPRelay:
 
     @pytest.mark.push_gate
     @pytest.mark.build
-    def test_basic_dhcp_relay(self):
+    def test_basic_dhcp_relay(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         try:
             with allure.step('Validate the IP address provided by the DHCP server'):
                 assert self.expected_ip in self.dhcp_client_engine.run_cmd(run_dhcp_client.format(self.dhclient_iface))
@@ -71,7 +72,8 @@ class TestDHCPRelay:
 
     @pytest.mark.skip(reason='https://github.com/Azure/sonic-utilities/pull/1269')
     @pytest.mark.build
-    def test_dhcp_relay_remove_dhcp_server(self):
+    def test_dhcp_relay_remove_dhcp_server(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         cleanup_engine = StubEngine()
         try:
             with allure.step('Remove DHCP relay setting from DUT'):
@@ -89,7 +91,7 @@ class TestDHCPRelay:
 
     @pytest.mark.build
     def test_dhcp_relay_release_message(self, current_platform):
-        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'])
+        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'], rm_ticket_list=[2404665])
         dhcp_release = '0x7'
         bootp_body = 'chaddr={},ciaddr="{}"'.format(self.chaddr, self.expected_ip)
         dhcp_options = '("message-type","release"),"end"'
@@ -113,7 +115,8 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     @pytest.mark.build
-    def test_dhcp_relay_nak_message(self):
+    def test_dhcp_relay_nak_message(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         dhcp_nak = '0x6'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         tcpdump_filter_nak = "'((port 67 or port 68) and ({} = {}))'".format(dhcp_option_53, dhcp_nak)
@@ -139,7 +142,8 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     @pytest.mark.build
-    def test_dhcp_relay_decline_message(self):
+    def test_dhcp_relay_decline_message(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         dhcp_decline = '0x4'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         tcpdump_filter_decline = "'((port 67 or port 68) and ({} = {}))'".format(dhcp_option_53, dhcp_decline)
@@ -164,7 +168,8 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     @pytest.mark.build
-    def test_dhcp_relay_inform_message(self):
+    def test_dhcp_relay_inform_message(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         dhcp_inform = '0x8'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         tcpdump_filter_inform = "'((port 67 or port 68) and ({} = {}))'".format(dhcp_option_53, dhcp_inform)
@@ -189,7 +194,7 @@ class TestDHCPRelay:
 
     @pytest.mark.build
     def test_dhcp_relay_unicast_request_message(self, current_platform):
-        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'])
+        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'], rm_ticket_list=[2404665])
         try:
             with allure.step('Getting IP address from DHCP server via DHCP relay functionality'):
                 assert self.expected_ip in self.dhcp_client_engine.run_cmd(run_dhcp_client.format(self.dhclient_iface))
@@ -208,7 +213,7 @@ class TestDHCPRelay:
 
     @pytest.mark.build
     def test_dhcp_relay_request_message_with_custom_src_port(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2398571])
+        ngts_skip(current_platform, rm_ticket_list=[2398571, 2404665])
         dhcp_ack = '0x5'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         # ACK on server side - dst port 67
@@ -277,7 +282,8 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     @pytest.mark.build
-    def test_dhcp_relay_upd_packet_with_src_and_dst_ports_the_same_as_dhcp(self):
+    def test_dhcp_relay_upd_packet_with_src_and_dst_ports_the_same_as_dhcp(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         tcpdump_filter_src_1_2_3_4 = "src 1.2.3.4"
         dst_ip = "30.0.0.2"
         udp_pkt = 'Ether(dst="{}")/IP(src="1.2.3.4",dst="{}")/UDP(sport=68,dport=67)/Raw()'.format(self.dut_mac, dst_ip)
@@ -305,8 +311,8 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     @pytest.mark.build
-    def test_dhcp_relay_packet_with_malformed_payload(self):
-
+    def test_dhcp_relay_packet_with_malformed_payload(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2404665])
         mac1 = self.dhclient_mac.replace(':', '')[:8]
         mac2 = self.dhclient_mac.replace(':', '')[8:]
         tcpdump_filter_random_payload = "'((port 67 or port 68) and (udp[36:4] = 0x{}) and (udp[40:2] = 0x{}))'".format(
