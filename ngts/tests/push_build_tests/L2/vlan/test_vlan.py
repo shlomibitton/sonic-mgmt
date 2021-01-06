@@ -6,6 +6,7 @@ from ngts.cli_util.verify_cli_show_cmd import verify_show_cmd
 from ngts.cli_wrappers.sonic.sonic_vlan_clis import SonicVlanCli
 from ngts.cli_wrappers.linux.linux_ip_clis import LinuxIpCli
 
+from ngts.tools.skip_test.skip import ngts_skip
 
 """
 
@@ -114,13 +115,14 @@ def test_vlan_trunk_mode(topology_obj):
 
 @pytest.mark.push_gate
 @allure.title('Test VLAN configuration on split port')
-def test_vlan_on_split_port(topology_obj):
+def test_vlan_on_split_port(topology_obj, current_platform):
     """
     configure different vlans on split port in trunk/access mode.
     check port are in up state after configuration and vlans were configured correctly
     :param topology_obj: topology object fixture
     :return: raise assertion error if expected output is not matched
     """
+    ngts_skip(current_platform, platform_prefix_list=['simx'])
     port_alias_template = "dut-lb-splt2-p{}-{}"
     vlan_list = [700, 800]
     port_indices = [1, 2]
