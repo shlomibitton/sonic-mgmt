@@ -11,6 +11,7 @@ from infra.tools.validations.traffic_validations.ping.ping_runner import PingChe
 logger = logging.getLogger()
 
 
+@pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('PushGate FDB test case')
 def test_push_gate_fdb(topology_obj):

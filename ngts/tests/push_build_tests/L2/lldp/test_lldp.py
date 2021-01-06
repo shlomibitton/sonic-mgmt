@@ -9,6 +9,7 @@ from ngts.cli_util.verify_cli_show_cmd import verify_show_cmd
 logger = logging.getLogger()
 
 
+@pytest.mark.build
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test show LLDP table information')
@@ -282,6 +283,7 @@ def verify_remote_device_id(topo_remote_device_id, lldp_remote_device_id):
         .format(topo_remote_device_id, lldp_remote_device_id)
 
 
+@pytest.mark.build
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP after disable on dut')
@@ -346,6 +348,7 @@ def verify_lldp_info_for_dut_host_ports(topology_obj):
         raise AssertionError(err)
 
 
+@pytest.mark.build
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP after disable on host')
@@ -370,6 +373,7 @@ def test_lldp_after_disable_on_host(topology_obj):
         retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
 
 
+@pytest.mark.build
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP when changing tx-interval on dut')

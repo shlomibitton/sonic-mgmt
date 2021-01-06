@@ -20,6 +20,7 @@ from ngts.tools.skip_test.skip import ngts_skip
 logger = logging.getLogger()
 
 
+@pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test Basic Static Route')
 def test_basic_static_route(topology_obj, current_platform):

@@ -21,6 +21,7 @@ logger = logging.getLogger()
 show_vlan_config_pattern = r"Vlan{vid}\s+{vid}\s+{member}\s+{mode}"
 
 
+@pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test VLAN access mode')
 def test_vlan_access_mode(topology_obj):
@@ -55,6 +56,8 @@ def test_vlan_access_mode(topology_obj):
         logger.info('Sending 3 tagged packets from bond0.700 to to 70.0.0.1 ({}.700)'.format(hb_dut_1))
         ping.run_validation()
 
+
+@pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test VLAN trunk mode')
 def test_vlan_trunk_mode(topology_obj):
@@ -113,6 +116,7 @@ def test_vlan_trunk_mode(topology_obj):
         ping.run_validation()
 
 
+@pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test VLAN configuration on split port')
 def test_vlan_on_split_port(topology_obj, current_platform):
@@ -161,6 +165,7 @@ def test_vlan_on_split_port(topology_obj, current_platform):
 
 
 @pytest.mark.skip(reason="skipped due bug 2253609")
+@pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test VLAN 4094/5 configuration')
 def test_vlan_4094_5(topology_obj):
