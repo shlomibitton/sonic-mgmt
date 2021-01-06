@@ -260,7 +260,8 @@ def test_show_platform_fanstatus_mocked(duthosts, rand_one_dut_hostname, mocker_
     mocker.mock_data()
     logging.info('Wait and check actual data with mocked FAN status data...')
     result = check_cli_output_with_mocker(duthost, mocker, CMD_PLATFORM_FANSTATUS, THERMAL_CONTROL_TEST_WAIT_TIME, 2)
-
+    if not result:
+        mocker.print_debug_info()
     assert result, 'FAN mock data mismatch'
 
 

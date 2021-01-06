@@ -701,6 +701,7 @@ class RandomFanStatusMocker(CheckMockerResultMixin, FanStatusMocker):
         # get a random value once here
         speed = random.randint(60, 100)
         FanData.mock_cooling_cur_state(self.mock_helper, speed/10)
+        logging.info('Mock fan speed to {}, cooling_cur_state to {}'.format(speed, speed/10))
         while fan_index <= MockerHelper.FAN_NUM:
             try:
                 if (fan_index - 1) % MockerHelper.FAN_NUM_PER_DRAWER == 0:
@@ -790,6 +791,38 @@ class RandomFanStatusMocker(CheckMockerResultMixin, FanStatusMocker):
                             '{} expected speed={}, actual speed={}'.format(fan_data.name, expected_speed, target_speed))
                         return False
         return True
+
+    def print_debug_info(self):
+        from tests.platform_tests.mellanox.check_sysfs import generate_sysfs_fan_config, generate_sysfs_psu_config
+        platform_data = get_platform_data(self.mock_helper.dut)
+        config = list()
+        config.append(generate_sysfs_fan_config(platform_data))
+        config.append(generate_sysfs_psu_config(platform_data))
+        config.append(self.generate_sysfs_cooling_level_config())
+        fan_facts = self.mock_helper.dut.sysfs_facts(config=config)['ansible_facts']
+        logging.info('Sysfs values: {}'\
+                .format(json.dumps(fan_facts, indent=2)))
+
+
+    def generate_sysfs_cooling_level_config(self):
+        return {
+            'name': 'cooling_cur_state',
+            'type': 'single',
+            'properties': [
+                {
+                    'name': 'cooling_level',
+                    'cmd_pattern': 'cat /var/run/hw-management/thermal/cooling_cur_state'
+                }, 
+                {
+                    'name': 'port_amb',
+                    'cmd_pattern': 'cat /var/run/hw-management/thermal/port_amb'
+                },
+                {
+                    'name': 'fan_amb',
+                    'cmd_pattern': 'cat /var/run/hw-management/thermal/fan_amb'
+                }
+            ]
+        }
 
 
 @mocker('ThermalStatusMocker')
