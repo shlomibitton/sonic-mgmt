@@ -8,6 +8,7 @@ from infra.tools.validations.traffic_validations.ping.ping_runner import PingChe
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 from ngts.cli_util.verify_cli_show_cmd import verify_show_cmd
 from ngts.tools.skip_test.skip import ngts_skip
+from retry.api import retry_call
 
 """
 
@@ -36,7 +37,9 @@ def test_basic_static_route(topology_obj, current_platform):
     try:
         # TODO: Workaround for bug https://redmine.mellanox.com/issues/2350931
         validation_create_arp_1_ipv4 = {'sender': 'hb', 'args': {'interface': 'bond0.69', 'count': 3, 'dst': '69.0.0.1'}}
-        PingChecker(topology_obj.players, validation_create_arp_1_ipv4).run_validation()
+        ping_checker = PingChecker(topology_obj.players, validation_create_arp_1_ipv4)
+        # Retry required, because some time this validation fail
+        retry_call(ping_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
         validation_create_arp_1_ipv6 = {'sender': 'hb', 'args': {'interface': 'bond0.69', 'count': 3, 'dst': '6900::1'}}
         PingChecker(topology_obj.players, validation_create_arp_1_ipv6).run_validation()
         validation_create_arp_2_ipv4 = {'sender': 'ha', 'args': {'interface': 'bond0', 'count': 3, 'dst': '30.0.0.1'}}
