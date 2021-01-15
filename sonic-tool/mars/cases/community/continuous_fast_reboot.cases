@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Continuous-Fast-Reboot Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> continuous_reboot </name>
+            <owner> </owner>
+        </Test>
+        <Case>
+            <tags> FAST-REBOOT, CONTINUOUS_REBOOT </tags>
+            <wrapper> run_ansible_playbook.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <ignore>
+            <condition>
+                <!-- fast-reboot and warm-reboot are not supported on spectrum2 and spectrum3 platforms yet-->
+                <key> chip_type </key>
+                <op> in </op>
+                <value> ["spectrum2", "spectrum3"] </value>
+            </condition>
+            <condition>
+                <key> skip_weekend_cases </key>
+                <op> == </op>
+                <value> yes </value>
+            </condition>
+        </ignore>
+
+        <info> Continuous_Fast_Reboot Case </info>
+        <name> continuous_fast_reboot </name>
+        <tout> 4200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'test_sonic.yml -i inventory --limit [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_name=[[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_type=[[conf:extra_info.topology]] -e testcase_name=continuous_reboot -e reboot_type=fast-reboot -e repeat_count=5 -e dump_since=-24hours [[conf:extra_info.verbosity]]\'" </static_args>
+             </params>
+        </cmd>
+
+        <!-- Fast reboot leaves switch in "just loaded" state which assumes some processes will still be in
+             progress Sleep for 5 min to let testbed finish initialization
+        -->
+        <post>
+            <info> sleep to stabilize </info>
+            <name> sleep to stabilize </name>
+            <type> reg_exec_cmd </type>
+            <tout> 360 </tout>
+            <params>
+                <exec> sleep 300 </exec>
+            </params>
+        </post>
+
+    </case>
+
+</CASEDEF>

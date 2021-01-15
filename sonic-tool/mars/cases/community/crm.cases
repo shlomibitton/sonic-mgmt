@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> CRM Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> crm </name>
+            <owner> </owner>
+        </Test>
+        <Case>
+            <tags> CRM </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 5400 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> CRM Case </info>
+        <name> crm </name>
+        <tout> 6000 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\ -k \"not test_crm_fdb_entry\"\'" --test-scripts crm/test_crm.py</static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

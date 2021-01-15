@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# login to docker registry
+
+source sonic-env
+
+docker login -u ${REGISTRY_USER} -p ${REGISTRY_PASS}  ${REGISTRY_HOST}:${REGISTRY_PORT}

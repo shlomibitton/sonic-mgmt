@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DBDEF>
+    <global>
+        <!-- parameters passed to setup steps commands-->
+        <default_params_type> basic_setup_step_params </default_params_type>
+        <DB>
+            <info> Sanity </info>
+            <owner> SONiC </owner>
+            <group> SONiC </group>
+
+            <!-- OPTIONAL TAGS -->
+            <tags> SANITY </tags>
+
+            <!-- pre db commands - executed once before DB run -->
+            <pre>
+            </pre>
+
+            <!-- post db commands - executed once after DB run -->
+            <post>
+            </post>
+        </DB>
+        <Test>
+            <!--Must reset any dynamic ignore tags created by other tests-->
+            <pre>
+                <type> reg_exec_func </type>
+                <name> reset dynamic ignore tags </name>
+                <mars_cmd_func> reset_dynamic_tags </mars_cmd_func>
+                <tout> 60 </tout>
+                <params>
+                    <tags_type> ignore_tags </tags_type>
+                </params>
+            </pre>
+            <pre>
+                <type> reg_exec_func </type>
+                <name> pre-test check </name>
+                <mars_cmd_func> run_on_stm </mars_cmd_func>
+                <tout> 300 </tout>
+                <params>
+                    <cmd> /root/pyenv/sonic/bin/python -E [[conf:execution_blocks.B_ID1.local_src_path]]/sonic-mgmt/sonic-tool/mars/scripts/pre_test_check.py </cmd>
+                    <cmd_params> --topo [[conf:topology_file]] --test-name [[run_time:test_name]] --sonic-topo [[conf:extra_info.topology]] --workspace-path [[conf:extra_info.sonic_mgmt_workspace]] --repo-name [[conf:extra_info.sonic_mgmt_repo_name]] </cmd_params>
+                </params>
+            </pre>
+            <post>
+            </post>
+        </Test>
+        <Case>
+            <!-- OPTIONAL TAGS -->
+            <!--<tags> TAG NAME</tags>-->
+            <pre></pre>
+            <ignore>
+                <ignore_by_tag> TAG_TOPOLOGY_NOT_APPLICABLE </ignore_by_tag>
+            </ignore>
+            <post></post>
+        </Case>
+    </global>
+
+    <!-- Based on VS image tests -->
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/nbr_health.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/announce_routes.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/interfaces.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/po_ch_update.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/po_cleanup.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/bgp_fact.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/lldp.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/bgp_speaker.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/dhcp_relay.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/rw_user.cases </cases>
+    </test>
+    <!-- Currently skipped, because of absent configuration of TACACS server -->
+    <!--
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/ro_user.cases </cases>
+    </test>
+    -->
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/ntp.cases </cases>
+    </test>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/snmp.cases </cases>
+    </test>
+
+</DBDEF>

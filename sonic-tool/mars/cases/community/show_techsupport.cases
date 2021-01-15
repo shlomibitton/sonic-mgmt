@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Show techsupport command test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> show_techsupport </name>
+            <owner> SONiC </owner>
+        </Test>
+        <Case>
+            <tags> SHOW_TECHSUPPORT </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> SHOW_TECHSUPPORT Case </info>
+        <name> show_techsupport </name>
+        <tout> 3600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no  -ra --showlocals -v\'" --test-scripts show_techsupport/test_techsupport.py --loop_num=1 --loop_delay=1 --logs_since="1 minute ago" </static_args>
+            </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

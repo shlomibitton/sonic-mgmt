@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Neighbour MAC Test </info>
+            <name> neighbour_mac_noptf </name>
+            <owner></owner>
+            <pre></pre>
+            <post></post>
+        </Test>
+        <Case>
+            <tags> NEIGHBOUR_MAC </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> Neighbour MAC Case </info>
+        <name> neighbour_mac_noptf </name>
+        <tout> 1500 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug --show-capture=no -ra --showlocals\'" --test-scripts arp/test_neighbor_mac_noptf.py </static_args>
+            </params>
+        </cmd>
+    </case>
+</CASEDEF>

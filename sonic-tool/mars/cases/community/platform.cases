@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Platform Test </info>
+            <name> platform </name>
+            <owner> </owner>
+            <pre></pre>
+            <post></post>
+        </Test>
+        <Case>
+            <tags> Platform </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 7200 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> Test Show Platform CLI Case </info>
+        <name> show_platform </name>
+        <tout> 300 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals \'" --test-scripts platform_tests/cli/test_show_platform.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Platform Info Case </info>
+        <name> platform_info </name>
+        <tout> 1800 </tout>
+        <ignore>
+            <bug> 2322676 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals \'" --test-scripts platform_tests/test_platform_info.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Dynamic Minimum Table and PSU policy  </info>
+        <name> thermal_control_for_mellanox </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals \'" --test-scripts platform_tests/mellanox/test_thermal_control.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+<!-- Test reboot is duplicated to exclude cold-reboot related cases from 'r-boxer-sw01' because of a known issue -->
+    <case>
+        <info> Test Reboot Case </info>
+        <name> reboot </name>
+        <tout> 10800 </tout>
+        <ignore>
+            <condition>
+                <key> dut_name </key>
+                <op> != </op>
+                <value> "r-boxer-sw01" </value>
+            </condition>
+            <bug> 2431822 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_cold_reboot and not test_continuous_reboot\"\'" --test-scripts platform_tests/test_reboot.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Reboot Weekend Case </info>
+        <name> reboot_for_weekend </name>
+        <tout> 10800 </tout>
+        <ignore>
+            <condition>
+                <key> skip_weekend_cases </key>
+                <op> == </op>
+                <value> yes </value>
+            </condition>
+            <condition>
+                <key> dut_name </key>
+                <op> == </op>
+                <value> "r-boxer-sw01" </value>
+            </condition>
+            <bug> 2431822 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/test_reboot.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Reboot Daily Case </info>
+        <name> reboot_for_daily </name>
+        <tout> 10800 </tout>
+        <ignore>
+            <condition>
+                <key> skip_weekend_cases </key>
+                <op> != </op>
+                <value> yes </value>
+            </condition>
+            <condition>
+                <key> dut_name </key>
+                <op> == </op>
+                <value> "r-boxer-sw01" </value>
+            </condition>
+            <bug> 2431822 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals --power_off_delay 5 -k \"not test_continuous_reboot\"\'" --test-scripts platform_tests/test_reboot.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Reload Config Case </info>
+        <name> reload_config </name>
+        <tout> 1200 </tout>
+        <ignore>
+            <bug> 2367843 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/test_reload_config.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Sequential Restart Case </info>
+        <name> sequential_restart </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/test_sequential_restart.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <!-- <ignore>
+            <condition>
+                <key> skip_weekend_cases </key>
+                <op> == </op>
+                <value> yes </value>
+            </condition>
+        </ignore> -->
+
+        <info> Test SFP Case </info>
+        <name> sfp </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2200131 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals -k \"not test_check_sfp_low_power_mode\" \'" --test-scripts platform_tests/test_sfp.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test XCVR Info in DB Case </info>
+        <name> xcvr_info_in_db </name>
+        <tout> 600 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/test_xcvr_info_in_db.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Check SFP Presence Case </info>
+        <name> sfp_presence </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/mellanox/test_check_sfp_presence.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Check SFP Using ethtool Case </info>
+        <name> check_sfp_using_ethtool </name>
+        <tout> 600 </tout>
+        <ignore>
+            <bug> 2367843 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/mellanox/test_check_sfp_using_ethtool.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Check sysfs Case </info>
+        <name> check_sysfs </name>
+        <tout> 600 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/mellanox/test_check_sysfs.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test hw-management Service Case </info>
+        <name> hw_management_service </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/mellanox/test_hw_management_service.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+ 
+        <info> Test Firmware Utility Case </info>
+        <name> fwutil </name>
+        <tout> 5200 </tout>
+        <ignore>
+            <bug> 2382365 </bug>
+            <condition>
+                <key> dut_name </key>
+                <op> == </op>
+                <value> "r-boxer-sw01" </value>
+            </condition>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals --config_file=config/mellanox_config.yml --binaries_path=/auto/sw_system_project/sonic/platform_fw/\'" --test-scripts platform_tests/fw_utility/test_fwutil.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <!-- Platform API Test Case Begin-->
+
+    <case>
+        <info> Test Watchdog Case </info>
+        <name> watchdog </name>
+        <tout> 1200 </tout>
+        <ignore>
+            <bug> 2219143 </bug>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/api/test_watchdog.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Chassis API Case </info>
+        <name> platform_api_chassis </name>
+        <tout> 1200 </tout>
+
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> != </op>
+                <value> "master" </value>
+            </condition>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_components and not test_fans and not test_status_led\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Chassis API Case For 201911 </info>
+        <name> platform_api_chassis_201911 </name>
+        <tout> 1200 </tout>
+
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> != </op>
+                <value> "201911" </value>
+            </condition>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_fan_drawers and not test_status_led\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Chassis Fan API Case </info>
+        <name> platform_api_chassis_fans </name>
+        <tout> 1200 </tout>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_position_in_parent and not test_is_replaceable and not test_set_fans_led and not test_get_fans_target_speed and not test_set_fans_speed\"\'" --test-scripts platform_tests/api/test_chassis_fans.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <!-- Mellanox does not support this test case for now, all test case in this
+            section will be skipped during run time.
+    -->
+
+    <case>
+        <info> Test PSU API Case </info>
+        <name> platform_api_psu </name>
+        <tout> 1200 </tout>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_presence or test_fans\"\'" --test-scripts platform_tests/api/test_psu.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test PSU Fan API Case </info>
+        <name> platform_api_psu_fans </name>
+        <tout> 500 </tout>
+
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> != </op>
+                <value> "master" </value>
+            </condition>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_fans_target_speed and not test_set_fans_speed and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable\"\'" --test-scripts platform_tests/api/test_psu_fans.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test PSU Fan API Case For 201911 </info>
+        <name> platform_api_psu_fans_201911 </name>
+        <tout> 1000 </tout>
+
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> != </op>
+                <value> "201911" </value>
+            </condition>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_speed and not test_get_fans_target_speed and not test_set_fans_speed and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable\"\'" --test-scripts platform_tests/api/test_psu_fans.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Fan Drawer API Case </info>
+        <name> platform_api_fan_drawer </name>
+        <tout> 1200 </tout>
+
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> != </op>
+                <value> "master" </value>
+            </condition>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_presence or test_get_all_fans\"\'" --test-scripts platform_tests/api/test_fan_drawer.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Fan Drawer Fans API Case </info>
+        <name> platform_api_fan_drawer_fans </name>
+        <tout> 600 </tout>
+
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> != </op>
+                <value> "master" </value>
+            </condition>
+        </ignore>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable and not test_set_fans_speed\"\'" --test-scripts platform_tests/api/test_fan_drawer_fans.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <!-- All thermal API test case failed on both 201911 and master.
+        The reason is that:
+            1. some SFP doesn't support temperature sensor and cause all
+            test case failure
+            2. it seems that we don't have a testbed whose SFP all support 
+            temperature sensor
+        
+        Based on this, we have to ignore this case for now.
+    -->
+
+    <!-- Mellanox platform API only initialize component on host side, but the test
+            case only run on PMON docker, and all test case will be skipped due to 
+            component is not initialized.
+    -->
+
+    <case>
+        <info> Test SFP API Case</info>
+        <name> platform_api_sfp </name>
+        <tout> 1200 </tout>
+        <ignore>
+            <bug> 2431010 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--skip-absent-sfp=True --log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_reset_status and not test_get_rx_los and not test_get_tx_fault and not test_get_temperature and not test_get_voltage and not test_get_tx_bias and not test_get_rx_power and not test_get_tx_power and not test_tx_disable and not test_lpmode and not test_thermals and not test_power_override and not test_tx_disable_channel\"\'" --test-scripts platform_tests/api/test_sfp.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

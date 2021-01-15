@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> QOS Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> qos_sai </name>
+            <owner> </owner>
+        </Test>
+        <Case>
+            <tags> QOS </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 5000 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <ignore>
+            <condition>
+                <!-- Don't run on t0 topology as test doesn't support it. -->
+                <key> topology </key>
+                <op> in </op>
+                <value> ["t0", "t0-64", "t0-116"] </value>
+            </condition>
+        </ignore>
+
+        <info> QOS Case </info>
+        <name> qos </name>
+        <tout> 5000 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -k \"not testQosSaiDwrr and not testQosSaiDwrrWeightChange\"\'" --test-scripts qos/test_qos_sai.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

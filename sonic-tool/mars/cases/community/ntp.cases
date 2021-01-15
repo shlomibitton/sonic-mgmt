@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> NTP Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> ntp </name>
+            <owner> </owner>
+            <pre></pre>
+            <post></post>
+        </Test>
+        <Case>
+            <tags> NTP </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <pre>
+            <info> mtbc_ntp_workaround </info>
+            <name> mtbc_ntp_workaround </name>
+            <type> reg_exec_cmd </type>
+            <tout> 50 </tout>
+            <params>
+                <exec> /bin/bash [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/sonic-tool/mars/scripts/mtbc_ntp_workaround.sh [[conf:extra_info.dut_name]] </exec>
+            </params>
+        </pre>
+
+        <info> NTP Case </info>
+        <name> ntp </name>
+        <tout> 1800 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts ntp/test_ntp.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

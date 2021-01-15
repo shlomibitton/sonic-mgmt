@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DBDEF>
+	<global>
+		<!-- parameters passed to setup steps commands-->
+		<default_params_type> basic_setup_step_params </default_params_type>
+		<DB>
+			<info> PFC_ASYM </info>
+			<owner> SONiC </owner>
+			<group> SONiC </group>
+
+			<!-- OPTIONAL TAGS -->
+			<tags> PFC_ASYM </tags>
+
+			<!-- pre db commands - executed once before DB run -->
+			<pre>
+			</pre>
+
+            <pre>
+                <info> check configured topology </info>
+                <type> reg_exec_cmd </type>
+                <name> check configured topology </name>
+                <tout> 30 </tout>
+                <ignore_pre_fail> True </ignore_pre_fail>
+                <run_posts_after_pre_failed> True </run_posts_after_pre_failed>
+                <params>
+                    <exec> test [[conf:extra_info.topology]] = t0 </exec>
+                </params>
+
+                <on_failure>
+                    <cmd>
+                        <info> remove configured topology </info>
+                        <type> reg_exec_cmd </type>
+                        <name> remove configured topology </name>
+                        <tout> 300 </tout>
+                        <params>
+                            <exec> ./testbed-cli.sh remove-topo [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] vault </exec>
+                            <cmd_workdir> [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/ansible </cmd_workdir>
+                        </params>
+                    </cmd>
+                    <cmd>
+                        <info> add required topology </info>
+                        <type> reg_exec_cmd </type>
+                        <name> add required topology </name>
+                        <tout> 1800 </tout>
+                        <params>
+                            <exec> ./testbed-cli.sh add-topo [[conf:extra_info.dut_name]]-t0 vault </exec>
+                            <cmd_workdir> [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/ansible </cmd_workdir>
+                        </params>
+                    </cmd>
+                    <cmd>
+                        <info> deploy minigraph of required topology </info>
+                        <type> reg_exec_cmd </type>
+                        <name> deploy minigraph of required topology </name>
+                        <tout> 1200 </tout>
+                        <params>
+                            <exec> ./testbed-cli.sh deploy-mg [[conf:extra_info.dut_name]]-t0 lab vault </exec>
+                            <cmd_workdir> [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/ansible </cmd_workdir>
+                        </params>
+                    </cmd>
+                </on_failure>
+            </pre>
+
+            <post>
+                <info> check configured topology </info>
+                <type> reg_exec_cmd </type>
+                <name> check configured topology </name>
+                <tout> 30 </tout>
+                <params>
+                    <exec> test [[conf:extra_info.topology]] = t0 </exec>
+                </params>
+
+                <on_failure>
+                    <cmd>
+                        <info> remove required topology </info>
+                        <type> reg_exec_cmd </type>
+                        <name> remove required topology </name>
+                        <tout> 300 </tout>
+                        <params>
+                            <exec> ./testbed-cli.sh remove-topo [[conf:extra_info.dut_name]]-t0 vault </exec>
+                            <cmd_workdir> [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/ansible </cmd_workdir>
+                        </params>
+                    </cmd>
+                    <cmd>
+                        <info> add configured topology </info>
+                        <type> reg_exec_cmd </type>
+                        <name> add configured topology </name>
+                        <tout> 1800 </tout>
+                        <params>
+                            <exec> ./testbed-cli.sh add-topo [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] vault </exec>
+                            <cmd_workdir> [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/ansible </cmd_workdir>
+                        </params>
+                    </cmd>
+                    <cmd>
+                        <info> deploy minigraph of configured topology </info>
+                        <type> reg_exec_cmd </type>
+                        <name> deploy minigraph of configured topology </name>
+                        <tout> 1200 </tout>
+                        <params>
+                            <exec> ./testbed-cli.sh deploy-mg [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] lab vault </exec>
+                            <cmd_workdir> [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/ansible </cmd_workdir>
+                        </params>
+                    </cmd>
+                </on_failure>
+            </post>
+		</DB>
+		<Test>
+			<pre></pre>
+			<post></post>
+		</Test>
+		<Case>
+			<!-- OPTIONAL TAGS -->
+			<!--<tags> TAG NAME</tags>-->
+			<pre></pre>
+			<ignore></ignore>
+			<post></post>
+		</Case>
+	</global>
+
+    <test>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/pfc_asym.cases </cases>
+    </test>
+
+</DBDEF>

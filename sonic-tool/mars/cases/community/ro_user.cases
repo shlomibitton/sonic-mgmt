@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> RO user test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> ro_user </name>
+            <owner> SONiC </owner>
+        </Test>
+        <Case>
+            <tags> RO_USER </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> RO_USER Case </info>
+        <name> ro_user </name>
+        <tout> 3600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=stdout --disable_loganalyzer  -ra --showlocals -v\'" --test-scripts tacacs/test_ro_user.py | tee abc.txt </static_args>
+            </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<DBDEF>
+	<global>
+		<default_params_type> extended_setup_step_params </default_params_type>
+		<DB>
+			<info> </info>
+			<owner> Petro Pikh </owner>
+			<group> SONiC </group>
+			<dimension> VER </dimension>
+
+            <pre>
+            </pre>
+
+		</DB>
+		<Test>
+			<post> </post>
+		</Test>
+		<Case>
+            <tags> configuration </tags>
+            <tags> l2 </tags>
+            <pre>
+			</pre>
+			<post>
+			</post>
+		</Case>
+	</global>
+	<test>
+		<tags> l2_counters </tags>
+		<cases> sonic-mgmt/sonic-tool/mars/cases/canonical/push_gate_build.cases </cases>
+	</test>
+</DBDEF>

@@ -1,0 +1,172 @@
+#!/usr/bin/env python2
+
+#####################
+#  0 (KERN_EMERG)   #
+#  1 (KERN_ALERT)   #
+#  2 (KERN_CRIT)    #
+#  3 (KERN_ERR)     #
+#  4 (KERN_WARNING) #
+#  5 (KERN_NOTICE)  #
+#  6 (KERN_INFO)    #
+#  7 (KERN_DEBUG)   #
+#####################
+
+import re
+import subprocess
+import sys
+import os.path
+
+def main():
+    if ( (len(sys.argv) == 4 and sys.argv[1] != "pmon") or len(sys.argv) > 4 or len(sys.argv) < 2):
+        print ("Too few/many arguments entered\nmust run with log level option: 'DEBUG', 'NOTICE', 'ERROR', 'INFO', 'WARNING'")
+        sys.exit()
+
+    # Host side modification
+    if sys.argv[1] in ['DEBUG', 'NOTICE', 'ERROR', 'INFO', 'WARNING']:
+
+        # Check if services are running to take affect
+        #import pdb; pdb.set_trace()
+        cmd = "docker ps"
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        if ( ("pmon" not in stdout) or ("swss" not in stdout) or ("syncd" not in stdout)):
+            print ("pmon \ syncd \ swss are not running, exiting...")
+            sys.exit()
+
+        print ("Changing log level to {}\n".format(sys.argv[1]))
+        old_level = dictionary("current")
+        new_level = dictionary(sys.argv[1])
+
+        #syncd and swss
+        cmd = "swssloglevel -l " + new_level['swss'] + " -a"
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        cmd = "swssloglevel -l SAI_LOG_LEVEL_" + new_level['swss'] + "  -s -a"
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        #kernel - for change to stay after reboot
+        with open ('/etc/sysctl.conf', 'r' ) as f:
+            old_content = f.read()
+            f.close()
+        if ( ("kernel.printk = 8" in old_content) or ("kernel.printk = 6" in old_content) or ("kernel.printk = 4" in old_content) or ("kernel.printk = 7" in old_content) ):
+            with open ('/etc/sysctl.conf', 'w' ) as f:
+                # Replace the string
+                new_content = re.sub(old_level['kernel'], new_level['kernel'], old_content, count=1)
+                f.write(new_content)
+                f.close()
+        else:
+            with open ('/etc/sysctl.conf', 'a' ) as f:
+                f.write(new_level['kernel'])
+                f.close()
+
+        #kernel - for immediate change
+        cmd = "dmesg -n " + new_level['dmesg']
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        #caclmgrd
+        with open ('/usr/bin/caclmgrd', 'r' ) as f:
+            old_content = f.read()
+            f.close()
+        with open ('/usr/bin/caclmgrd', 'w' ) as f:
+            # Replace the string
+            new_content = re.sub(old_level['caclmgrd'], new_level['caclmgrd'], old_content, count=1)
+            f.write(new_content)
+            f.close()
+        print ("caclmgrd log level changed to {}".format(sys.argv[1]))
+
+        #Copy script to pmon docker
+        cmd = "docker cp "+ __file__ + " pmon:/tmp"
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        #Run script on pmon docker
+        cmd = "docker exec -it pmon ./tmp/" + os.path.basename(__file__) + " pmon " + sys.argv[1] + " " + old_level['pmon']
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        #Update cache file to current configuration
+        with open ('/etc/sonic/log_script.cache', 'w' ) as f:
+            f.write(sys.argv[1])
+            f.close()
+
+        #Restart services to change take effect
+        cmd = "service caclmgrd restart"
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        cmd = "service pmon restart"
+        print ("command = " + cmd)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        print("return code = " + str(proc.returncode))
+
+        print("DONE!")
+
+    # pmon docker side modification
+    elif sys.argv[1] == "pmon":
+        old_level = dictionary(sys.argv[3])
+        new_level = dictionary(sys.argv[2])
+        with open ('/usr/local/lib/python2.7/dist-packages/sonic_py_common/logger.py', 'r' ) as f:
+            old_content = f.read()
+            f.close()
+        with open ('/usr/local/lib/python2.7/dist-packages/sonic_py_common/logger.py', 'w' ) as f:
+            # Replace the string
+            new_content = re.sub("self.LOG_PRIORITY_" + old_level['pmon'], "self.LOG_PRIORITY_" + new_level['pmon'], old_content, count=1)
+            f.write(new_content)
+            f.close()
+
+    else:
+        print ("Must run with log level option: 'DEBUG', 'NOTICE', 'ERROR', 'INFO', 'WARNING'")
+        sys.exit()
+
+def dictionary(dict_type):
+
+    debug = {'swss': 'DEBUG', 'caclmgrd': 'set_min_log_priority_debug', 'pmon': 'DEBUG', 'dmesg': 'debug', 'kernel': 'kernel.printk = 8 4 1 7'}
+    notice = {'swss': 'NOTICE', 'caclmgrd': 'set_min_log_priority_notice', 'pmon': 'NOTICE', 'dmesg': 'debug', 'kernel': 'kernel.printk = 8 4 1 7'}
+    error = {'swss': 'ERROR', 'caclmgrd': 'set_min_log_priority_error', 'pmon': 'ERROR', 'dmesg': 'debug', 'kernel': 'kernel.printk = 8 4 1 7'}
+    info = {'swss': 'INFO', 'caclmgrd': 'set_min_log_priority_info', 'pmon': 'INFO', 'dmesg': 'debug', 'kernel': 'kernel.printk = 8 4 1 7'}
+    warning = {'swss': 'WARN', 'caclmgrd': 'set_min_log_priority_warning', 'pmon': 'WARNING', 'dmesg': 'debug', 'kernel': 'kernel.printk = 8 4 1 7'}
+    default = {'caclmgrd': 'set_min_log_priority_info', 'pmon': 'NOTICE', 'kernel': 'kernel.printk = 7 4 1 7'}
+
+    if (dict_type == "current"):
+        if os.path.isfile("/etc/sonic/log_script.cache"):
+            with open ('/etc/sonic/log_script.cache', 'r' ) as f:
+                dict_type = f.read()
+                f.close()
+        else:
+            f = open('/etc/sonic/log_script.cache', 'w+')
+            f.close()
+            dict_type = "DEFAULT"
+
+    if (dict_type == "DEBUG"):
+        return debug
+    elif (dict_type == "NOTICE"):
+        return notice
+    elif (dict_type == "ERROR"):
+        return error
+    elif (dict_type == "INFO"):
+        return info
+    elif (dict_type == "WARNING"):
+        return warning
+    elif (dict_type == "DEFAULT"):
+        return default
+    else:
+        return None
+
+if __name__ == "__main__":
+    main()

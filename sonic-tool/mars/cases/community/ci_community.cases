@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> CI Tests </info>
+            <name> CI </name>
+            <owner> </owner>
+            <pre></pre>
+            <post></post>
+        </Test>
+        <Case>
+            <tags> CI </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 7200 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> ANNOUNCE_ROUTES Case </info>
+        <name> announce_routes </name>
+        <tout> 3600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts test_announce_routes.py </static_args>
+            </params>
+        </cmd>
+
+        <post>
+            <info> wait for routes to be in redis DB </info>
+            <name> wait for routes to be in redis DB </name>
+            <type> reg_exec_cmd </type>
+            <tout> 210 </tout>
+            <params>
+                <exec> sleep 180 </exec>
+            </params>
+        </post>
+    </case>
+
+    <case>
+        <info> FIB Case </info>
+        <name> fib </name>
+        <tout> 3600 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals\'" --test-scripts fib/test_fib.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> FDB Case </info>
+        <name> fdb </name>
+        <tout> 1800 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals\'" --test-scripts fdb/test_fdb.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> LLDP Case </info>
+        <name> lldp </name>
+        <tout> 900 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts lldp/test_lldp.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> VLAN_Trunk Case </info>
+        <name> vlan </name>
+        <tout> 2400 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts vlan/test_vlan.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> WR ARP Case </info>
+        <name> wr_arp </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2384141 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug --show-capture=no -ra --showlocals\'" --test-scripts arp/test_wr_arp.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> ACL Case </info>
+        <name> acl </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2136404 </bug>
+        </ignore>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -m \"not (reboot or port_toggle)\" \'" --test-scripts acl/test_acl.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> BGP Fact Case </info>
+        <name> bgp_fact </name>
+        <tout> 1500 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug --show-capture=no -ra --showlocals\'" --test-scripts bgp/test_bgp_fact.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> PFCWD config Case</info>
+        <name> pfc_wd_config </name>
+        <tout> 1200  </tout>
+        <ignore>
+            <bug> 2413350 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfc_config.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> PFCWD All ports storm Case</info>
+        <name> pfc_wd_ports_storm </name>
+        <tout> 1200 </tout>
+        <ignore>
+            <bug> 2413350 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfcwd_all_port_storm.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Features Case </info>
+        <name> features </name>
+        <tout> 1800 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts test_features.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <pre>
+            <info> mtbc_ntp_workaround </info>
+            <name> mtbc_ntp_workaround </name>
+            <type> reg_exec_cmd </type>
+            <tout> 50 </tout>
+            <params>
+                <exec> /bin/bash [[run_time:remote_src_path]]/sonic-tool/mars/scripts/mtbc_ntp_workaround.sh [[conf:extra_info.dut_name]] </exec>
+            </params>
+        </pre>
+
+        <info> NTP Case </info>
+        <name> ntp </name>
+        <tout> 1800 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts ntp/test_ntp.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> snmp_cpu  </info>
+        <name> snmp_cpu </name>
+        <tout> 600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_cpu.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> System Log Case </info>
+        <name> syslog </name>
+        <tout> 3600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts syslog/test_syslog.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Telemetry Case </info>
+        <name> telemetry </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2402645 </bug>
+        </ignore>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts telemetry/test_telemetry.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+
+        <info> VNET-VxLAN test case </info>
+        <name> vnet_vxlan </name>
+        <tout> 6000 </tout>
+        <ignore>
+            <bug> 2431736 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals \'" --test-scripts vxlan/test_vnet_vxlan.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> VXLAN Decap Case </info>
+        <name> vxlan_decap </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2256267 </bug>
+        </ignore>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals \'" --test-scripts vxlan/test_vxlan_decap.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> RW_USER Case </info>
+        <name> rw_user </name>
+        <tout> 3600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=stdout --disable_loganalyzer  -ra --showlocals -v\'" --test-scripts tacacs/test_rw_user.py | tee abc.txt </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> WHAT-JUST-HAPPENED Case </info>
+        <name> wjh </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2413350 </bug>
+        </ignore>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v -k \"not test_equal_smac_dmac_drop and not test_multicast_smac_drop and not test_unicast_ip_incorrect_eth_dst\"\'" --test-scripts drop_packets/test_wjh.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+
+</CASEDEF>

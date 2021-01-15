@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> VLAN_Trunk Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> vlan </name>
+            <owner> </owner>
+        </Test>
+        <Case>
+            <tags>  VLAN, TRUNK </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> VLAN_Trunk Case </info>
+        <name> vlan </name>
+        <tout> 2400 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals --check_items="-bgp" -v\'" --test-scripts vlan/test_vlan.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

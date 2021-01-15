@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+##
+# For volume mounts...
+##
+python3.7 /auto/sw_system_project/sx_mlnx_os/devts/infra/tools/xmlrpc/run_process_server.py --log_level DEBUG
+chown -R frr:frr /etc/frr
+/etc/init.d/frr start
+/usr/sbin/sshd -D
+exec sleep 10000d

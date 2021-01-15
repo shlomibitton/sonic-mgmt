@@ -1,0 +1,44 @@
+switches:
+
+    - ip: 10.210.24.55
+      alias: dut
+      username: admin
+      password: YourPaSsWoRd
+
+hosts:
+
+    - ip: 10.215.14.63
+      alias: ha
+      username: root
+      password: 3tango
+
+    - ip: 10.215.14.64
+      alias: hb
+      username: root
+      password: 3tango
+
+other_entities:
+
+    - ip: 10.215.14.60
+      username: root
+      password: 3tango
+      alias: hypervisor
+      mac: 44:a8:42:1b:a8:e8
+      hostname: r-sonic-10
+      entity_id: hypervisor
+
+    - ip: 10.215.14.65
+      username: root
+      password: 3tango
+      alias: ngts
+      mac: 00:50:56:28:0e:41
+      hostname: r-sonic-10-ngts
+      entity_id: ngts
+
+    - ip: 10.215.14.66
+      username: root
+      password: 12345 # NOTE: password is 12345
+      alias: sonic-mgmt
+      mac: 00:50:56:28:0e:42
+      hostname: r-sonic-10-sonic-mgmt
+      entity_id: sonic_mgmt

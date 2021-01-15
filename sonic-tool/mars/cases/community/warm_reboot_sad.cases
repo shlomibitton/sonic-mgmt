@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Warm Reboot Sad Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> warm-reboot-sad</name>
+            <owner> </owner>
+        </Test>
+        <Case>
+            <tags> WARM-REBOOT-SAD </tags>
+            <wrapper> run_ansible_playbook.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <ignore>
+            <ignore_by_tag> TAG_ISSU_DISABLED </ignore_by_tag>
+            <condition>
+                <key> skip_weekend_cases </key>
+                <op> == </op>
+                <value> yes </value>
+            </condition>
+        </ignore>
+
+        <pre>
+            <info> run linkstate/up.yml </info>
+            <name> run linkstate/up.yml </name>
+            <tout> 300 </tout>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/up.yml -e lab_admin_pass=3tango -e fanout_listener=\"scripts/mlnx/fanout_listener.py\"\'" </static_args>
+                <remote_test_path> [[run_time:remote_test_path]] </remote_test_path>
+            </params>
+        </pre>
+
+        <info> Warm_Reboot_Sad Case </info>
+        <name> warm_reboot_sad </name>
+        <tout> 12000 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'test_sonic.yml -i inventory --limit [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_name=[[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_type=[[conf:extra_info.topology]] -e testcase_name=warm-reboot-sad -e reboot_limit=1 [[conf:extra_info.verbosity]]\'" </static_args>
+             </params>
+        </cmd>
+
+        <post>
+            <info> run linkstate/down.yml </info>
+            <name> run linkstate/down.yml </name>
+            <tout> 300 </tout>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/down.yml -e lab_admin_pass=3tango\'" </static_args>
+                <remote_test_path> [[run_time:remote_test_path]] </remote_test_path>
+            </params>
+        </post>
+
+    </case>
+
+</CASEDEF>

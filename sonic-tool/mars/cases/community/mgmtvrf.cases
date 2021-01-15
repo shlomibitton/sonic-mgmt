@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Mgmtvrf test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> mgmtvrf </name>
+            <owner> SONiC </owner>
+            <pre></pre>
+            <post></post>
+        </Test>
+        <Case>
+            <tags> MGMTVRF </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> MGMTVRF Case </info>
+        <name> mgmtvrf </name>
+        <tout> 3600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=stdout --duration=0  -ra --showlocals -v -k \"not test_ntp\"\'" --test-scripts mvrf/test_mgmtvrf.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

@@ -1,0 +1,327 @@
+<DeviceMiniGraph xmlns="Microsoft.Search.Autopilot.Evolution" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+  <CpgDec>
+  </CpgDec>
+  <DpgDec>
+    <DeviceDataPlaneInfo>
+      <LoopbackIPInterfaces xmlns:a="http://schemas.datacontract.org/2004/07/Microsoft.Search.Autopilot.Evolution">
+      </LoopbackIPInterfaces>
+      <ManagementIPInterfaces xmlns:a="http://schemas.datacontract.org/2004/07/Microsoft.Search.Autopilot.Evolution">
+      </ManagementIPInterfaces>
+      <RsvpInterfaces/>
+      <Hostname>{{ hostname }}</Hostname>
+      <PortChannelInterfaces>
+      </PortChannelInterfaces>
+      <VlanInterfaces>
+      </VlanInterfaces>
+      <IPInterfaces>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp1</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp2</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp3</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp4</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp5</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp6</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp7</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp9</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp11</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp12</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp13</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp14</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp15</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp16</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp17</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp18</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp19</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp20</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp21</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp22</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+         <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp23</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp24</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp25</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp26</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp27</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp28</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp29</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp30</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp31</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp32</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp33</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp34</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp35</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp36</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp37</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp38</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp39</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp40</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp41</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp42</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp43</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp44</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp45</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp46</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp47</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp48</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp49</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp50</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp51</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp52</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp53</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp54</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp55</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp56</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp57</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp58</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp59</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp60</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp61</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+        <IPInterface>
+          <Name i:nil="true"/>
+          <AttachTo>etp62</AttachTo>
+          <Prefix>0.0.0.0/0</Prefix>
+        </IPInterface>
+      </IPInterfaces>
+      <AclInterfaces>
+      </AclInterfaces>
+    </DeviceDataPlaneInfo>
+  </DpgDec>
+  <PngDec>
+  </PngDec>
+  <Hostname>{{ hostname }}</Hostname>
+  <HwSku>ACS-MSN3800</HwSku>
+</DeviceMiniGraph>
+

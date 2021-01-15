@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Link_Flap test </info>
+            <name> link_flap </name>
+            <owner> SONiC </owner>
+        </Test>
+        <Case>
+            <tags> LINK_FLAP </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 9600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> Link_Flap Case </info>
+        <name> link_flap </name>
+        <tout> 9600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts platform_tests/link_flap/test_link_flap.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

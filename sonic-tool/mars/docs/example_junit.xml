@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite errors="0" failures="0" name="pytest" skipped="1" tests="4" time="25.555">
+    <testcase classname="platform.test_platform_info" file="platform/test_platform_info.py" line="22" name="test_show_platform_summary" time="6.404"></testcase>
+    <testcase classname="platform.test_platform_info" file="platform/test_platform_info.py" line="59" name="test_show_platform_psustatus" time="7.858"></testcase>
+    <testcase classname="platform.test_platform_info" file="platform/test_platform_info.py" line="73" name="test_turn_on_off_psu_and_check_psustatus" time="5.590">
+        <skipped message="No PSU controller for arc-switch1029, skip rest of the testing in this case" type="pytest.skip">/root/mars/workspace/sonic-mgmt/tests/platform/test_platform_info.py:96: No PSU controller for arc-switch1029, skip rest of the testing in this case</skipped>
+    </testcase>
+    <testcase classname="platform.test_platform_info" file="platform/test_platform_info.py" line="166" name="test_show_platform_syseeprom" time="5.664"></testcase>
+</testsuite>

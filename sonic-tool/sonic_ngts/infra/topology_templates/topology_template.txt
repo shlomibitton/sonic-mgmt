@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+    <TOPOLOGY>
+ {% for switch in switches -%}
+    <INTERCONNECTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{switch.hostname}}">
+            <xi:include href="{{switch.hostname}}.xml"/>
+        </INTERCONNECTS>
+ {% endfor %}
+ {% for host in hosts -%}
+    <HOSTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{host.hostname}}">
+            <xi:include href="{{host.hostname}}.xml"/>
+        </HOSTS>
+ {% endfor %}
+
+    <HOSTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{ngts.hostname}}">
+            <xi:include href="{{ngts.hostname}}.xml"/>
+        </HOSTS>
+    <HOSTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{sonic_mgmt.hostname}}">
+            <xi:include href="{{sonic_mgmt.hostname}}.xml"/>
+        </HOSTS>
+    <HOSTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{hypervisor.hostname}}">
+            <xi:include href="{{hypervisor.hostname}}.xml"/>
+        </HOSTS>
+
+ {% for connection in connections -%}
+ <CONNECTIVITY>
+            <CONNECTION>
+                <LINK>{{connection.link1}}</LINK>
+                <LINK>{{connection.link2}}</LINK>
+            </CONNECTION>
+        </CONNECTIVITY>
+ {% endfor %}
+</TOPOLOGY>

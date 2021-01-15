@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# push docker images to registry
+
+source sonic-env
+
+USAGE=\
+"$0 [dir]\n\
+\tdir - directory with docker archives"
+
+DOCKER_IMAGES=( docker-database docker-fpm docker-orchagent-mlnx docker-syncd-mlnx )
+
+if [[ "$#" != "1" ]]; then
+    echo -e ${USAGE}
+    exit 1
+fi
+
+TARGET_DIR=$1
+
+sonic-registry-login
+
+for IMAGE in ${DOCKER_IMAGES[@]} ; do
+    docker load -i "${TARGET_DIR}/${IMAGE}.gz"
+    docker tag -f ${IMAGE}  arc-build-server:5000/${IMAGE}
+    docker push arc-build-server:5000/${IMAGE}
+done

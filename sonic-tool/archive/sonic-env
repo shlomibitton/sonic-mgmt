@@ -1,0 +1,5 @@
+# docker registry variables
+REGISTRY_HOST=${REGISTRY_HOST:-arc-build-server}
+REGISTRY_PORT=${REGISTRY_PORT:-5000}
+REGISTRY_USER=${REGISTRY_USER:-admin}
+REGISTRY_PASS=${REGISTRY_PASS:-admin}

@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+
+    <INTERCONNECT>
+        <TYPE>MLNX_SWITCH</TYPE>
+        <SUB_TYPE>{{switch.system_type}}</SUB_TYPE>
+        <SWITCH_TYPE>{{switch.HwSKU}}</SWITCH_TYPE>
+        <NUM_PORTS>{{switch.port_number}}</NUM_PORTS>
+        <IS_DUT>True</IS_DUT>
+        <ACT_AS>SWITCH</ACT_AS>
+        <SWITCH_NICKNAME>{{switch.hostname}}</SWITCH_NICKNAME>
+        <DESCRIPTION>{{switch.alias}}</DESCRIPTION>
+        <REBOOT_IN_POST_CHECKER>yes</REBOOT_IN_POST_CHECKER>
+
+        <CONNECTIONS>
+            <CONNECTION CONN_TYPE="SSH">
+                <CLI_TYPE>SHELL</CLI_TYPE>
+                <IP>{{switch.ip}}</IP>
+                <MAC>{{switch.mac}}</MAC>
+            </CONNECTION>
+        </CONNECTIONS>
+
+        <USERS>
+            <USER>
+                <TYPE>CLI</TYPE>
+                <USERNAME>{{switch.username}}</USERNAME>
+                <PASSWORD>{{switch.password}}</PASSWORD>
+            </USER>
+        </USERS>
+
+  {% for port in ports -%}
+  <PORTS name="{{port.id}}">
+            <PORT>
+                <IF>{{port.if}}</IF>
+                <DESCRIPTION>{{port.connection_alias}}</DESCRIPTION>
+            </PORT>
+        </PORTS>
+  {% endfor %}
+  {% for port in ports -%}
+    <ACTIVE_PORTS_IDS>{{ port.id }}</ACTIVE_PORTS_IDS>
+  {% endfor %}
+
+</INTERCONNECT>

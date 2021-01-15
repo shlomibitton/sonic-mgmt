@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Table Size Test </info>
+            <name> table_size </name>
+            <owner> </owner>
+            <pre></pre>
+            <post></post>
+        </Test>
+        <Case>
+            <tags> TABLE_SIZE, RESOURCES </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> Test Table Size Case </info>
+        <name> table_size </name>
+        <tout> 3600 </tout>
+        <ignore>
+            <bug> 2063902 </bug>
+        </ignore>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts mellanox/test_table_size.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>

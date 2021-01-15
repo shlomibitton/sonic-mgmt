@@ -1,0 +1,35 @@
+<HOST>
+        <TYPE>Linux</TYPE>
+        <IS_ROUTER>False</IS_ROUTER>
+        <DESCRIPTION>{{host.alias}}</DESCRIPTION>
+        <CONNECTIONS>
+            <CONNECTION CONN_TYPE="SSH">
+                <CLI_TYPE>SHELL</CLI_TYPE>
+                <IP>{{host.ip}}</IP>
+                <MAC>{{host.mac}}</MAC>
+            </CONNECTION>
+        </CONNECTIONS>
+
+        <USERS>
+            <USER>
+                <USERNAME>{{host.username}}</USERNAME>
+                <PASSWORD>{{host.password}}</PASSWORD>
+            </USER>
+        </USERS>
+
+  {% for port in ports -%}
+      <PORTS name="{{ port.id }}">
+                <PORT>
+                    <MAC>{{ port.mac }}</MAC>
+                    <IF>{{port.if}}</IF>
+                    <DESCRIPTION>{{port.connection_alias}}</DESCRIPTION>
+
+                    <TYPE>ETH</TYPE>
+                </PORT>
+            </PORTS>
+  {% endfor %}
+
+  {% for port in ports -%}
+    <ACTIVE_PORTS_IDS>{{port.id}}</ACTIVE_PORTS_IDS>
+  {% endfor %}
+</HOST>

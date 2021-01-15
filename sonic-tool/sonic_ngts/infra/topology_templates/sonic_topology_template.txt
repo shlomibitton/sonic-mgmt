@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TOPOLOGY>
+
+    <HOSTS name="TEST_SERVER">
+        <HOST>
+            <TYPE>Linux</TYPE>
+            <BASE_IP>{{hypervisor.ip}}</BASE_IP>
+	    <CONNECTIONS>
+                <CONNECTION CONN_TYPE="SSH">
+                    <CLI_TYPE>SHELL</CLI_TYPE>
+		            <IP>{{hypervisor.ip}}</IP>
+                </CONNECTION>
+            </CONNECTIONS>
+            <USERS>
+                <USER>
+                    <USERNAME>{{hypervisor.username}}</USERNAME>
+                    <PASSWORD>{{hypervisor.password}}</PASSWORD>
+                </USER>
+            </USERS>
+            <MAC_ADDRESS>{{hypervisor.mac}}</MAC_ADDRESS>
+        </HOST>
+    </HOSTS>
+
+    <HOSTS name="SONIC_MGMT">
+        <HOST>
+            <TYPE>Linux</TYPE>
+            <BASE_IP>{{sonic_mgmt.ip}}</BASE_IP>
+	    <CONNECTIONS>
+                <CONNECTION CONN_TYPE="SSH">
+                    <CLI_TYPE>SHELL</CLI_TYPE>
+                    <IP>{{sonic_mgmt.ip}}</IP>
+                </CONNECTION>
+            </CONNECTIONS>
+            <USERS>
+                <USER>
+                    <USERNAME>{{sonic_mgmt.username}}</USERNAME>
+                    <PASSWORD>{{sonic_mgmt.password}}</PASSWORD>
+                </USER>
+            </USERS>
+            <MAC_ADDRESS>{{sonic_mgmt.mac}}</MAC_ADDRESS>
+        </HOST>
+    </HOSTS>
+
+    <HOSTS name="NGTS">
+        <HOST>
+            <TYPE>Linux</TYPE>
+            <BASE_IP>{{ngts.ip}}</BASE_IP>
+	    <CONNECTIONS>
+                <CONNECTION CONN_TYPE="SSH">
+                    <CLI_TYPE>SHELL</CLI_TYPE>
+                    <IP>{{ngts.ip}}</IP>
+                </CONNECTION>
+            </CONNECTIONS>
+            <USERS>
+                <USER>
+                    <USERNAME>{{ngts.username}}</USERNAME>
+                    <PASSWORD>{{ngts.password}}</PASSWORD>
+                </USER>
+            </USERS>
+            <MAC_ADDRESS>{{ngts.mac}}</MAC_ADDRESS>
+        </HOST>
+    </HOSTS>
+
+ {% for switch in switches -%}
+    <HOSTS name="{{switch.alias|upper}}">
+        <HOST>
+            <TYPE>Linux</TYPE>
+            <BASE_IP>{{switch.ip}}</BASE_IP>
+            <CONNECTIONS>
+                <CONNECTION CONN_TYPE="SSH">
+                    <CLI_TYPE>SHELL</CLI_TYPE>
+                    <IP>{{switch.ip}}</IP>
+                </CONNECTION>
+            </CONNECTIONS>
+            <USERS>
+                <USER>
+                    <USERNAME>{{switch.username}}</USERNAME>
+                    <PASSWORD>{{switch.password}}</PASSWORD>
+                </USER>
+            </USERS>
+        </HOST>
+    </HOSTS>
+ {% endfor %}
+
+ {% for host in hosts -%}
+    <HOSTS name="{{host.alias|upper}}">
+        <HOST>
+            <TYPE>Linux</TYPE>
+            <BASE_IP>{{host.ip}}</BASE_IP>
+            <CONNECTIONS>
+                <CONNECTION CONN_TYPE="SSH">
+                    <CLI_TYPE>SHELL</CLI_TYPE>
+                    <IP>{{host.ip}}</IP>
+                </CONNECTION>
+            </CONNECTIONS>
+            <USERS>
+                <USER>
+                    <USERNAME>{{host.username}}</USERNAME>
+                    <PASSWORD>{{host.password}}</PASSWORD>
+                </USER>
+            </USERS>
+        </HOST>
+    </HOSTS>
+ {% endfor %}
+
+</TOPOLOGY>

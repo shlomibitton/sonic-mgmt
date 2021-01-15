@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> PFCWD Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> pfc_wd</name>
+            <owner> </owner>
+            <pre>
+                <info> check_pfcwd_config </info>
+                <name> check_pfcwd_config </name>
+                <tout> 1200 </tout>
+                <params>
+                    <test_wrapper> [[run_time:db_tests_path]]/sonic-mgmt/sonic-tool/mars/cases/community/run_ansible_playbook.py </test_wrapper>
+                    <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i lab fanout.yml -l [[conf:extra_info.fanout_switch]] -e pfcwd_dockers_url=[[conf:extra_info.pfcwd_dockers_url]] --tags pfcwd_config,check_pfcwd_config -vvv\'" </static_args>
+                </params>
+            </pre>
+
+        </Test>
+        <Case>
+            <tags> PFCWD </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 10800 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> PFCWD config Case</info>
+        <name> pfc_wd_config </name>
+        <tout> 1200  </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfc_config.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+    <case>
+        <info> PFCWD function Case</info>
+        <name> pfc_wd_func </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfcwd_function.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+    <case>
+        <info> PFCWD All ports storm Case</info>
+        <name> pfc_wd_ports_storm </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfcwd_all_port_storm.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+    <case>
+        <info> PFCWD timer accuracy Case</info>
+        <name> pfc_wd_timer_accuracy </name>
+        <tout> 1200 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfcwd_timer_accuracy.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+    <case>
+        <info> PFCWD Warm Reboot Case </info>
+        <name> pfc_wd_warm_reboot </name>
+        <tout> 10800 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfcwd_warm_reboot.py  </static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>
