@@ -56,8 +56,7 @@ class TestDHCPRelay:
         self.dut_mac = SonicMacCli.get_mac_address_for_interface(self.dut_engine, self.dut_vlan_iface)
         self.chaddr = bytes.fromhex(self.dhclient_mac.replace(':', ''))
 
-    def test_basic_dhcp_relay(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    def test_basic_dhcp_relay(self):
         try:
             with allure.step('Validate the IP address provided by the DHCP server'):
                 assert self.expected_ip in self.dhcp_client_engine.run_cmd(run_dhcp_client.format(self.dhclient_iface))
@@ -70,8 +69,7 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
 
     @pytest.mark.skip(reason='https://github.com/Azure/sonic-utilities/pull/1269')
-    def test_dhcp_relay_remove_dhcp_server(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    def test_dhcp_relay_remove_dhcp_server(self):
         cleanup_engine = StubEngine()
         try:
             with allure.step('Remove DHCP relay setting from DUT'):
@@ -87,8 +85,7 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
             self.dut_engine.run_cmd_set(cleanup_engine.commands_list)
 
-    def test_dhcp_relay_release_message(self, current_platform):
-        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'], rm_ticket_list=[2404665])
+    def test_dhcp_relay_release_message(self):
         dhcp_release = '0x7'
         bootp_body = 'chaddr={},ciaddr="{}"'.format(self.chaddr, self.expected_ip)
         dhcp_options = '("message-type","release"),"end"'
@@ -111,8 +108,8 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_nak_message(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    @pytest.mark.build
+    def test_dhcp_relay_nak_message(self):
         dhcp_nak = '0x6'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         tcpdump_filter_nak = "'((port 67 or port 68) and ({} = {}))'".format(dhcp_option_53, dhcp_nak)
@@ -137,8 +134,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_decline_message(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    def test_dhcp_relay_decline_message(self):
         dhcp_decline = '0x4'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         tcpdump_filter_decline = "'((port 67 or port 68) and ({} = {}))'".format(dhcp_option_53, dhcp_decline)
@@ -162,8 +158,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_inform_message(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    def test_dhcp_relay_inform_message(self):
         dhcp_inform = '0x8'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         tcpdump_filter_inform = "'((port 67 or port 68) and ({} = {}))'".format(dhcp_option_53, dhcp_inform)
@@ -187,7 +182,6 @@ class TestDHCPRelay:
             raise AssertionError(err)
 
     def test_dhcp_relay_unicast_request_message(self, current_platform):
-        ngts_skip(current_platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6053'], rm_ticket_list=[2404665])
         try:
             with allure.step('Getting IP address from DHCP server via DHCP relay functionality'):
                 assert self.expected_ip in self.dhcp_client_engine.run_cmd(run_dhcp_client.format(self.dhclient_iface))
@@ -204,8 +198,7 @@ class TestDHCPRelay:
         finally:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
 
-    def test_dhcp_relay_request_message_with_custom_src_port(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2398571, 2404665])
+    def test_dhcp_relay_request_message_with_custom_src_port(self):
         dhcp_ack = '0x5'
         bootp_body = 'chaddr={}'.format(self.chaddr)
         # ACK on server side - dst port 67
@@ -239,14 +232,13 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_request_message_with_empty_payload(self, current_platform):
+    def test_dhcp_relay_request_message_with_empty_payload(self):
         """
         This test case check that if we send DHCP request packet with empty payload - packet forwarded to DHCP
         server and no more field were added by the DHCP relay other than option 82, by checking packet size is less
         thank 330 bytes
         Test related to GitHub issue: https://github.com/Azure/sonic-buildimage/issues/6052
         """
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
         bootp_body = 'chaddr={}'.format(self.chaddr)
 
         # REQUEST message on server side - should be less than 330 bytes
@@ -273,8 +265,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_upd_packet_with_src_and_dst_ports_the_same_as_dhcp(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    def test_dhcp_relay_upd_packet_with_src_and_dst_ports_the_same_as_dhcp(self):
         tcpdump_filter_src_1_2_3_4 = "src 1.2.3.4"
         dst_ip = "30.0.0.2"
         udp_pkt = 'Ether(dst="{}")/IP(src="1.2.3.4",dst="{}")/UDP(sport=68,dport=67)/Raw()'.format(self.dut_mac, dst_ip)
@@ -301,8 +292,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_packet_with_malformed_payload(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2404665])
+    def test_dhcp_relay_packet_with_malformed_payload(self):
         mac1 = self.dhclient_mac.replace(':', '')[:8]
         mac2 = self.dhclient_mac.replace(':', '')[8:]
         tcpdump_filter_random_payload = "'((port 67 or port 68) and (udp[36:4] = 0x{}) and (udp[40:2] = 0x{}))'".format(
