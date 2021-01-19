@@ -48,7 +48,8 @@ def test_deploy_sonic_image(topology_obj, base_version):
 
         with allure.step('Deploying image'):
             with allure.step('Copying image to dut'):
-                dut_engine.copy_file(image_path, image_name, '/tmp')
+                dut_engine.copy_file(source_file=image_path, dest_file=image_name, file_system='/tmp',
+                                     overwrite_file=True, verify_file=False)
 
             with allure.step('Installing the image'):
                 SonicGeneralCli.install_image(dut_engine, image_target_path, delimiter)

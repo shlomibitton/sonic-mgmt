@@ -23,7 +23,8 @@ def dhcp_server_configuration(topology_obj):
     hadut2 = topology_obj.ports['ha-dut-2']
 
     hb_engine = topology_obj.players['hb']['engine']
-    hb_engine.copy_file(src=dhcpd_conf_path, dst=dhcpd_conf_name, workdir='/etc/dhcp/')
+    hb_engine.copy_file(source_file=dhcpd_conf_path, dest_file=dhcpd_conf_name, file_system='/etc/dhcp/',
+                        overwrite_file=True, verify_file=False)
 
     # VLAN config which will be used in test
     vlan_config_dict = {
@@ -86,7 +87,8 @@ def configure_additional_dhcp_server(topology_obj):
     ha_engine = topology_obj.players['ha']['engine']
     dut_engine = topology_obj.players['dut']['engine']
 
-    ha_engine.copy_file(src=dhcpd_conf_path, dst=dhcpd_conf_name, workdir='/etc/dhcp/')
+    ha_engine.copy_file(source_file=dhcpd_conf_path, dest_file=dhcpd_conf_name, file_system='/etc/dhcp/',
+                        overwrite_file=True, verify_file=False)
 
     ha_engine.run_cmd('sed -e "s/INTERFACESv4=\\"\\"/INTERFACESv4=\\"bond0\\"/g" -i /etc/default/isc-dhcp-server')
     ha_engine.run_cmd('/etc/init.d/isc-dhcp-server restart')
