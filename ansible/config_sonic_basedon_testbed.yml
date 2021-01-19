@@ -360,4 +360,10 @@
         become: true
         shell: config save -y
         when: save is defined and save|bool == true
+
+      - name: cleanup cached facts
+        shell: python ../tests/common/cache/facts_cache.py {{ inventory_hostname }}
+        delegate_to: localhost
+        ignore_errors: true
+
     when: deploy is defined and deploy|bool == true

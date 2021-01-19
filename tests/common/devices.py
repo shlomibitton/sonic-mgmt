@@ -25,6 +25,7 @@ from errors import RunAnsibleModuleFail
 from errors import UnsupportedAnsibleModule
 from tests.common.helpers.constants import DEFAULT_ASIC_ID, DEFAULT_NAMESPACE, NAMESPACE_PREFIX
 from tests.common.helpers.dut_utils import is_supervisor_node
+from tests.common.cache import cached
 
 # HACK: This is a hack for issue https://github.com/Azure/sonic-mgmt/issues/1941 and issue
 # https://github.com/ansible/pytest-ansible/issues/47
@@ -239,6 +240,7 @@ class SonicHost(AnsibleHostBase):
 
         self.critical_services = service_list
 
+    @cached(name='basic_facts')
     def _gather_facts(self):
         """
         Gather facts about the platform for this SONiC device.
@@ -851,7 +853,7 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
         bgp_facts = self.bgp_facts()['ansible_facts']
         if stat in bgp_facts['bgp_statistics']:
             ret = bgp_facts['bgp_statistics'][stat]
-        return ret;
+        return ret
 
     def check_bgp_statistic(self, stat, value):
         val = self.get_bgp_statistic(stat)
@@ -1096,6 +1098,7 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
             return DEFAULT_NAMESPACE
         return "{}{}".format(NAMESPACE_PREFIX, asic_id)
 
+    @cached(name='mg_facts')
     def get_extended_minigraph_facts(self, tbinfo):
         mg_facts = self.minigraph_facts(host = self.hostname)['ansible_facts']
         mg_facts['minigraph_ptf_indices'] = mg_facts['minigraph_port_indices'].copy()
@@ -1357,7 +1360,7 @@ class EosHost(AnsibleHostBase):
         out = self.eos_config(
             lines=['lacp rate %s' % mode],
             parents='interface %s' % interface_name)
-        
+
         if out['failed'] == True:
             # new eos deprecate lacp rate and use lacp timer command
             out = self.eos_config(
