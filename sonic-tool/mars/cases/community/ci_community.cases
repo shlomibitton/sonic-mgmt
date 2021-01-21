@@ -165,7 +165,7 @@
             <type> reg_exec_cmd </type>
             <tout> 50 </tout>
             <params>
-                <exec> /bin/bash [[run_time:remote_src_path]]/sonic-tool/mars/scripts/mtbc_ntp_workaround.sh [[conf:extra_info.dut_name]] </exec>
+                <exec> /bin/bash [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]]/sonic-tool/mars/scripts/mtbc_ntp_workaround.sh [[conf:extra_info.dut_name]] </exec>
             </params>
         </pre>
 

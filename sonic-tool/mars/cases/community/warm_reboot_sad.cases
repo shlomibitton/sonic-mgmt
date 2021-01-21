@@ -30,7 +30,6 @@
             <tout> 300 </tout>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/up.yml -e lab_admin_pass=3tango -e fanout_listener=\"scripts/mlnx/fanout_listener.py\"\'" </static_args>
-                <remote_test_path> [[run_time:remote_test_path]] </remote_test_path>
             </params>
         </pre>
 
@@ -49,7 +48,6 @@
             <tout> 300 </tout>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/down.yml -e lab_admin_pass=3tango\'" </static_args>
-                <remote_test_path> [[run_time:remote_test_path]] </remote_test_path>
             </params>
         </post>
 

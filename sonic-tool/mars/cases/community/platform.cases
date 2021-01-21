@@ -266,37 +266,9 @@
         <name> platform_api_chassis </name>
         <tout> 1200 </tout>
 
-        <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> "master" </value>
-            </condition>
-        </ignore>
-
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_components and not test_fans and not test_status_led\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
-             </params>
-        </cmd>
-    </case>
-
-    <case>
-        <info> Test Chassis API Case For 201911 </info>
-        <name> platform_api_chassis_201911 </name>
-        <tout> 1200 </tout>
-
-        <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> "201911" </value>
-            </condition>
-        </ignore>
-
-        <cmd>
-             <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_fan_drawers and not test_status_led\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
              </params>
         </cmd>
     </case>
@@ -334,14 +306,6 @@
         <name> platform_api_psu_fans </name>
         <tout> 500 </tout>
 
-        <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> "master" </value>
-            </condition>
-        </ignore>
-
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_fans_target_speed and not test_set_fans_speed and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable\"\'" --test-scripts platform_tests/api/test_psu_fans.py </static_args>
@@ -350,37 +314,9 @@
     </case>
 
     <case>
-        <info> Test PSU Fan API Case For 201911 </info>
-        <name> platform_api_psu_fans_201911 </name>
-        <tout> 1000 </tout>
-
-        <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> "201911" </value>
-            </condition>
-        </ignore>
-
-        <cmd>
-             <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_speed and not test_get_fans_target_speed and not test_set_fans_speed and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable\"\'" --test-scripts platform_tests/api/test_psu_fans.py </static_args>
-             </params>
-        </cmd>
-    </case>
-
-    <case>
         <info> Test Fan Drawer API Case </info>
         <name> platform_api_fan_drawer </name>
         <tout> 1200 </tout>
-
-        <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> "master" </value>
-            </condition>
-        </ignore>
 
         <cmd>
              <params>
@@ -393,14 +329,6 @@
         <info> Test Fan Drawer Fans API Case </info>
         <name> platform_api_fan_drawer_fans </name>
         <tout> 600 </tout>
-
-        <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> "master" </value>
-            </condition>
-        </ignore>
 
         <cmd>
              <params>

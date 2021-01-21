@@ -16,8 +16,6 @@
 			<post> </post>
 		</Test>
 		<Case>
-            <tags> configuration </tags>
-            <tags> l2 </tags>
             <pre>
 			</pre>
 			<post>
@@ -25,7 +23,6 @@
 		</Case>
 	</global>
 	<test>
-		<tags> l2_counters </tags>
 		<cases> sonic-mgmt/sonic-tool/mars/cases/canonical/push_gate_ci.cases </cases>
 	</test>
 </DBDEF>

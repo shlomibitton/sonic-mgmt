@@ -56,7 +56,7 @@
     </test>
 
     <test>
-        <cases> sonic-mgmt/sonic-tool/mars/cases/platform.cases </cases>
+        <cases> sonic-mgmt/sonic-tool/mars/cases/community/platform.cases </cases>
     </test>
 
     <test>
