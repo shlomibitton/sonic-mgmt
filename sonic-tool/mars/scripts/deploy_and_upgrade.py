@@ -8,17 +8,18 @@ run commands on it. Purpose is to prepare the SONiC testing topology using the t
 
 # Builtin libs
 import argparse
-import json
 import os
 import random
 import re
-import shutil
 import socket
 import sys
-import time
 import contextlib
-import BaseHTTPServer
 import subprocess
+import logging
+import BaseHTTPServer
+import shutil
+import json
+import time
 from multiprocessing.pool import ThreadPool
 
 # Third-party libs
@@ -45,6 +46,7 @@ def _parse_args():
     parser.add_argument("--target-version", nargs="?", default="", dest="target_version",
                         help="URL or path to the SONiC image. If this argument is specified, upgrade switch to this \
                               version after upgraded to the base_version. Default: ''")
+    parser.add_argument('--log_level', dest='log_level', default=logging.INFO, help='log verbosity')
     parser.add_argument("--upgrade-only", nargs="?", default="no", dest="upgrade_only",
                         help="Specify whether to skip topology change and only do upgrade. Default: 'no'")
     parser.add_argument("--reboot", nargs="?", default="no", choices=["no", "random"] + constants.REBOOT_TYPES.keys(),
@@ -56,6 +58,14 @@ def _parse_args():
                         help="Specify the test setup's number of ports. Default: ''")
     parser.add_argument("--wjh-deb-url", help="Specify url to WJH debian package",
                         dest="wjh_deb_url", default="")
+    parser.add_argument("--recover_by_reboot", help="If post validation install validation has failed, "
+                                                    "reboot the dut and run post validation again."
+                                                    "This flag might be useful when the first boot has failed due to fw upgrade timeout",
+                        dest="recover_by_reboot", default=True, action='store_true')
+    parser.add_argument("--serve_files", help="Specify whether to run http server on the runnning machine and serve the installer files"
+                                              "Note: this option is not supported when running from a docker without ip",
+                        dest="serve_files", default=False, action='store_true')
+
     return parser.parse_args()
 
 
@@ -97,7 +107,6 @@ class ImageHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         except IOError:
             self.send_error(404, "Read file %s failed" % served_file)
             return None
-
         self.send_response(200)
         self.send_header("Content-type", "application/octet-stream")
         fs = os.fstat(f.fileno())
@@ -124,6 +133,10 @@ def separate_logger(func):
             sys.stdout = original_out
             sys.stderr = original_err
 
+    def get_std_data(std_data_filename):
+        with open(std_data_filename) as data:
+            return data.read()
+
     def wrapper(*args, **kwargs):
         method_name = func.__name__
         dut_name = kwargs.get('dut_name')
@@ -136,11 +149,10 @@ def separate_logger(func):
         try:
             with redirect_stdout_stderr(std_data_filename):
                 func(*args, **kwargs)
+            logger.debug(get_std_data(std_data_filename))
         except Exception as err:
-            with open(std_data_filename) as data:
-                logger.error('Error "{}" during execution of method: {}, please check logs below'.format(err, method_name))
-                logger.error(data.read())
-                raise Exception(err)
+            logger.error(get_std_data(std_data_filename))
+            raise Exception(err)
         finally:
             logger.info('#' * 100)
             logger.info('Finished run for method: {}'.format(method_name))
@@ -171,44 +183,73 @@ def start_http_server(served_files):
     return httpd
 
 
-def prepare_images(base_version, target_version):
+def prepare_images(base_version, target_version, serve_file):
     """
     Method which starts HTTP server if need and share image via HTTP
     """
     image_urls = {"base_version": "", "target_version": ""}
-    served_files = {}
 
-    # If the provided base_version is a file from network storage, for example:
-    #   "/auto/sw_system_release/sonic/sonic-mellanox.bin"
-    # Then serve the file via HTTP. Generate a http URL for the deploy script.
-    if re.match('https?://', base_version):
-        image_urls["base_version"] = base_version
+    if serve_file:
+        serve_files_over_http(base_version, target_version, image_urls)
     else:
-        if not os.path.isfile(base_version):
-            logger.error("The base_version %s does not exist" % base_version)
-            sys.exit(1)
-        else:
-            served_files["/base_version"] = base_version
+        set_image_path(base_version, "base_version", image_urls)
+        if target_version:
+            set_image_path(target_version, "target_version", image_urls)
 
-    if target_version:
-        if re.match('https?://', target_version):
-            image_urls["target_version"] = target_version
-        else:
-            if not os.path.isfile(target_version):
-                logger.error("The target_version %s does not exists" % target_version)
-                sys.exit(1)
-            else:
-                served_files["/target_version"] = target_version
-
-    # Start HTTP server to serve the image file if needed.
-    if served_files:
-        httpd = start_http_server(served_files)
-        http_base_url = "http://{}:{}".format(httpd.server_name, httpd.server_port)
-        for served_file_path in served_files:
-            image_urls[served_file_path.lstrip("/")] = http_base_url + served_file_path
-
+    for image_role in image_urls:
+        logger.info('Image {image_role} URL is:{image}'.format(image_role=image_role, image=image_urls[image_role]))
     return image_urls
 
+
+def serve_files_over_http(base_version, target_version, image_urls):
+    served_files = {}
+    verify_file_exists(base_version)
+    served_files["/base_version"] = base_version
+    if target_version:
+        verify_file_exists(target_version)
+        served_files["/target_version"] = target_version
+
+    httpd = start_http_server(served_files)
+    http_base_url = "http://{}:{}".format(httpd.server_name, httpd.server_port)
+    for served_file_path in served_files:
+        image_urls[served_file_path.lstrip("/")] = http_base_url + served_file_path
+
+
+def set_image_path(image_path, image_key, image_dict):
+    if is_url(image_path):
+        path = image_path
+    else:
+        verify_file_exists(image_path)
+        logger.info("Image {} path is:{}".format(image_key, os.path.realpath(image_path)))
+        path = get_installer_url_from_nfs_path(image_path)
+    image_dict[image_key] = path
+
+
+def is_url(image_path):
+    return re.match('https?://', image_path)
+
+
+def get_installer_url_from_nfs_path(image_path):
+    http_base = 'http://fit69.mtl.labs.mlnx'
+    verify_image_stored_in_nfs(image_path)
+    image_path = get_image_path_in_new_nfs_dir(image_path)
+    return "{http_base}{image_path}".format(http_base=http_base, image_path=image_path)
+
+
+def verify_file_exists(image_path):
+    is_file = os.path.isfile(image_path)
+    assert is_file, "Cannot access Image {}: no such file.".format(image_path)
+
+
+def verify_image_stored_in_nfs(image_path):
+    nfs_base_path = '\/auto\/|\/\.autodirect\/'
+    is_located_in_nfs = re.match(r"^({nfs_base_path}).+".format(nfs_base_path=nfs_base_path), image_path)
+    assert is_located_in_nfs, "The Image must be located under {nfs_base_path}".\
+        format(nfs_base_path=nfs_base_path)
+
+
+def get_image_path_in_new_nfs_dir(image_path):
+    return re.sub(r"^\/\.autodirect\/", "/auto/", image_path)
 
 @separate_logger
 def generate_minigraph(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, port_number):
@@ -318,20 +359,28 @@ def apply_canonical_config(topo, dut_name):
     print(process.stdout.read())
 
     if process.returncode != 0:
-        raise Exception("Encountered an error during application of configuration files on the DUT, please check logs")
+        raise Exception("Encountered an error during application of configuration files on the DUT, please review the "
+                        "error logs")
 
 
 @separate_logger
-def post_install_check(ansible_path, mgmt_docker_engine, dut_name, sonic_topo):
+def post_install_check(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, recover_by_reboot):
     """
     Method which doing post install checks: check ports status, check dockers status, etc.
     """
     with mgmt_docker_engine.cd(ansible_path):
-        logger.info("Doing post manufacturing check")
-        cmd = "ansible-playbook -i inventory --limit {SWITCH}-{TOPO} post_upgrade_check.yml -e topo={TOPO} " \
+        post_install_validation = "ansible-playbook -i inventory --limit {SWITCH}-{TOPO} post_upgrade_check.yml -e topo={TOPO} " \
               "-b -vvv".format(SWITCH=dut_name, TOPO=sonic_topo)
-        logger.info("Running CMD: {}".format(cmd))
-        mgmt_docker_engine.run(cmd)
+        if recover_by_reboot:
+            try:
+                logger.info("Performing post-install validation by running: {}".format(post_install_validation))
+                return mgmt_docker_engine.run(post_install_validation)
+            except Exception:
+                logger.warning("Failed in post-installation validation")
+                logger.warning("Performing a reboot and retrying")
+                reboot_validation(ansible_path, mgmt_docker_engine, "reboot", dut_name, sonic_topo)
+        logger.info("Performing post-install validation by running: {}".format(post_install_validation))
+        return mgmt_docker_engine.run(post_install_validation)
 
 
 @separate_logger
@@ -383,6 +432,7 @@ def main():
     repo_name = args.repo_name
     repo_path = os.path.join(workspace_path, repo_name)
     ansible_path = os.path.join(repo_path, "ansible")
+    logger.setLevel(args.log_level)
 
     topo = parse_topology(args.topo)
     sonic_mgmt_device = topo.get_device_by_topology_id(constants.SONIC_MGMT_DEVICE_ID)
@@ -396,7 +446,7 @@ def main():
                                    config=Config(overrides={"run": {"echo": True}}),
                                    connect_kwargs={"password": hypervisor_device.USERS[0].PASSWORD})
 
-    image_urls = prepare_images(args.base_version, args.target_version)
+    image_urls = prepare_images(args.base_version, args.target_version, args.serve_files)
 
     if args.upgrade_only and re.match(r"^(no|false)$", args.upgrade_only, re.I):
         recover_topology(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine,
@@ -416,7 +466,7 @@ def main():
                          sonic_topo=args.sonic_topo)
 
     post_install_check(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                       sonic_topo=args.sonic_topo)
+                       sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
 
     if image_urls["target_version"]:
         logger.info("Target version is defined, upgrade switch again to the target version.")
@@ -425,7 +475,7 @@ def main():
                       sonic_topo=args.sonic_topo, image_url=image_urls["target_version"], upgrade_type='sonic')
 
         post_install_check(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                           sonic_topo=args.sonic_topo)
+                           sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
 
     if args.reboot and args.reboot != "no":
         reboot_validation(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, reboot=args.reboot,
