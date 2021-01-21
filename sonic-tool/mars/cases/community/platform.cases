@@ -239,7 +239,7 @@
         </ignore>
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals --config_file=config/mellanox_config.yml --binaries_path=/auto/sw_system_project/sonic/platform_fw/\'" --test-scripts platform_tests/fw_utility/test_fwutil.py </static_args>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals --config_file=config/mellanox_config.yml --binaries_path=/auto/sw_system_project/sonic/platform_fw/ --second_image_path=/auto/sw_system_release/sonic/master-lastrc-internal-sonic-mellanox.bin\'" --test-scripts platform_tests/fw_utility/test_fwutil.py </static_args>
              </params>
         </cmd>
     </case>
