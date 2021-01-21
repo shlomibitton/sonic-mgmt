@@ -72,20 +72,45 @@
   - topo_facts: topo={{ topo }}
     delegate_to: localhost
 
+  - name: find interface name mapping and individual interface speed if defined from dut
+    port_alias: hwsku="{{ hwsku }}"
+    when: deploy is defined and deploy|bool == true
+
+  - name: find interface name mapping and individual interface speed if defined with local data
+    port_alias: hwsku="{{ hwsku }}"
+    delegate_to: localhost
+    when: deploy is not defined or deploy|bool == false
+
+  - name: find all enabled host_interfaces
+    set_fact:
+      host_if_indexes: "{{ vm_topo_config['host_interfaces_by_dut'][dut_index|int] | difference(vm_topo_config['disabled_host_interfaces_by_dut'][dut_index|int]) }}"
+
+  - name: find all vlan interface names for T0 topology
+    set_fact:
+      vlan_intfs: "{{ vlan_intfs|default([])}} + ['{{ port_alias[item] }}' ]"
+    with_items: "{{ host_if_indexes }}"
+    when: "('host_interfaces_by_dut' in vm_topo_config) and ('tor' in vm_topo_config['dut_type'] | lower)"
+
   - name: set default dualtor facts
     set_fact:
       dual_tor_facts: {}
     when: "'dualtor' not in topo"
-    
+
   - name: gather dual ToR information
-    dual_tor_facts: hostname="{{ inventory_hostname }}" testbed_facts="{{ testbed_facts }}" hostvars="{{ hostvars }}" vm_config="{{ vm_topo_config }}"
+    dual_tor_facts:
+      hostname: "{{ inventory_hostname }}"
+      testbed_facts: "{{ testbed_facts }}"
+      hostvars: "{{ hostvars }}"
+      vm_config: "{{ vm_topo_config }}"
+      port_alias: "{{ port_alias }}"
+      vlan_intfs: "{{ vlan_intfs }}"
     delegate_to: localhost
     when: "'dualtor' in topo"
 
   - name: generate y_cable simulator driver
     include_tasks: dualtor/config_y_cable_simulator.yml
     when: "'dualtor' in topo"
-    
+
   - name: set default vm file path
     set_fact:
       vm_file: veos
@@ -122,7 +147,7 @@
     when: "('host_interfaces_by_dut' in vm_topo_config) and ('tor' in vm_topo_config['dut_type'] | lower)"
 
   - name: find any tunnel configurations
-    tunnel_config: 
+    tunnel_config:
       vm_topo_config: "{{ vm_topo_config }}"
       tunnel_config: "{{ tunnel_config | default(None) }}"
     delegate_to: localhost
