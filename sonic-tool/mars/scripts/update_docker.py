@@ -161,7 +161,7 @@ def create_and_start_container(conn, image_name, image_tag, container_name, mac_
         if key == "/workspace":
             container_mountpoints_list.append("-v {}:{}:rw".format(key, value))
         else:
-            container_mountpoints_list.append("-v {}:{}".format(key, value))
+            container_mountpoints_list.append("-v {}:{}:rslave".format(key, value))
 
     container_mountpoints = " ".join(container_mountpoints_list)
 
