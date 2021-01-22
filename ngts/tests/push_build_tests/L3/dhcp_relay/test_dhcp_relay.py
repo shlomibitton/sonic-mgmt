@@ -189,7 +189,9 @@ class TestDHCPRelay:
             with allure.step('Trying to GET ip address from DHCP server when DHCP request sent to not broadcast address'):
                 dhclient_with_server_ip_run_cmd = 'dhclient {} -cf dhclient.conf -s {} -v'.format(self.dhclient_iface,
                                                                                                   self.dut_dhclient_vlan_ip)
-                assert self.expected_ip in self.dhcp_client_engine.run_cmd(dhclient_with_server_ip_run_cmd)
+                dhcp_client_output =self.dhcp_client_engine.run_cmd(dhclient_with_server_ip_run_cmd)
+                assert self.expected_ip in dhcp_client_output
+                assert LinuxDhcpCli.dhcp_client_no_offers not in dhcp_client_output
 
             with allure.step('Release DHCP address from client'):
                 self.dhcp_client_engine.run_cmd(dhclient_stop_cmd.format(self.dhclient_iface))
