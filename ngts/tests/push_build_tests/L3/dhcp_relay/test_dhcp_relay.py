@@ -85,7 +85,8 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
             self.dut_engine.run_cmd_set(cleanup_engine.commands_list)
 
-    def test_dhcp_relay_release_message(self):
+    def test_dhcp_relay_release_message(self, current_platform):
+        ngts_skip(current_platform, rm_ticket_list=[2443647])
         dhcp_release = '0x7'
         bootp_body = 'chaddr={},ciaddr="{}"'.format(self.chaddr, self.expected_ip)
         dhcp_options = '("message-type","release"),"end"'
