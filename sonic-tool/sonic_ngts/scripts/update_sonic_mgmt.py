@@ -106,6 +106,7 @@ class Inventory:
         tb_topo = "{dut_name}-ptf-any\n{dut_name}".format(dut_name=dut_name)
         dev_topo = "{dut_name}-ptf-any {sonic_latest}\n{dut_name} {sonic_latest}".format(dut_name=dut_name,
                 sonic_latest=sonic_latest_entry.format(dut_name=dut_name, hwsku=hwsku, console=console, pdu_host=pdu_host))
+        pdu_line = "{} ansible_host={} protocol=snmp".format(pdu_host, pdu_host[4:].replace('-', '.'))
         for line in self.inventory_buff.splitlines():
             if "[lab]" in line:
                 buff += line + "\n"
@@ -113,6 +114,10 @@ class Inventory:
             elif "[sonic_latest]" in line:
                 buff += line + "\n"
                 buff += dev_topo + "\n"
+            elif "[pdu]" in line:
+                if pdu_line not in self.inventory_buff:
+                    buff += line + "\n"
+                    buff += pdu_line + "\n"
             else:
                 buff += line + "\n"
         with open(self.inventory_path, "w", 0o0600) as inv_file:
