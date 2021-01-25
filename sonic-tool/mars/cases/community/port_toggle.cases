@@ -20,7 +20,7 @@
         <tout> 1200 </tout>
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'test_sonic.yml -i inventory --limit [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_name=[[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_type=[[conf:extra_info.topology]] -e testcase_name=port_toggle [[conf:extra_info.verbosity]]\'" </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/test_port_toggle.py </static_args>
              </params>
         </cmd>
     </case>
