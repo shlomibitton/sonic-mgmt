@@ -8,8 +8,7 @@
     "gerrit_propertiesFile=/auto/sw_system_release/ci/general/ngci_properties/swgerrit.properties",
     "build_propertiesFile=build/common/build.properties",
     "PIPELINE_FORCE_CLEAN=true",
-    "PRIORITY_NUMBER=4",
-    "TARBALL_NAME=SONIC_MGMT_TAR.db.1.tgz"
+    "PRIORITY_NUMBER=4"
   ],
   "phases": [
     {
@@ -35,7 +34,7 @@
         {
           "name": "Clone",
           "module": "com.mellanox.jenkins.generic_modules.Checkout",
-          "category": "Pre BAT",
+          "category": "Pre Build",
           "node": "SONIC_LITE",
           "parameters": {
             "CLONE_PATH": "${PROJECT_NAME}",
@@ -58,7 +57,7 @@
         {
           "name": "Components Match",
           "module": "com.mellanox.jenkins.generic_modules.ComponentMatch",
-          "category": "Pre BAT",
+          "category": "Pre Build",
           "node": "SONIC_LITE",
           "parameters": {
             "MAP_FILE": "${PROJECT_NAME}/build/ci/file_mapping.yaml",
@@ -70,24 +69,12 @@
         {
           "name": "Handle Components Match",
           "module": "${nfs_dir}/build/ci/handle_component.groovy",
-          "category": "Pre BAT",
+          "category": "Pre Build",
           "node": "SONIC_LITE",
           "parameters": {},
           "skip": false,
           "on_failure": "stop",
           "out_of_mail": false
-        },
-        {
-          "name": "Create tarball",
-          "module": "com.mellanox.jenkins.generic_modules.RunCmd",
-          "category": "Pre BAT",
-          "node": "SONIC_LITE",
-          "parameters": {
-            "cmd": "tar --exclude=.git -zcvf ${nfs_dir}/${TARBALL_NAME} ${nfs_dir}/sonic-mgmt"
-          },
-          "skip": false,
-          "on_failure": "stop",
-          "out_of_mail": true
         }
       ]
     },
@@ -298,18 +285,6 @@
           "node": "SONIC_LITE",
           "skip": false,
           "on_failure": "stop"
-        },
-        {
-          "name": "move tarball to shared directory",
-          "module": "com.mellanox.jenkins.generic_modules.RunCmd",
-          "category": "Move Tarball",
-          "node": "SONIC_LITE",
-          "parameters": {
-            "cmd": "cp -f ${nfs_dir}/sonic-mgmt /.autodirect/sw_regression/system/SONIC/MARS/tarballs/SONIC_CANONICAL-sonic-mgmt_${GERRIT_BRANCH}.db.1.tgz"
-          },
-          "skip": false,
-          "on_failure": "stop",
-          "out_of_mail": true
         },
         {
           "name": "Clean env",
