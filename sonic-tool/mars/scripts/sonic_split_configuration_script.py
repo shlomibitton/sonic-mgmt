@@ -18,6 +18,9 @@ from infra.constants.constants import LinuxConsts, ConfigDbJsonConst, SonicConst
 logger = logging.getLogger("sonic_split_configuration_script")
 
 
+SHARED_MOUNTS_HTTP_SERVER_URL = "http://fit69.mtl.labs.mlnx"
+
+
 def set_logger(log_level):
     logging.basicConfig(level=log_level,
                         format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -399,7 +402,8 @@ def load_port_config_ini_to_switch(engine, port_config_ini_path, platform, hwsku
     """
     logger.info("Load port_config.ini on to switch.")
     switch_config_ini_path = "/usr/share/sonic/device/{}/{}/{}".format(platform, hwsku, SonicConsts.PORT_CONFIG_INI)
-    engine.copy_file_to_host(src_path=port_config_ini_path, dst_path=switch_config_ini_path, copy_to_tmp=True)
+    engine.run_cmd(
+        'sudo curl {}{} -o {}'.format(SHARED_MOUNTS_HTTP_SERVER_URL, port_config_ini_path, switch_config_ini_path))
 
 
 @retry(Exception, tries=5, delay=2)
@@ -411,7 +415,8 @@ def load_config_db_to_switch(engine, config_db_path):
     :return: None
     """
     logger.info("Load modified initial config_db.json on to switch {}.".format(SonicConsts.CONFIG_DB_JSON_PATH))
-    engine.copy_file_to_host(src_path=config_db_path, dst_path=SonicConsts.CONFIG_DB_JSON_PATH, copy_to_tmp=True)
+    engine.run_cmd(
+        'sudo curl {}{} -o {}'.format(SHARED_MOUNTS_HTTP_SERVER_URL, config_db_path, SonicConsts.CONFIG_DB_JSON_PATH))
 
 
 @retry(Exception, tries=5, delay=2)
@@ -423,7 +428,8 @@ def load_minigraph_xml_to_switch(engine, minigraph_xml_path):
     :return: None
     """
     logger.info("Load minigraph.xml on to switch {}.".format(SonicConsts.MINIGRAPH_XML_PATH))
-    engine.copy_file_to_host(src_path=minigraph_xml_path, dst_path=SonicConsts.MINIGRAPH_XML_PATH, copy_to_tmp=True)
+    engine.run_cmd(
+        'sudo curl {}{} -o {}'.format(SHARED_MOUNTS_HTTP_SERVER_URL, minigraph_xml_path, SonicConsts.MINIGRAPH_XML_PATH))
 
 
 @retry(Exception, tries=3, delay=10)
