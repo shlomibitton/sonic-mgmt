@@ -9,7 +9,7 @@
         </Test>
         <Case>
             <tags> PORT_TOGGLE </tags>
-            <wrapper> run_ansible_playbook.py </wrapper>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
             <tout> 3600 </tout>
         </Case>
     </global>
