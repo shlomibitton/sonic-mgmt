@@ -19,7 +19,15 @@
         <name> sensors </name>
         <tout> 900 </tout>
         <ignore>
-            <bug> 2303231 </bug>
+            <condition_group>
+                <operand> AND </operand>
+                <condition>
+                    <key> dut_name </key>
+                    <op> == </op>
+                    <value> "r-ocelot-02" </value>
+                </condition>
+                <bug> 2430822 </bug>
+            </condition_group>
         </ignore>
         <cmd>
              <params>

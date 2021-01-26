@@ -182,6 +182,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.skip(reason='https://redmine.mellanox.com/issues/2443647')
     def test_dhcp_relay_unicast_request_message(self, current_platform):
         try:
             with allure.step('Getting IP address from DHCP server via DHCP relay functionality'):
