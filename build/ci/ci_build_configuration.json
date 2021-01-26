@@ -266,6 +266,18 @@
           "finally": true
         },
         {
+          "name": "move tarball to shared directory",
+          "module": "com.mellanox.jenkins.generic_modules.RunCmd",
+          "category": "Move Tarball",
+          "node": "SONIC_LITE",
+          "parameters": {
+            "cmd": "cp -f ${nfs_dir}/${TARBALL_NAME} /.autodirect/sw_regression/system/SONIC/MARS/tarballs/SONIC_CANONICAL-sonic-mgmt_${GERRIT_BRANCH}.db.1.tgz"
+          },
+          "skip": false,
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
           "name": "Gerrit Update",
           "module": "com.mellanox.jenkins.generic_modules.GerritVerification",
           "category": "Gerrit Update",
@@ -298,18 +310,6 @@
           "node": "SONIC_LITE",
           "skip": false,
           "on_failure": "stop"
-        },
-        {
-          "name": "move tarball to shared directory",
-          "module": "com.mellanox.jenkins.generic_modules.RunCmd",
-          "category": "Move Tarball",
-          "node": "SONIC_LITE",
-          "parameters": {
-            "cmd": "cp -f ${nfs_dir}/sonic-mgmt /.autodirect/sw_regression/system/SONIC/MARS/tarballs/SONIC_CANONICAL-sonic-mgmt_${GERRIT_BRANCH}.db.1.tgz"
-          },
-          "skip": false,
-          "on_failure": "stop",
-          "out_of_mail": true
         },
         {
           "name": "Clean env",
