@@ -7,12 +7,12 @@ def pre(name, ci_tools) {
 
 def run_step(name, ci_tools) {
     try {
-        if (env.RUN_REGRESSION && env.RUN_REGRESSION.toBoolean() == true) {
-            print "Regression test are defined to run with topic \"RUN_REGRESSION=true\""
-        } else if (env.CHANGED_COMPONENTS && env.CHANGED_COMPONENTS.contains("NoMatch")) {
-            print "Changed files triggered regression tests"
+        if (env.RUN_COMMUNITY_REGRESSION && env.RUN_COMMUNITY_REGRESSION.toBoolean() == true &&  env.CHANGED_COMPONENTS && env.CHANGED_COMPONENTS.contains("NoMatch")) {
+            print "Topic \"RUN_COMMUNITY_REGRESSION=true\" and changed files triggered community regression tests"
         } else {
-            env.SKIP_MINI_REGRESSION = true
+            env.SKIP_COMMUNITY_REGRESSION = true
+            ci_tools.insert_test_result_to_matrix(name, "ETH Community", "SPC", "Skipped=status")
+
         }
         return true
     }
@@ -20,11 +20,6 @@ def run_step(name, ci_tools) {
         ci_tools.set_error_in_env(exc, "user", name)
         return false
 
-    }
-    finally {
-        if (env.SKIP_MINI_REGRESSION == "true") {
-//            ci_tools.insert_test_result_to_matrix(name, "IB", "SIB2", "Skipped=status")
-        }
     }
 }
 

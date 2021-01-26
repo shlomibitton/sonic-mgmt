@@ -67,7 +67,7 @@ def run_step(name, ci_tools)
             //add build name and number
             def topic = "${JOB_BASE_NAME} #${BUILD_NUMBER}"
 
-            def possible_topic_list = ["RUN_REGRESSION", "FORCE_UNLOCK_REGRSSION", "IMAGE_VERSION", "IMAGE_BRANCH"]
+            def possible_topic_list = ["RUN_COMMUNITY_REGRESSION", "FORCE_UNLOCK_REGRSSION", "IMAGE_VERSION", "IMAGE_BRANCH"]
 
             possible_topic_list.each { possible_topic ->
                 if (param_contain_value(ci_tools, env."${possible_topic}")) {
