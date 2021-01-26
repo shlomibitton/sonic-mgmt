@@ -271,7 +271,7 @@
           "category": "Move Tarball",
           "node": "SONIC_LITE",
           "parameters": {
-            "cmd": "cp -f ${nfs_dir}/${TARBALL_NAME} /.autodirect/sw_regression/system/SONIC/MARS/tarballs/SONIC_CANONICAL-sonic-mgmt_${GERRIT_BRANCH}.db.1.tgz"
+            "cmd": "sudo cp -f ${nfs_dir}/${TARBALL_NAME} /.autodirect/sw_regression/system/SONIC/MARS/tarballs/SONIC_CANONICAL-sonic-mgmt_${GERRIT_BRANCH}.db.1.tgz"
           },
           "skip": false,
           "on_failure": "stop",
