@@ -31,6 +31,15 @@
         debug: msg="{{ result.stdout_lines }}"
 
     - block:
+        - name: Get platform name
+          shell: show platform summary
+          register: platform_data
+
+        - name: Remove platform.json file as a workaround for issue 2437774
+          file:
+            path: "/usr/share/sonic/device/{{ platform_data.stdout_lines[0] }}/platform.json"
+            state: absent
+          become: true
 
         - name: Deploy minigraph file.
           copy:
