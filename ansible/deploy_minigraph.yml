@@ -37,7 +37,7 @@
 
         - name: Remove platform.json file as a workaround for issue 2437774
           file:
-            path: "/usr/share/sonic/device/{{ platform_data.stdout_lines[0] }}/platform.json"
+            path: "/usr/share/sonic/device/{{ platform_data.stdout_lines[0].split(':')[1].strip() }}/platform.json"
             state: absent
           become: true
 
