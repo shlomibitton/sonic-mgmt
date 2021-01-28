@@ -273,12 +273,18 @@ def configure_docker_route(conn, container_name, mac_address, facts):
                  .format(MACVLAN_IFACE=macvlan_iface, DEFAULT_IFACE=default_iface), warn=True)
         conn.run("ip link set dev {MACVLAN_IFACE} netns {CONTAINER_PID}"
                  .format(MACVLAN_IFACE=macvlan_iface, CONTAINER_PID=container_pid))
-        conn.run('docker exec {CONTAINER_NAME} bash -c "\
-                  sudo ip link set dev {MACVLAN_IFACE} name {CONTAINER_IFACE} && \
-                  sudo ip link set dev {CONTAINER_IFACE} up && \
-                  sudo ip link set dev {CONTAINER_IFACE} address {CONTAINER_IFACE_MAC}"'
+
+        conn.run('docker exec {CONTAINER_NAME} bash -c '\
+                 '"sudo ip link set dev {MACVLAN_IFACE} name {CONTAINER_IFACE}"'
                  .format(CONTAINER_NAME=container_name, MACVLAN_IFACE=macvlan_iface,
-                         CONTAINER_IFACE=container_iface, CONTAINER_IFACE_MAC=mac_address))
+                         CONTAINER_IFACE=container_iface))
+        conn.run('docker exec {CONTAINER_NAME} bash -c '\
+                 '"sudo ip link set dev {CONTAINER_IFACE} up"'
+                 .format(CONTAINER_NAME=container_name, CONTAINER_IFACE=container_iface))
+        conn.run('docker exec {CONTAINER_NAME} bash -c '\
+                 '"sudo ip link set dev {CONTAINER_IFACE} address {CONTAINER_IFACE_MAC}"'
+                 .format(CONTAINER_NAME=container_name, CONTAINER_IFACE=container_iface,
+                         CONTAINER_IFACE_MAC=mac_address))
 
         conn.run('docker exec {CONTAINER_NAME} bash -c "sudo ip route del default"'
                  .format(CONTAINER_NAME=container_name))
