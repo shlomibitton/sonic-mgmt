@@ -92,7 +92,7 @@ fi
 pushd $SONIC_MGMT_DIR/ansible
 if [ -n "$refresh_dut" ]; then
     # Refresh dut in the virtual switch topology
-    ./testbed-cli.sh -m $inventory -t $testbed_file refresh-dut $tbname password.txt
+    ./testbed-cli.sh -m $inventory -t $testbed_file -k ceos refresh-dut $tbname password.txt
     sleep 120
 fi
 
@@ -145,7 +145,8 @@ test_features.py \
 test_procdockerstatsd.py \
 iface_namingmode/test_iface_namingmode.py \
 platform_tests/test_cpu_memory_usage.py \
-bgp/test_bgpmon.py"
+bgp/test_bgpmon.py \
+container_checker/test_container_checker.py"
 
 ./run_tests.sh $RUNTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname
 popd

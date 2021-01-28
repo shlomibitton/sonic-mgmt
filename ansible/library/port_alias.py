@@ -9,9 +9,9 @@ from itertools import groupby
 from collections import defaultdict
 
 try:
-    from sonic_py_common import multi_asic
+    from sonic_py_common import multi_asic  
 except ImportError:
-    print("Failed to import multi_asic")
+    print("Failed to import multi_asic")     
 
 DOCUMENTATION = '''
 module: port_alias.py
@@ -23,7 +23,7 @@ Description:
         The definition of this mapping is specified in http://github.com/azure/sonic-buildimage/device
         You should build docker-sonic-mgmt from sonic-buildimage and run Ansible from sonic-mgmt docker container
         For multi-asic platforms, port_config.ini for each asic will be parsed to get the port_alias information.
-        When bringing up the testbed, port-alias will only contain external interfaces, so that vs image can come up with
+        When bringing up the testbed, port-alias will only contain external interfaces, so that vs image can come up with 
         external interfaces.
     Input:
         hwsku num_asic
@@ -151,14 +151,14 @@ def main():
         aliasmap = {}
         portspeed = {}
         allmap = SonicPortAliasMap(m_args['hwsku'])
-        # When this script is invoked on sonic-mgmt docker, num_asic
+        # When this script is invoked on sonic-mgmt docker, num_asic 
         # parameter is passed.
         if m_args['num_asic'] is not None:
             num_asic = m_args['num_asic']
         else:
             # When this script is run on the device, num_asic parameter
             # is not passed.
-            try:
+            try: 
                 num_asic = multi_asic.get_num_asics()
             except Exception, e:
                 num_asic = 1

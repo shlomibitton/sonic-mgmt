@@ -11,7 +11,7 @@
   delegate_to: localhost
   tags: always
 
-- set_fact: sw_type='Fanout'
+- set_fact: sw_type="{{ device_info[inventory_hostname]['Type'] }}"
   tags: always
 
 - set_fact: os='eos'
