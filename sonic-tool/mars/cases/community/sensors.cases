@@ -22,9 +22,9 @@
             <condition_group>
                 <operand> AND </operand>
                 <condition>
-                    <key> dut_name </key>
+                    <key> chip_type </key>
                     <op> == </op>
-                    <value> "r-ocelot-02" </value>
+                    <value> SPC3 </value>
                 </condition>
                 <bug> 2430822 </bug>
             </condition_group>
