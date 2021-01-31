@@ -1,7 +1,7 @@
 {
   "author": "system-sw-dev-ops-support@mellanox.com",
   "notify": "GERRIT_PATCHSET_UPLOADER_EMAIL,GERRIT_CHANGE_OWNER_EMAIL,NBU-sw-ci-sonic@nvidia.com",
-  "timeout": "3",
+  "timeout": "10",
   "control_file": "/auto/sw_system_project/devops/sw-r2d2-bot/ngci_control_files/sonic_mgmt_control_file.yaml",
   "properties": [
     "default_propertiesFile=/auto/sw_system_release/ci/general/ngci_properties/swfw_default_params.properties",
@@ -94,6 +94,23 @@
     {
       "phase_3": [
         {
+          "name": "Allocate setup SPC Community",
+          "module": "com.mellanox.jenkins.generic_modules.AllocateSetups",
+          "category": "Allocate setups",
+          "node": "MINI_MARS@COMMUNITY_SPC",
+          "parameters": {
+            "queue_id": "devops_sonic_ci_community_spc",
+            "priority": "${PRIORITY_NUMBER}",
+            "setup_type": "CI_SONIC_COMMUNITY_SPC",
+            "setup_var": "CI_SONIC_COMMUNITY_SPC_SETUP",
+            "device_var": "SWITCH_PANTHER1",
+            "setup_requirements": "group_name:Sagi,sub_group:SONIC_CI,setup_status:enable"
+          },
+          "skip": "${SKIP_COMMUNITY_REGRESSION}",
+          "on_failure": "stop",
+          "out_of_mail": true
+        },
+        {
           "name": "Allocate setup SPC",
           "module": "com.mellanox.jenkins.generic_modules.AllocateSetups",
           "category": "Allocate setups",
@@ -143,6 +160,24 @@
           "skip": "${SKIP_BAT}",
           "on_failure": "stop",
           "out_of_mail": true
+        },
+        {
+          "name": "BAT Community SPC",
+          "module": "/auto/sw_system_release/ci/sonic_devops/build/ci/bat.groovy",
+          "category": "BAT",
+          "node": "MINI_MARS@COMMUNITY_SPC",
+          "parameters": {
+            "matrix_row": "ETH_COMMUNITY",
+            "matrix_col": "SPC",
+            "global_conf": "${MARS_GLOBAL_CONF}",
+            "setup_id": "${CI_SONIC_COMMUNITY_SPC_SETUP}",
+            "setup_conf_file_path": "${MARS_CONF_BASE}/${CI_SONIC_COMMUNITY_SPC_SETUP}/",
+            "base_version": "${BASE_VERSION}",
+            "test_type": "REGRESSION",
+            "sonic_mgmt_repo_url": "${nfs_dir}"
+          },
+          "skip": "${SKIP_COMMUNITY_REGRESSION}",
+          "on_failure": "stop"
         },
         {
           "name": "BAT SPC",
@@ -200,6 +235,19 @@
           "skip": "${SKIP_BAT}",
           "on_failure": "stop",
           "out_of_mail": false
+        },
+        {
+          "name": "Free community setup",
+          "module": "com.mellanox.jenkins.generic_modules.FreeSetup",
+          "category": "Clean",
+          "node": "MINI_MARS@COMMUNITY_SPC",
+          "parameters": {
+            "setup_name": "${CI_SONIC_COMMUNITY_SPC_SETUP}"
+          },
+          "skip": false,
+          "finally": true,
+          "on_failure": "ignore",
+          "out_of_mail": true
         },
         {
           "name": "Free SPC setup",

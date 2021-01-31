@@ -1,3 +1,4 @@
 BAT_ONLY:
-  - Tests/platform_tests
+  - tests/platform_tests
   - ngts
+  - sonic-tool

@@ -22,8 +22,8 @@ def run_step(name, ci_tools) {
                 topic_map["IMAGE_VERSION"] && ci_tools.is_parameter_contains_value(topic_map["IMAGE_VERSION"])) {
             error "IMAGE_BRANCH and IMAGE_VERSION cannot be defined together. remove one or both of them from Gerrit topic to continue "
         }
-        if (topic_map["RUN_REGRESSION"] && topic_map["RUN_REGRESSION"].toBoolean() == true) {
-            env.RUN_REGRESSION = true
+        if (topic_map["RUN_COMMUNITY_REGRESSION"] && topic_map["RUN_COMMUNITY_REGRESSION"].toBoolean() == true) {
+            env.RUN_COMMUNITY_REGRESSION = true
         }
 
         if (topic_map["FORCE_UNLOCK_REGRSSION"] && topic_map["FORCE_UNLOCK_REGRSSION"].toBoolean() == true) {
