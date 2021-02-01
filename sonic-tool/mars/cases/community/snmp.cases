@@ -12,7 +12,7 @@
         <Case>
             <tags> SNMP </tags>
             <wrapper> community_mars_pytest_runner.py </wrapper>
-            <tout> 3600 </tout>
+            <tout> 4800 </tout>
         </Case>
     </global>
 
@@ -78,6 +78,17 @@
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_psu.py </static_args>
+            </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> snmp_phy_entity </info>
+        <name> snmp_phy_entity </name>
+        <tout> 1200 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_phy_entity.py </static_args>
             </params>
         </cmd>
     </case>
