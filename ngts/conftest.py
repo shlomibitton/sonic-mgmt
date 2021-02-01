@@ -13,6 +13,7 @@ from infra.tools.topology_tools.topology_setup_utils import get_topology_by_setu
 from ngts.cli_wrappers.sonic.sonic_cli import SonicCli
 from ngts.cli_wrappers.linux.linux_cli import LinuxCli
 from ngts.tools.allure_report.allure_server import AllureServer
+from ngts.tools.skip_test.skip import ngts_skip
 from distutils.dist import strtobool
 logger = logging.getLogger()
 
@@ -73,9 +74,21 @@ def update_topology_with_cli_class(topology):
             player_info['cli'] = LinuxCli()
 
 
-@pytest.fixture(scope='session', autouse=True)
-def current_platform(topology_obj):
+@pytest.fixture(scope='session')
+def show_platform_summary(topology_obj):
     return topology_obj.players['dut']['engine'].run_cmd('show platform summary')
+
+
+@pytest.fixture(autouse=True)
+def skip_test_according_to_ngts_skip(request, show_platform_summary):
+    skip_marker = 'ngts_skip'
+    if request.node.get_closest_marker(skip_marker):
+        rm_ticket_list = request.node.get_closest_marker(skip_marker).args[0].get('rm_ticket_list')
+        github_ticket_list = request.node.get_closest_marker(skip_marker).args[0].get('github_ticket_list')
+        platform_prefix_list = request.node.get_closest_marker(skip_marker).args[0].get('platform_prefix_list')
+        operand = request.node.get_closest_marker(skip_marker).args[0].get('operand', 'or')
+
+        ngts_skip(show_platform_summary, rm_ticket_list, github_ticket_list, platform_prefix_list, operand)
 
 
 def pytest_sessionfinish(session, exitstatus):

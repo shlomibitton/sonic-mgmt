@@ -9,7 +9,6 @@ from ngts.cli_wrappers.sonic.sonic_dhcp_relay_clis import SonicDhcpRelayCli
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
 from ngts.cli_util.stub_engine import StubEngine
-from ngts.tools.skip_test.skip import ngts_skip
 from retry.api import retry_call
 
 
@@ -85,8 +84,8 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
             self.dut_engine.run_cmd_set(cleanup_engine.commands_list)
 
-    def test_dhcp_relay_release_message(self, current_platform):
-        ngts_skip(current_platform, rm_ticket_list=[2443647])
+    @pytest.mark.ngts_skip({'rm_ticket_list': [2443647]})
+    def test_dhcp_relay_release_message(self):
         dhcp_release = '0x7'
         bootp_body = 'chaddr={},ciaddr="{}"'.format(self.chaddr, self.expected_ip)
         dhcp_options = '("message-type","release"),"end"'
@@ -182,8 +181,8 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    @pytest.mark.skip(reason='https://redmine.mellanox.com/issues/2443647')
-    def test_dhcp_relay_unicast_request_message(self, current_platform):
+    @pytest.mark.ngts_skip({'rm_ticket_list': [2443647]})
+    def test_dhcp_relay_unicast_request_message(self):
         try:
             with allure.step('Getting IP address from DHCP server via DHCP relay functionality'):
                 assert self.expected_ip in self.dhcp_client_engine.run_cmd(run_dhcp_client.format(self.dhclient_iface))
