@@ -394,13 +394,16 @@ def reboot_validation(ansible_path, mgmt_docker_engine, reboot, dut_name, sonic_
         reboot_type = constants.REBOOT_TYPES[reboot]
 
     with mgmt_docker_engine.cd(ansible_path):
+        logger.info("Running reboot type: {}".format(reboot_type))
         reboot_res = mgmt_docker_engine.run("ansible-playbook test_sonic.yml -i inventory --limit {SWITCH}-{TOPO} \
                                      -e testbed_name={SWITCH}-{TOPO} -e testbed_type={TOPO} \
                                      -e testcase_name=reboot -e reboot_type={REBOOT_TYPE} -vvv".format(SWITCH=dut_name,
                                                                                                        TOPO=sonic_topo,
                                                                                                        REBOOT_TYPE=reboot_type),
                                             warn=True)
-        # Fall back to cold reboot
+        logger.warning("reboot type: {} failed".format(reboot_type))
+        logger.debug("reboot type {} failure results: {}".format(reboot_type, reboot_res))
+        logger.info("Running reboot type: {} after reboot failed".format(constants.REBOOT_TYPES["reboot"]))
         if reboot_res.failed and reboot != constants.REBOOT_TYPES["reboot"]:
             mgmt_docker_engine.run("ansible-playbook test_sonic.yml -i inventory --limit {SWITCH}-{TOPO} \
                             -e testbed_name={SWITCH}-{TOPO} -e testbed_type={TOPO} -e testcase_name=reboot \
