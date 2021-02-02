@@ -13,7 +13,7 @@ class SonicLldpCli(LldpCliCommon):
     def enable_lldp(engine):
         """
         This method enable the LLDP on the sonic switch
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         return engine.run_cmd('sudo config feature state lldp enabled')
@@ -22,7 +22,7 @@ class SonicLldpCli(LldpCliCommon):
     def disable_lldp(engine):
         """
         This method disables the LLDP on the sonic switch
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         return engine.run_cmd('sudo config feature state lldp disabled')
@@ -31,7 +31,7 @@ class SonicLldpCli(LldpCliCommon):
     def show_lldp_table(engine):
         """
         This method return output of "show lldp table" command
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         return engine.run_cmd('show lldp table')
@@ -61,7 +61,7 @@ class SonicLldpCli(LldpCliCommon):
     def show_lldp_info_for_specific_interface(engine, interface_name):
         """
         This method return lldp information for a specified by the user interface
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :param interface_name: SONiC interface name
         :return: command output
         """
@@ -72,7 +72,7 @@ class SonicLldpCli(LldpCliCommon):
         """
         This method change transmit delay to the specified value in seconds. The transmit delay is the
         delay between two transmissions of LLDP PDU. The default value is 30 seconds.
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :param interval: value of interval in seconds
         :return: command output
         """
@@ -84,7 +84,7 @@ class SonicLldpCli(LldpCliCommon):
     def verify_lldp_tx_interval(engine, expected_transmit_interval=30):
         """
         This method verify the transmit delay is the specified interval value in seconds.
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :param expected_transmit_interval: value of the expected interval in seconds
         :return: command output
         """
@@ -102,7 +102,7 @@ class SonicLldpCli(LldpCliCommon):
     def pause_lldp(engine):
         """
         pause lldp demon.
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         pause_lldp_demon = "docker exec {}  /bin/bash -c \"lldpcli pause\""\
@@ -114,7 +114,7 @@ class SonicLldpCli(LldpCliCommon):
     def resume_lldp(engine):
         """
         resume lldp demon.
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         resume_lldp_demon = "docker exec {}  /bin/bash -c \"lldpcli resume\"".format(SonicDockersConstant.LLDP)

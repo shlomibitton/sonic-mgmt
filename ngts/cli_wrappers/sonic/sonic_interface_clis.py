@@ -136,7 +136,7 @@ class SonicInterfaceCli(InterfaceCliCommon):
     def show_interfaces_alias(engine):
         """
         This method return output of "show interfaces alias" command
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         return engine.run_cmd('show interfaces alias')

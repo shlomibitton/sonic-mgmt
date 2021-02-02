@@ -12,7 +12,7 @@ class LinuxLldpCli(LldpCliCommon):
     def show_lldp_info_for_specific_interface(engine, interface_name):
         """
         This method gets LLDP information for a specific interface
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :param interface_name: interface name
         :return: command output
         """
@@ -44,7 +44,7 @@ class LinuxLldpCli(LldpCliCommon):
     def disable_lldp_on_interface(engine, interface):
         """
         This method disable LLDP on host interface
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :param interface: interface name
         :return: command output
         """
@@ -54,7 +54,7 @@ class LinuxLldpCli(LldpCliCommon):
     def enable_lldp_on_interface(engine, interface):
         """
         This method enable LLDP on host interface
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :param interface: interface name
         :return: command output
         """
@@ -64,7 +64,7 @@ class LinuxLldpCli(LldpCliCommon):
     def enable_lldp_on_host(engine):
         """
         This method enable LLDP on host
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         return engine.run_cmd("lldpad -d")
@@ -73,7 +73,7 @@ class LinuxLldpCli(LldpCliCommon):
     def is_lldp_enabled_on_host(engine):
         """
         This method enable LLDP on host
-        :param engine: ssh enging object
+        :param engine: ssh engine object
         :return: command output
         """
         regex_pattern = "lldpad -d"

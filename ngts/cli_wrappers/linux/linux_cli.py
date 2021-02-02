@@ -10,6 +10,7 @@ from ngts.cli_wrappers.linux.linux_chassis_clis import LinuxChassisCli
 from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
 from ngts.cli_wrappers.linux.linux_general_clis import LinuxGeneralCli
 from ngts.cli_wrappers.linux.linux_dhcp_clis import LinuxDhcpCli
+from ngts.cli_wrappers.linux.linux_ifconfig_clis import LinuxIfconfigCli
 logger = logging.getLogger()
 
 
@@ -26,3 +27,4 @@ class LinuxCli:
         self.chassis = LinuxChassisCli()
         self.general = LinuxGeneralCli()
         self.dhcp = LinuxDhcpCli()
+        self.ifconfig = LinuxIfconfigCli()
