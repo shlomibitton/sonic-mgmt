@@ -15,7 +15,7 @@ from tests.common.plugins.loganalyzer.loganalyzer import LogAnalyzer, LogAnalyze
 PLATFORM_COMP_PATH_TEMPLATE = '/usr/share/sonic/device/{}/platform_components.json'
 
 FW_INSTALL_INVALID_NAME_LOG = '.*Invalid value for "<component_name>"*.'
-FW_INSTALL_INVALID_PATH_LOG = '.*Error: Invalid value for "fw_path"*.'
+FW_INSTALL_INVALID_PATH_LOG = '.*Error: Invalid value for "<fw_path>"*.'
 FW_INSTALL_INVALID_URL_LOG = '.*Error: Did not receive a response from remote machine. Aborting...*.'
 
 FW_UPDATE_INVALID_PLATFORM_SCHEMA_LOG = '.*Error: Failed to parse "platform_components.json": invalid platform schema*.'
