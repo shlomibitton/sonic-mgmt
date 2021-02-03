@@ -403,13 +403,15 @@ def reboot_validation(ansible_path, mgmt_docker_engine, reboot, dut_name, sonic_
                                             warn=True)
         logger.warning("reboot type: {} failed".format(reboot_type))
         logger.debug("reboot type {} failure results: {}".format(reboot_type, reboot_res))
-        logger.info("Running reboot type: {} after reboot failed".format(constants.REBOOT_TYPES["reboot"]))
+        logger.info("Running reboot type: {} after {} failed".format(constants.REBOOT_TYPES["reboot"], reboot_type))
         if reboot_res.failed and reboot != constants.REBOOT_TYPES["reboot"]:
-            mgmt_docker_engine.run("ansible-playbook test_sonic.yml -i inventory --limit {SWITCH}-{TOPO} \
+           reboot_res = mgmt_docker_engine.run("ansible-playbook test_sonic.yml -i inventory --limit {SWITCH}-{TOPO} \
                             -e testbed_name={SWITCH}-{TOPO} -e testbed_type={TOPO} -e testcase_name=reboot \
                             -e reboot_type={REBOOT_TYPE} -vvv".format(SWITCH=dut_name, TOPO=sonic_topo,
                                                                       REBOOT_TYPE=constants.REBOOT_TYPES["reboot"]),
                                    warn=True)
+           logger.info("reboot type: {} result is {}"
+                       .format(constants.REBOOT_TYPES["reboot"], reboot_res))
 
 
 @separate_logger
