@@ -6,6 +6,7 @@ import os
 import json
 import copy
 import tempfile
+from ngts.tools.skip_test.skip import ngts_skip
 
 from retry.api import retry_call
 
@@ -127,6 +128,7 @@ def apply_acl_config(env, entry_num=1):
 
 @pytest.mark.build
 @pytest.mark.push_gate
+@pytest.mark.ngts_skip({'rm_ticket_list': [2457577]})
 @pytest.mark.parametrize('ip_ver,dst,mask', [('4', '2.2.2.0', 24), ('6', '2001::', 126)], ids=['ipv4', 'ipv6'])
 @allure.title('Test CRM route counters')
 def test_crm_route(env, cleanup, ip_ver, dst, mask):
