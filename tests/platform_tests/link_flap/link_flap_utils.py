@@ -4,7 +4,6 @@ Test utils used by the link flap tests.
 import time
 import logging
 
-from tests.common.mellanox_data import is_mellanox_device, get_chip_type
 from tests.common.platform.device_utils import fanout_switch_port_lookup
 from tests.common.utilities import wait_until
 from tests.common.helpers.assertions import pytest_assert
@@ -138,11 +137,6 @@ def toggle_one_link(dut, dut_port, fanout, fanout_port, watch=False):
     logger.info("Bring up fanout switch %s port %s connecting to %s", fanout.hostname, fanout_port, dut_port)
     fanout.no_shutdown(fanout_port)
     linkup_timeout = 30
-
-    # Temporary change for https://redmine.mellanox.com/issues/2257439
-    # Once the bug is fixed, need update a new timeout here
-    if is_mellanox_device(dut) and get_chip_type(dut) == 'spectrum2':
-        linkup_timeout = 60
 
     pytest_assert(wait_until(linkup_timeout, 1, __check_if_status, dut, dut_port, 'up', True), "dut port {} didn't go up as expected".format(dut_port))
 
