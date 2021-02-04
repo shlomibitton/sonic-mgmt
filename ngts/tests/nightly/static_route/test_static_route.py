@@ -90,6 +90,7 @@ def static_route_configuration(topology_obj):
     logger.info('StaticRoute Scale cleanup completed')
 
 
+@pytest.mark.skip(reason="Too long test, will be created separate cases file")
 @allure.title('Test Scale Static Route')
 def test_scale_static_route(topology_obj, disable_ssh_client_alive_interval, static_route_configuration):
     """

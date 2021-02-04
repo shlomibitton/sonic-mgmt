@@ -23,6 +23,6 @@
 		</Case>
 	</global>
 	<test>
-		<cases> sonic-mgmt/sonic-tool/mars/cases/canonical/copp.cases </cases>
+		<cases> sonic-mgmt/sonic-tool/mars/cases/canonical/nightly.cases </cases>
 	</test>
 </DBDEF>
