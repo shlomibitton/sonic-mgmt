@@ -221,7 +221,11 @@
         <name> vnet_vxlan </name>
         <tout> 6000 </tout>
         <ignore>
-            <bug> 2431736 </bug>
+            <condition_group>
+                <operand> AND </operand>
+                <bug> 2431736 </bug>
+                <bug> 2413591 </bug>
+            </condition_group>
         </ignore>
         <cmd>
              <params>
