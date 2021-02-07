@@ -57,6 +57,7 @@ def configure_dhcp_scale(topology_obj):
     logger.info('DHCP relay scale configuration completed')
 
 
+@pytest.mark.skip(reason="skipped due debugging")
 @allure.title('Test DHCP Relay scale')
 def test_dhcp_relay_few_dhcp_servers(topology_obj, configure_dhcp_scale):
     """

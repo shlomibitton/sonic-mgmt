@@ -34,7 +34,12 @@
         <name> platform_info </name>
         <tout> 1800 </tout>
         <ignore>
-            <bug> 2322676 </bug>
+            <condition_group>
+                <operand> AND </operand>
+                <bug> 2456455 </bug>
+                <bug> 2456386 </bug>
+                <bug> 2456156 </bug>
+            </condition_group>
         </ignore>
         <cmd>
              <params>
@@ -47,6 +52,13 @@
         <info> Test Dynamic Minimum Table and PSU policy  </info>
         <name> thermal_control_for_mellanox </name>
         <tout> 1200 </tout>
+        <ignore>
+            <condition_group>
+                <operand> AND </operand>
+                <bug> 2459420 </bug>
+                <bug> 2459412 </bug>
+            </condition_group>
+        </ignore>
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals \'" --test-scripts platform_tests/mellanox/test_thermal_control.py </static_args>
@@ -126,9 +138,6 @@
         <info> Test Reload Config Case </info>
         <name> reload_config </name>
         <tout> 1200 </tout>
-        <ignore>
-            <bug> 2367843 </bug>
-        </ignore>
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts platform_tests/test_reload_config.py </static_args>
