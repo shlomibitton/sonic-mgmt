@@ -118,6 +118,7 @@ class CoppBase:
                 self.dut_cli_object.general.reboot_flow(self.dut_engine)
                 self.pre_rx_counts = self.dut_cli_object.ifconfig.\
                     get_interface_ifconfig_details(self.dut_engine, self.dut_iface).rx_packets
+                time.sleep(10)  # to make sure all services are Up
                 # with allure.step('Check functionality of configured burst limit after reboot'):
                 #     self.run_validation_flow(self.user_cbs, 'cbs')
                 with allure.step('Check functionality of configured rate limit after reboot'):
