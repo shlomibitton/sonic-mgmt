@@ -76,7 +76,6 @@ def mgmt_merge_flow() {
         IMAGE_VERSION = IMAGE_VERSION.trim()
         IMAGE_BRANCH = IMAGE_BRANCH.trim()
         RUN_COMMUNITY_REGRESSION = RUN_COMMUNITY_REGRESSION.trim()
-        FORCE_UNLOCK_REGRSSION = FORCE_UNLOCK_REGRSSION.trim()
 
         //Validate branch is defined
         if (!is_parameter_contains_value(GITHUB_BRANCH)) {
@@ -124,7 +123,7 @@ def mgmt_merge_flow() {
     def htmlAll = "${htmlHead}"
     def list_of_params = ["GITHUB_BRANCH"   : "${GITHUB_BRANCH}", "MGMT_GERRIT_BRANCH": "${MGMT_GERRIT_BRANCH}",
                           "IMAGE_VERSION" : "${IMAGE_VERSION}", "IMAGE_BRANCH":"${IMAGE_BRANCH}",
-    "RUN_COMMUNITY_REGRESSION": "${RUN_COMMUNITY_REGRESSION}", "FORCE_UNLOCK_REGRSSION": "${FORCE_UNLOCK_REGRSSION}"]
+    "RUN_COMMUNITY_REGRESSION": "${RUN_COMMUNITY_REGRESSION}"]
     list_of_params.each { param, value ->
         htmlAll += "<BR><BR><B>${param}</B></br> &nbsp&nbsp&nbsp${value}</B>"
         if (is_parameter_contains_value(erros_map["${param}"])) {
