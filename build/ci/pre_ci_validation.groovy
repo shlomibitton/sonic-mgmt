@@ -26,10 +26,6 @@ def run_step(name, ci_tools) {
             env.RUN_COMMUNITY_REGRESSION = true
         }
 
-        if (topic_map["FORCE_UNLOCK_REGRSSION"] && topic_map["FORCE_UNLOCK_REGRSSION"].toBoolean() == true) {
-            env.FORCE_UNLOCK_REGRSSION = true
-        }
-
         def sonic_branch = ""
 
         if (topic_map["IMAGE_BRANCH"] && ci_tools.is_parameter_contains_value(topic_map["IMAGE_BRANCH"])) {
