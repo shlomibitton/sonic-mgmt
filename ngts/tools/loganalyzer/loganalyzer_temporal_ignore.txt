@@ -1,0 +1,4 @@
+r, ".* ERR swss#orchagent: :- update: Failed to get port by bridge port ID.*"
+r, ".* INFO bgp#supervisord .* ERRO pool .* event buffer overflowed.*"
+r, ".* ERR bgp#/supervisor-proc-exit-listener: Syntax of the line .* in critical_processes file is incorrect.*"
+r, ".* ERR swss#orchagent: .* FdbOrch .* Failed to locate vlan.*port from bv_id"

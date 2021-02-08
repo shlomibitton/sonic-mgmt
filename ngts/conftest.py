@@ -20,6 +20,9 @@ logger = logging.getLogger()
 pytest_plugins = ('ngts.tools.sysdumps')
 
 
+pytest_plugins = ('ngts.tools.loganalyzer')
+
+
 @pytest.fixture(scope='session')
 def is_simx(request):
     """
