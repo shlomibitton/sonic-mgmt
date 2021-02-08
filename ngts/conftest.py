@@ -81,6 +81,11 @@ def show_platform_summary(topology_obj):
 
 @pytest.fixture(autouse=True)
 def skip_test_according_to_ngts_skip(request, show_platform_summary):
+    """
+    This fixture doing skip for test cases according to BUG ID in Redmine/GitHub or platform
+    :param request: pytest buildin
+    :param show_platform_summary: output for cmd 'show platform summary' from fixture show_platform_summary
+    """
     skip_marker = 'ngts_skip'
     if request.node.get_closest_marker(skip_marker):
         rm_ticket_list = request.node.get_closest_marker(skip_marker).args[0].get('rm_ticket_list')
@@ -89,6 +94,24 @@ def skip_test_according_to_ngts_skip(request, show_platform_summary):
         operand = request.node.get_closest_marker(skip_marker).args[0].get('operand', 'or')
 
         ngts_skip(show_platform_summary, rm_ticket_list, github_ticket_list, platform_prefix_list, operand)
+
+
+def pytest_runtest_setup(item):
+    """
+    Pytest hook - see https://docs.pytest.org/en/stable/reference.html#pytest.hookspec.pytest_runtest_setup
+    """
+    ngts_skip_test_change_fixture_execution_order(item)
+
+
+def ngts_skip_test_change_fixture_execution_order(item):
+    """
+    The purpose of this method is to change the order of fixtures execution - skip test by ngts logic should be run first
+    Otherwise autouse fixtures of ignored tests will be running, even if the test case is skipped.
+    :param item: pytest buildin
+    """
+    ngts_skip_fixture = item.fixturenames.pop(item.fixturenames.index('skip_test_according_to_ngts_skip'))
+    if ngts_skip_fixture:
+        item.fixturenames.insert(0, ngts_skip_fixture)
 
 
 def pytest_sessionfinish(session, exitstatus):
