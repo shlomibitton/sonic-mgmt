@@ -263,7 +263,7 @@
         <name> watchdog </name>
         <tout> 1200 </tout>
         <ignore>
-            <bug> 2219143 </bug>
+            <bug> 2269112 </bug>
         </ignore>
 
         <cmd>
