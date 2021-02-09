@@ -232,11 +232,12 @@ class CoppBase:
             logger.info('The dispatch time is {:10.4f} '.format(self.dispatch_time))
             logger.info('The delta of RX counters is {} '.format(rx_count))
             rx_pps = int(rx_count / self.dispatch_time)
-            logger.info("Verify that received pps({}) is in allowed rate: {} +-10%".format(rx_pps, expected_pps))
-            assert int(rx_pps) > int(expected_pps) * 0.9, \
-                "The received pps {} is less then 90% of expected {}".format(rx_pps, expected_pps)
-            assert int(rx_pps) < int(expected_pps) * 1.1, \
-                "The received pps {} is bigger then 110% of expected {}".format(rx_pps, expected_pps)
+            # We use +- 15% threshold due to not possible to be more precise
+            logger.info("Verify that received pps({}) is in allowed rate: {} +-15%".format(rx_pps, expected_pps))
+            assert int(rx_pps) > int(expected_pps) * 0.85, \
+                "The received pps {} is less then 85% of expected {}".format(rx_pps, expected_pps)
+            assert int(rx_pps) < int(expected_pps) * 1.15, \
+                "The received pps {} is bigger then 115% of expected {}".format(rx_pps, expected_pps)
 
     # -------------------------------------------------------------------------------
 
