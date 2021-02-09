@@ -296,20 +296,23 @@ def recover_topology(ansible_path, mgmt_docker_engine, hypervisor_engine, dut_na
         hypervisor_engine.run("virsh list")
 
         with mgmt_docker_engine.cd(ansible_path):
-            mgmt_docker_engine.run("./testbed-cli.sh start-vms server_{} vault".format(vms_number))
+            cmd = "./testbed-cli.sh start-vms server_{} vault".format(vms_number)
+            logger.info("Running CMD: {}".format(cmd))
+            mgmt_docker_engine.run(cmd)
 
     logger.info("Continue preparing topology for SONiC testing")
     with mgmt_docker_engine.cd(ansible_path):
         logger.info("Remove all topologies. This may increase a chance to deploy a new one successful")
         for topology in constants.TOPO_ARRAY:
             logger.info("Remove topo {}".format(topology))
-            mgmt_docker_engine.run("./testbed-cli.sh remove-topo {SWITCH}-{TOPO} vault".format(SWITCH=dut_name,
-                                                                                               TOPO=topology),
-                                   warn=True)
+            cmd = "./testbed-cli.sh remove-topo {SWITCH}-{TOPO} vault".format(SWITCH=dut_name, TOPO=topology)
+            logger.info("Running CMD: {}".format(cmd))
+            mgmt_docker_engine.run(cmd, warn=True)
 
         logger.info("Add topology")
-        mgmt_docker_engine.run("./testbed-cli.sh add-topo {SWITCH}-{TOPO} vault".format(SWITCH=dut_name,
-                                                                                        TOPO=sonic_topo))
+        cmd = "./testbed-cli.sh add-topo {SWITCH}-{TOPO} vault".format(SWITCH=dut_name, TOPO=sonic_topo)
+        logger.info("Running CMD: {}".format(cmd))
+        mgmt_docker_engine.run(cmd)
 
 
 @separate_logger
@@ -324,6 +327,7 @@ def install_image(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, image_
                                                                                           topo=sonic_topo,
                                                                                           upgrade_type=upgrade_type,
                                                                                           image_url=image_url)
+        logger.info("Running CMD: {}".format(cmd))
         mgmt_docker_engine.run(cmd)
 
 
