@@ -27,13 +27,17 @@
 - import_tasks: fanout_mlnx.yml
   when: os == 'mellanox'
 
-- block:
-  - set_fact:
-      leaf_name: "{{ inventory_hostname }}"
-      leaf: "{{ ansible_host }}"
-
-  - import_tasks: rootfanout_connect.yml
-    vars:
-      deploy_leaf: true
-  when: sw_type == 'FanoutLeaf'
-  tags: always
+# UNCOMMENT ONCE FIXED!
+# Temporarly comment this block out localy since it causes deploy fanout playbook to fail.
+# Anyway it is only needed for testbeds with multiple fanouts which is not our case.
+# Need to merge all the latest sonic-mgmt changes from upstream which should resolve it
+#- block:
+#  - set_fact:
+#      leaf_name: "{{ inventory_hostname }}"
+#      leaf: "{{ ansible_host }}"
+#
+#  - import_tasks: rootfanout_connect.yml
+#    vars:
+#      deploy_leaf: true
+#  when: sw_type == 'FanoutLeaf'
+#  tags: always
