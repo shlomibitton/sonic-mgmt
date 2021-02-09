@@ -25,6 +25,9 @@
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts dhcp_relay/test_dhcp_relay.py </static_args>
             </params>
         </cmd>
+        <ignore>
+                <bug>2115025</bug>
+        </ignore>
     </case>
 
     <case>
@@ -36,6 +39,9 @@
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts dhcp_relay/test_dhcp_pkt_fwd.py </static_args>
             </params>
         </cmd>
+        <ignore>
+                <bug>2115025</bug>
+        </ignore>
     </case>
 
 </CASEDEF>
