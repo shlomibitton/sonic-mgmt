@@ -18,7 +18,7 @@ from infra.constants.constants import LinuxConsts, ConfigDbJsonConst, SonicConst
 logger = logging.getLogger("sonic_split_configuration_script")
 
 
-SHARED_MOUNTS_HTTP_SERVER_URL = "http://fit69.mtl.labs.mlnx"
+SHARED_MOUNTS_HTTP_SERVER_URL = "http://10.7.34.69"
 
 
 def set_logger(log_level):
