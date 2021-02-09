@@ -17,6 +17,8 @@ from ngts.tools.skip_test.skip import ngts_skip
 from distutils.dist import strtobool
 logger = logging.getLogger()
 
+pytest_plugins = ('ngts.tools.sysdumps')
+
 
 @pytest.fixture(scope='session')
 def is_simx(request):
@@ -124,3 +126,20 @@ def pytest_sessionfinish(session, exitstatus):
     allure_server_port = '5050'
     allure_report_dir = session.config.known_args_namespace.allure_report_dir
     AllureServer(allure_server_ip, allure_server_port, allure_report_dir).generate_allure_report()
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    Pytest hook which are executed in all phases: Setup, Call, Teardown
+    :param item: pytest buildin
+    :param call: pytest buildin
+    """
+    # execute all other hooks to obtain the report object
+    outcome = yield
+    rep = outcome.get_result()
+
+    # set a report attribute for phase of a call, which can
+    # be "setup", "call", "teardown"
+
+    setattr(item, "rep_" + rep.when, rep)

@@ -113,3 +113,15 @@ class SonicGeneralCli(GeneralCliCommon):
                        tries=5,
                        delay=10,
                        logger=logger)
+
+    @staticmethod
+    def generate_techsupport(engine, duration=60):
+        """
+        Generate sysdump for a given time frame in seconds
+        :param engine: ssh engine object
+        :param duration: time frame in seconds
+        :return: dump path
+        """
+        with allure.step('Generate Techsupport of last {} seconds'.format(duration)):
+            output = engine.run_cmd('sudo generate_dump -s \"-{} seconds\"'.format(duration))
+            return output.splitlines()[-1]
