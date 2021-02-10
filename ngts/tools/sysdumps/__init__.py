@@ -19,7 +19,7 @@ def session_id():
     Get MARS session id from environment variables
     :return: session id
     """
-    return os.environ.get(ENV_SESSION_ID)
+    return os.environ.get(ENV_SESSION_ID, '')
 
 
 @pytest.fixture(scope='session')
