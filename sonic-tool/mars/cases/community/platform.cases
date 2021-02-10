@@ -316,7 +316,7 @@
     <case>
         <info> Test PSU Fan API Case </info>
         <name> platform_api_psu_fans </name>
-        <tout> 500 </tout>
+        <tout> 1000 </tout>
 
         <cmd>
              <params>
