@@ -26,6 +26,7 @@ class InterfaceConfigTemplate:
                     iface = interface_info['iface']
                     speed = interface_info.get('speed')
                     mtu = interface_info.get('mtu')
+                    dynamic_port_breakout = interface_info.get('dpb')
                     if interface_info.get('create'):
                         if_type = interface_info['type']
                         cli_object.interface.add_interface(stub_engine, iface, if_type)
@@ -34,6 +35,10 @@ class InterfaceConfigTemplate:
                         cli_object.interface.set_interface_speed(stub_engine, iface, speed)
                     if mtu:
                         cli_object.interface.set_interface_mtu(stub_engine, iface, mtu)
+                    if dynamic_port_breakout:
+                        breakout_mode = dynamic_port_breakout['breakout_mode']
+                        cli_object.interface.configure_dpb_on_port(stub_engine, iface, breakout_mode,
+                                                                   expect_error=False, force=False)
                 conf[player_alias] = stub_engine.commands_list
 
             parallel_config_runner(topology_obj, conf)
@@ -56,12 +61,17 @@ class InterfaceConfigTemplate:
                     iface = interface_info['iface']
                     original_speed = interface_info.get('original_speed')
                     original_mtu = interface_info.get('original_mtu')
+                    dynamic_port_breakout = interface_info.get('dpb')
                     if original_speed:
                         cli_object.interface.set_interface_speed(stub_engine, iface, original_speed)
                     if original_mtu:
                         cli_object.interface.set_interface_mtu(stub_engine, iface, original_mtu)
                     if interface_info.get('create'):
                         cli_object.interface.del_interface(stub_engine, iface)
+                    if dynamic_port_breakout:
+                        original_breakout_mode = dynamic_port_breakout['original_breakout_mode']
+                        cli_object.interface.configure_dpb_on_port(stub_engine, iface, original_breakout_mode,
+                                                                   expect_error=False, force=True)
                 conf[player_alias] = stub_engine.commands_list
 
             parallel_config_runner(topology_obj, conf)

@@ -90,3 +90,12 @@ class SonicLagLacpCli(LagLacpCliCommon):
         :return: command output
         """
         return engine.run_cmd("sudo config portchannel member del {} {}".format(lacp_interface_name, interface))
+
+    @staticmethod
+    def show_interfaces_port_channel(engine):
+        """
+        This method performs show portchannel command
+        :param engine: ssh engine object
+        :return: command output
+        """
+        return engine.run_cmd("show interfaces portchannel")
