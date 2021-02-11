@@ -48,6 +48,7 @@ def loganalyzer_load_temporal_ignore(loganalyzer):
     """
     Extend loganalyzer common ignore regexp by custom regexps if such defined.
     """
-    ignore_reg_exp = loganalyzer.parse_regexp_file(src=TEMP_IGNORE)
-    loganalyzer.ignore_regex.extend(ignore_reg_exp)
+    if loganalyzer:
+        ignore_reg_exp = loganalyzer.parse_regexp_file(src=TEMP_IGNORE)
+        loganalyzer.ignore_regex.extend(ignore_reg_exp)
     yield

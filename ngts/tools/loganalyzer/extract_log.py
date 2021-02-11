@@ -192,7 +192,7 @@ def calculate_files_to_copy(filenames, file_with_latest_line):
 
 def combine_logs_and_save(directory, filenames, start_string, target_filename):
     do_copy = False
-    with open(target_filename, 'w') as fp:
+    with open(target_filename, 'w+') as fp:
         for filename in reversed(filenames):
             path = os.path.join(directory, filename)
             log_file = None
@@ -206,6 +206,7 @@ def combine_logs_and_save(directory, filenames, start_string, target_filename):
                         do_copy = True
                     if do_copy:
                         fp.write(line)
+    os.chmod(target_filename, 0o777)
 
 
 def extract_log(directory, prefixname, target_string, target_filename):
