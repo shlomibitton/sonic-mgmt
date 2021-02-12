@@ -84,7 +84,7 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
             self.dut_engine.run_cmd_set(cleanup_engine.commands_list)
 
-    @pytest.mark.ngts_skip({'rm_ticket_list': [2443647]})
+    @pytest.mark.ngts_skip({'github_ticket_list': ['https://github.com/Azure/sonic-buildimage/issues/6053']})
     def test_dhcp_relay_release_message(self):
         dhcp_release = '0x7'
         bootp_body = 'chaddr={},ciaddr="{}"'.format(self.chaddr, self.expected_ip)
@@ -181,7 +181,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    @pytest.mark.ngts_skip({'rm_ticket_list': [2443647]})
+    @pytest.mark.ngts_skip({'github_ticket_list': ['https://github.com/Azure/sonic-buildimage/issues/6053']})
     def test_dhcp_relay_unicast_request_message(self):
         try:
             with allure.step('Getting IP address from DHCP server via DHCP relay functionality'):
@@ -268,7 +268,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
-    def test_dhcp_relay_upd_packet_with_src_and_dst_ports_the_same_as_dhcp(self):
+    def test_dhcp_relay_udp_packet_with_src_and_dst_ports_the_same_as_dhcp(self):
         tcpdump_filter_src_1_2_3_4 = "src 1.2.3.4"
         dst_ip = "30.0.0.2"
         udp_pkt = 'Ether(dst="{}")/IP(src="1.2.3.4",dst="{}")/UDP(sport=68,dport=67)/Raw()'.format(self.dut_mac, dst_ip)
