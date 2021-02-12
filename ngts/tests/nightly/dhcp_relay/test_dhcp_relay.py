@@ -2,10 +2,12 @@ import pytest
 import allure
 import logging
 
+from retry.api import retry_call
 from ngts.config_templates.vlan_config_template import VlanConfigTemplate
 from ngts.config_templates.ip_config_template import IpConfigTemplate
 from ngts.config_templates.dhcp_relay_config_template import DhcpRelayConfigTemplate
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
+from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
 
 logger = logging.getLogger()
 num_of_dhcp_servers = 10
@@ -15,7 +17,6 @@ num_of_dhcp_servers = 10
 def configure_dhcp_scale(topology_obj):
     dutha1 = topology_obj.ports['dut-ha-1']
     duthb1 = topology_obj.ports['dut-hb-1']
-    hadut1 = topology_obj.ports['ha-dut-1']
     hbdut1 = topology_obj.ports['hb-dut-1']
     dhcp_client_vlan = 100
     dhcp_servers_first_vlan = 101
@@ -27,7 +28,6 @@ def configure_dhcp_scale(topology_obj):
 
     ip_config_dict = {
         'dut': [{'iface': 'Vlan100', 'ips': [('10.0.0.1', '24')]}],
-        'ha': [{'iface': hadut1, 'ips': [('10.0.0.2', '24')]}],
         'hb': []
     }
 
@@ -48,6 +48,13 @@ def configure_dhcp_scale(topology_obj):
     DhcpRelayConfigTemplate.configuration(topology_obj, dhcp_relay_config_dict)
     logger.info('DHCP relay scale configuration completed')
 
+    # Validation below required for update ARP for peers(DHCP servers)
+    for item in range(dhcp_servers_first_vlan, dhcp_servers_first_vlan + num_of_dhcp_servers):
+        validation_create_arp_ipv4 = {'sender': 'hb', 'args': {'interface': '{}.{}'.format(hbdut1, item),
+                                                               'count': 3, 'dst': '10.{}.0.1'.format(item)}}
+        ping_checker = PingChecker(topology_obj.players, validation_create_arp_ipv4)
+        retry_call(ping_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
+
     yield
 
     logger.info('Starting DHCP relay scale configuration cleanup')
@@ -57,7 +64,6 @@ def configure_dhcp_scale(topology_obj):
     logger.info('DHCP relay scale configuration completed')
 
 
-@pytest.mark.skip(reason="skipped due debugging")
 @allure.title('Test DHCP Relay scale')
 def test_dhcp_relay_few_dhcp_servers(topology_obj, configure_dhcp_scale):
     """
