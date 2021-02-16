@@ -1,5 +1,5 @@
-docker_registry_host: arc-build-server:5000
+docker_registry_host: harbor.mellanox.com/sonic
 
-docker_registry_username: admin
-docker_registry_password: admin
+docker_registry_username: sonicdev
+docker_registry_password: Dev12345
 
