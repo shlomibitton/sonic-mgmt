@@ -24,7 +24,7 @@ class ChassisConst:
                            'chip_type': "SPC3"
                            }
 
-    MAIN_FRU_DIC[LIGER] = {'fru': ['4600V'],
+    MAIN_FRU_DIC[LIGER] = {'fru': ['4600'],
                            'port_number': 64,
                            'chip_type': "SPC3"
                            }

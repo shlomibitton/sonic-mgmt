@@ -28,7 +28,7 @@ def init_parser():
     description = ('Functionality of the script: \n'
                    '1. Get switch connectivity via LLDP protocol.\n'
                    '2. Get additional information from switch.\n'
-                   '   (number of ports in setup, switches/hosts names and IP’s, type, HwSku.\n'
+                   '   (number of ports in setup, switches/hosts names and IPs, type, HwSku.\n'
                    '3. Export setup information to Noga (connectivity, aliases and additional information).\n'
                    '4. create .setup file for setup.\n')
 
