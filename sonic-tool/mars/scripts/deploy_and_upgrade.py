@@ -332,16 +332,24 @@ def install_image(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, image_
 
 
 @separate_logger
-def deploy_minigprah(ansible_path, mgmt_docker_engine, dut_name, sonic_topo):
+def deploy_minigprah(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, recover_by_reboot):
     """
     Method which doing minigraph deploy on DUT
     """
     with mgmt_docker_engine.cd(ansible_path):
-        logger.info("Deploying minigraph")
         cmd = "ansible-playbook -i inventory --limit {SWITCH}-{TOPO} deploy_minigraph.yml " \
               "-e dut_minigraph={SWITCH}.{TOPO}.xml -b -vvv".format(SWITCH=dut_name, TOPO=sonic_topo)
         logger.info("Running CMD: {}".format(cmd))
-        mgmt_docker_engine.run(cmd)
+        if recover_by_reboot:
+            try:
+                logger.info("Deploying minigraph")
+                return mgmt_docker_engine.run(cmd)
+            except Exception:
+                logger.warning("Failed in Deploying minigraph")
+                logger.warning("Performing a reboot and retrying")
+                reboot_validation(ansible_path, mgmt_docker_engine, "reboot", dut_name, sonic_topo)
+        logger.info("Deploying minigraph")
+        return mgmt_docker_engine.run(cmd)
 
 
 @separate_logger
@@ -368,21 +376,13 @@ def apply_canonical_config(topo, dut_name):
 
 
 @separate_logger
-def post_install_check(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, recover_by_reboot):
+def post_install_check(ansible_path, mgmt_docker_engine, dut_name, sonic_topo):
     """
     Method which doing post install checks: check ports status, check dockers status, etc.
     """
     with mgmt_docker_engine.cd(ansible_path):
         post_install_validation = "ansible-playbook -i inventory --limit {SWITCH}-{TOPO} post_upgrade_check.yml -e topo={TOPO} " \
               "-b -vvv".format(SWITCH=dut_name, TOPO=sonic_topo)
-        if recover_by_reboot:
-            try:
-                logger.info("Performing post-install validation by running: {}".format(post_install_validation))
-                return mgmt_docker_engine.run(post_install_validation)
-            except Exception:
-                logger.warning("Failed in post-installation validation")
-                logger.warning("Performing a reboot and retrying")
-                reboot_validation(ansible_path, mgmt_docker_engine, "reboot", dut_name, sonic_topo)
         logger.info("Performing post-install validation by running: {}".format(post_install_validation))
         return mgmt_docker_engine.run(post_install_validation)
 
@@ -472,10 +472,10 @@ def main():
         apply_canonical_config(topo=args.topo, dut_name=args.dut_name)
     else:
         deploy_minigprah(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                         sonic_topo=args.sonic_topo)
+                         sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
 
     post_install_check(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                       sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
+                       sonic_topo=args.sonic_topo)
 
     if image_urls["target_version"]:
         logger.info("Target version is defined, upgrade switch again to the target version.")
@@ -484,7 +484,7 @@ def main():
                       sonic_topo=args.sonic_topo, image_url=image_urls["target_version"], upgrade_type='sonic')
 
         post_install_check(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                           sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
+                           sonic_topo=args.sonic_topo)
 
     if args.reboot and args.reboot != "no":
         reboot_validation(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, reboot=args.reboot,
