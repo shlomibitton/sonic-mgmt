@@ -1,12 +1,19 @@
 import logging
 import pytest
+import json
+import ptf.testutils as testutils
 
+from ipaddress import ip_interface
 from natsort import natsorted
-
+from tests.common.config_reload import config_reload
+from tests.common.helpers.assertions import pytest_assert
 from tests.common.helpers.assertions import pytest_assert as pt_assert
 from tests.common.helpers.dut_ports import encode_dut_port_name
 
 logger = logging.getLogger(__name__)
+
+UPPER_TOR = 'upper_tor'
+LOWER_TOR = 'lower_tor'
 
 
 @pytest.fixture(scope='session')
@@ -74,6 +81,20 @@ def lower_tor_host(duthosts):
     return dut
 
 
+def map_hostname_to_tor_side(tbinfo, hostname):
+    if 'dualtor' not in tbinfo['topo']['name']:
+        return None
+
+    if hostname not in tbinfo['duts_map']:
+        return None
+    if tbinfo['duts_map'][hostname] == 0:
+        return UPPER_TOR
+    elif tbinfo['duts_map'][hostname] == 1:
+        return LOWER_TOR
+    else:
+        return None
+
+
 def get_t1_ptf_ports(dut, tbinfo):
     '''
     Gets the PTF ports connected to a given DUT for the first T1
@@ -95,6 +116,54 @@ def get_t1_ptf_ports(dut, tbinfo):
     logger.info("Using portchannel ports {} on PTF for DUT {}".format(ptf_portchannel_intfs, dut.hostname))
     return ptf_portchannel_intfs
 
+def update_mux_configs_and_config_reload(dut, state):
+    """
+    @summary: Update config_db.json, and then load with 'config reload'
+            Please note that this is a general method, and caller must
+            backup config_db.json and do a restore at the end.
+    @param dut: The DUT we are testing against
+    @param state: A str, auto|active|standby
+    """
+    STATE_LIST = ['auto', 'active', 'standby']
+    pytest_assert(state in STATE_LIST, "state should be one of {}".format(STATE_LIST))
+
+    mux_cable_config = dut.shell("sonic-cfggen -d  --var-json 'MUX_CABLE'")['stdout']
+    pytest_assert(len(mux_cable_config.strip()) != 0, "No mux_cable configuration is found in config_db")
+
+    # Update mux_cable state and dump to a temp file
+    mux_cable_config_json = json.loads(mux_cable_config)
+    for _, config in mux_cable_config_json.items():
+            config['state'] = state
+    mux_cable_config_json = {"MUX_CABLE": mux_cable_config_json}
+    TMP_FILE = "/tmp/mux_config.json"
+    with open(TMP_FILE, "w") as f:
+        json.dump(mux_cable_config_json, f)
+
+    dut.copy(src=TMP_FILE, dest=TMP_FILE)
+
+    # Load updated mux_cable config with sonic-cfggen
+    cmds = [
+        "sonic-cfggen -j {} -w".format(TMP_FILE),
+        "config save -y"
+    ]
+    dut.shell_cmds(cmds=cmds)
+    config_reload(dut)
+    dut.file(path=TMP_FILE, state='absent')
+
+
+def force_active_tor(dut, intf):
+    """
+    @summary: Manually set dut host to the active tor for intf
+    @param dut: The duthost for which to toggle mux
+    @param intf: One or a list of names of interface or 'all' for all interfaces
+    """
+    if type(intf) == str:
+        cmds = ["config muxcable mode active {}".format(intf)]
+    else:
+        cmds = []
+        for i in intf:
+            cmds.append("config muxcable mode active {}".format(i))
+    dut.shell_cmds(cmds=cmds)
 
 def _get_tor_fanouthosts(tor_host, fanouthosts):
     """Helper function to get the fanout host objects that the current tor_host connected to.
@@ -404,3 +473,31 @@ def shutdown_t1_tor_intfs(upper_tor_host, lower_tor_host, nbrhosts, tbinfo):
     logger.info('Recover T1 VM ports connected to tor')
     for eos_host, vm_intf in down_intfs:
         eos_host.no_shutdown(vm_intf)
+
+
+@pytest.fixture(scope='function', autouse=True)
+def start_linkmgrd_heartbeat(ptfadapter, duthost, tbinfo):
+    '''
+    Send a GARP from from PTF->ToR from each PTF port connected to a mux cable
+
+    This is needed since linkmgrd will not start sending heartbeats until the PTF MAC is learned in the DUT neighbor table
+    '''
+    garp_pkts = {}
+
+    ptf_indices = duthost.get_extended_minigraph_facts(tbinfo)["minigraph_ptf_indices"]
+    mux_cable_table = duthost.get_running_config_facts()['MUX_CABLE']
+
+    for vlan_intf, config in mux_cable_table.items():
+        ptf_port_index = ptf_indices[vlan_intf]
+        server_ip = ip_interface(config['server_ipv4'])
+        ptf_mac = ptfadapter.dataplane.ports[(0, ptf_port_index)].mac()
+
+        garp_pkt = testutils.simple_arp_packet(eth_src=ptf_mac,
+                                               hw_snd=ptf_mac,
+                                               ip_snd=str(server_ip.ip),
+                                               ip_tgt=str(server_ip.ip), # Re-use server IP as target IP, since it is within the subnet of the VLAN IP
+                                               arp_op=2)
+        garp_pkts[ptf_port_index] = garp_pkt
+
+    for port, pkt in garp_pkts.items():
+        testutils.send_packet(ptfadapter, port, pkt)

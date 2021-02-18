@@ -350,13 +350,14 @@ class QosSaiBase:
         """
         duthost = duthosts[rand_one_dut_hostname]
         swapSyncd = request.config.getoption("--qos_swap_syncd")
-        if swapSyncd:
-            docker.swap_syncd(duthost, creds)
+        try:
+            if swapSyncd:
+                docker.swap_syncd(duthost, creds)
 
-        yield
-
-        if swapSyncd:
-            docker.restore_default_syncd(duthost, creds)
+            yield
+        finally:
+            if swapSyncd:
+                docker.restore_default_syncd(duthost, creds)
 
     @pytest.fixture(scope='class', autouse=True)
     def dutConfig(self, request, duthosts, rand_one_dut_hostname, tbinfo):
@@ -529,6 +530,9 @@ class QosSaiBase:
 
                 ".*ERR monit.*'bgp\|bgpmon' status failed.*'/usr/bin/python.* /usr/local/bin/bgpmon' is not running.*",
                 ".*ERR monit.*bgp\|fpmsyncd.*status failed.*NoSuchProcess process no longer exists.*",
+                ".*WARNING syncd#SDK:.*check_attribs_metadata: Not implemented attribute.*",
+                ".*WARNING syncd#SDK:.*sai_set_attribute: Failed attribs check, key:Switch ID.*",
+                ".*WARNING syncd#SDK:.*check_rate: Set max rate to 0.*"
             ]
             loganalyzer[rand_one_dut_hostname].ignore_regex.extend(ignoreRegex)
 
