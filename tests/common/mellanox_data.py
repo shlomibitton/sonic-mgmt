@@ -624,6 +624,60 @@ SWITCH_MODELS = {
                 "number": 1
             }
         }
+    },
+    "x86_64-mlnx_msn4600-r0": {
+        "chip_type": "spectrum3",
+        "reboot": {
+            "cold_reboot": True,
+            "fast_reboot": True,
+            "warm_reboot": True
+        },
+        "fans": {
+            "number": 3,
+            "hot_swappable": True
+        },
+        "psus": {
+            "number": 2,
+            "hot_swappable": True
+        },
+        "cpu_pack": {
+            "number": 1
+        },
+        "cpu_cores": {
+            "number": 4
+        },
+        "ports": {
+            "number": 64
+        },
+        "thermals": {
+            "cpu_core": {
+                "start": 0,
+                "number": 4
+            },
+            "module": {
+                "start": 1,
+                "number": 64
+            },
+            "psu": {
+                "start": 1,
+                "number": 2
+            },
+            "cpu_pack": {
+                "number": 1
+            },
+            "asic_ambient": {
+                "number": 1
+            },
+            "port_ambient": {
+                "number": 1
+            },
+            "fan_ambient": {
+                "number": 1
+            },
+            "comex_ambient": {
+                "number": 1
+            }
+        }
     }
 }
 
