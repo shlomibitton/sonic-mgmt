@@ -332,7 +332,7 @@
     <case>
         <info> Test Fan Drawer Fans API Case </info>
         <name> platform_api_fan_drawer_fans </name>
-        <tout> 600 </tout>
+        <tout> 1200 </tout>
 
         <cmd>
              <params>
