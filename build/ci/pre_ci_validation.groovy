@@ -48,7 +48,11 @@ def run_step(name, ci_tools) {
             version_name = mgmt_tools.get_lastrc_version(ci_tools, sonic_branch)
             print "Image version is defined by lastrc link for branch: ${sonic_branch}"
         }
-        //TODO support public
+
+        if (version_name.contains("_Public")) {
+            env.VERSION_DIRECTORY = env.VERSION_DIRECTORY + "/public"
+        }
+
         def bin_path = "${env.VERSION_DIRECTORY}/${version_name}/Mellanox/sonic-mellanox.bin"
         if (! new File(bin_path).exists()) {
                 error "ERROR: bin file not found: ${bin_path}"

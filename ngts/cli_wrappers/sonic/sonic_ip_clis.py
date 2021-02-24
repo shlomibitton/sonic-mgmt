@@ -42,3 +42,11 @@ class SonicIpCli(IpCliCommon):
         :return: command output
         """
         SonicIpCli.add_del_ip_from_interface(engine, 'remove', interface, ip, mask)
+
+    @staticmethod
+    def show_ip_interfaces(engine):
+        """
+        This method shows ip configuration on interfaces
+        :return: the output of the command "show ip interfaces"
+        """
+        return engine.run_cmd('sudo show ip interfaces')

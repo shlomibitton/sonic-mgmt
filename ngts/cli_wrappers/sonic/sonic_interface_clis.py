@@ -6,6 +6,7 @@ from ngts.cli_util.cli_parsers import generic_sonic_output_parser
 
 logger = logging.getLogger()
 
+
 class SonicInterfaceCli(InterfaceCliCommon):
 
     @staticmethod
@@ -170,3 +171,35 @@ class SonicInterfaceCli(InterfaceCliCommon):
 
         for port in ports_list:
             assert ports_status[port]['Oper'] == expected_status
+
+    def configure_dpb_on_ports(self, engine, conf, expect_error=False, force=False):
+        for breakout_mode, ports_list in conf.items():
+            for port in ports_list:
+                self.configure_dpb_on_port(engine, port, breakout_mode, expect_error, force)
+
+    @staticmethod
+    def configure_dpb_on_port(engine, port, breakout_mode, expect_error=False, force=False):
+        """
+        :param engine: ssh engine object
+        :param port: i.e, Ethernet0
+        :param breakout_mode: i.e, 4x50G[40G,25G,10G,1G]
+        :param expect_error: True if breakout configuration is expected to fail, else False
+        :param force: True if breakout configuration should be applied with force, else False
+        :return: command output
+        """
+        logger.info('Configuring breakout mode: {} on port: {}, force mode: {}'.format(breakout_mode, port, force))
+        force = "" if force is False else "-f"
+        try:
+            cmd = 'sudo config interface breakout {PORT} {MODE} -y {FORCE}'.format(PORT=port,
+                                                                                   MODE=breakout_mode,
+                                                                                   FORCE=force)
+            output = engine.send_config_set([cmd, 'y'])
+            logger.info(output)
+            return output
+        except Exception as e:
+            if expect_error:
+                logger.info(output)
+                return output
+            else:
+                raise AssertionError("Command: {} failed with error {} when was expected to pass".format(cmd, e))
+

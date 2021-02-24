@@ -576,7 +576,7 @@ class CpldComponent(FwComponent):
         cpld_ver_major = cpld_ver[:5]
         cpld_ver_minor = cpld_ver[5:]
 
-        return cpld_ver_major, cpld_ver_minor
+        return cpld_pn, cpld_ver_major, cpld_ver_minor
 
     def __parse_update_version(self, files_path, file_name):
         fw_path = os.path.join(files_path, file_name)
@@ -615,14 +615,14 @@ class CpldComponent(FwComponent):
         cpld_ver_major = cpld_ver[:5]
         cpld_ver_minor = cpld_ver[5:]
 
-        return cpld_ver_major, cpld_ver_minor
+        return cpld_pn, cpld_ver_major, cpld_ver_minor
 
-    def __parse_version(self, files_path, file_name, fw_status, fw_type):
+    def __parse_version(self, files_path, file_name, fw_status, fw_type, platform_type):
         # parse CPLD version
         if fw_type == FW_TYPE_INSTALL:
-            cpld_ver_major, cpld_ver_minor = self.__parse_install_version(files_path, file_name)
+            cpld_pn, cpld_ver_major, cpld_ver_minor = self.__parse_install_version(files_path, file_name)
         else:
-            cpld_ver_major, cpld_ver_minor = self.__parse_update_version(files_path, file_name)
+            cpld_pn, cpld_ver_major, cpld_ver_minor = self.__parse_update_version(files_path, file_name)
 
         # parse component version
         comp_pn = fw_status[self.get_name()]['version'].split('_')[0]
@@ -630,11 +630,12 @@ class CpldComponent(FwComponent):
         comp_ver_major = comp_ver[:5]
         comp_ver_minor = comp_ver[5:]
 
-        # TODO: Provide better way for handling minor version support
-        if int(comp_ver_minor) != 0:
-            parsed_ver = "{}_{}{}".format(comp_pn, cpld_ver_major, cpld_ver_minor)
-        else:
-            parsed_ver = "{}_{}00".format(comp_pn, cpld_ver_major)
+        parsed_ver = "{}_{}{}".format(cpld_pn, cpld_ver_major, cpld_ver_minor)
+
+        # handle not supported CPLD3 (Port CPLD) P/N and version minor on SPC-1
+        if platform_type in ['x86_64-mlnx_msn2700-r0', 'x86_64-mlnx_msn2410-r0']:
+            if self.get_name() == 'CPLD3':
+                parsed_ver = "{}_{}{}".format(comp_pn, cpld_ver_major, comp_ver_minor)
 
         return parsed_ver, cpld_ver_major == comp_ver_major
 
@@ -668,10 +669,10 @@ class CpldComponent(FwComponent):
 
         for file_name in os.listdir(files_path):
             if file_name.startswith(latest):
-                latest_ver, is_latest = self.__parse_version(files_path, file_name, fw_status, fw_type)
+                latest_ver, is_latest = self.__parse_version(files_path, file_name, fw_status, fw_type, platform_type)
                 latest_fw_path = os.path.realpath(os.path.join(files_path, file_name))
             if file_name.startswith(other):
-                previous_ver, is_previous = self.__parse_version(files_path, file_name, fw_status, fw_type)
+                previous_ver, is_previous = self.__parse_version(files_path, file_name, fw_status, fw_type, platform_type)
                 previous_fw_path = os.path.realpath(os.path.join(files_path, file_name))
 
         if latest_fw_path is None or previous_fw_path is None:
@@ -1044,9 +1045,9 @@ def install_firmware(request, fw_path, fw_version):
         logger.info("Remove firmware from {}: remote_path={}".format(hostname, remote_fw_path))
         duthost.file(path=remote_fw_path, state='absent')
 
-    logger.info("Get {} firmware status".format(comp_name))
     fw_status = get_fw_status(duthost)
     comp_fw_status = fw_status[comp_name]
+    logger.info("Parsed {} firmware status:\n{}".format(comp_name, json.dumps(comp_fw_status, indent=4)))
 
     logger.info("Verify {} firmware is updated: version={}".format(comp_name, fw_version))
     if not component_object.check_version(fw_version, comp_fw_status):
@@ -1084,9 +1085,9 @@ def update_firmware(request, fw_path, fw_version, image_type):
             logger.info("Remove firmware from {}: remote_path={}".format(hostname, remote_fw_path))
             duthost.file(path=remote_fw_path, state='absent')
 
-    logger.info("Get {} firmware status".format(comp_name))
     fw_status = get_fw_status(duthost)
     comp_fw_status = fw_status[comp_name]
+    logger.info("Parsed {} firmware status:\n{}".format(comp_name, json.dumps(comp_fw_status, indent=4)))
 
     logger.info("Verify {} firmware is updated: version={}".format(comp_name, fw_version))
     if not component_object.check_version(fw_version, comp_fw_status):

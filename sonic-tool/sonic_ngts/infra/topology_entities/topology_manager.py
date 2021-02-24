@@ -116,7 +116,8 @@ class TopologyManager:
         :return: None
         """
         ips = self.get_switches_ips()
-        sorted_switches_ip = sorted(ips, key=ipaddress.IPv4Address)
+        unicode_ip_list = [unicode(ip) for ip in ips]
+        sorted_switches_ip = sorted(unicode_ip_list, key=ipaddress.IPv4Address)
         switch_ip = min(sorted_switches_ip)
         self.dut = self.get_switch_by_ip(switch_ip)
 

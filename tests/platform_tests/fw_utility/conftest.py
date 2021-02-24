@@ -71,7 +71,8 @@ def skip_if_no_update(component_object, component_firmware):
     Fixture that skips test execution in case no firmware updates: previous = latest
     """
     if component_firmware['latest_version'] == component_firmware['previous_version']:
-        pytest.skip("Latest {} firmware is already installed".format(component_object.get_name()))
+        if component_firmware['is_latest_installed']:
+            pytest.skip("Latest {} firmware is already installed".format(component_object.get_name()))
 
 
 @pytest.fixture(scope='function')

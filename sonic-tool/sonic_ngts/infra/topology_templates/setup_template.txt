@@ -5,7 +5,7 @@
 
     <players> {{hypervisor.ip}} </players>
     <steps>
-        <default> steps/ngts_regression.steps </default>
+        <default> steps/ngts_regression_single_repo.steps </default>
     </steps>
 
     <topology_file> topo/{{tm.setup_name}}/topology.xml </topology_file>
@@ -13,13 +13,13 @@
     <execution_block>
         <block_id> B_ID1 </block_id>
         <entry_points> SONIC_MGMT </entry_points>
-        <tests_dbs_tarball> sonic-tool/mars/dbs/platform.db </tests_dbs_tarball>
+        <tests_dbs_tarball> sonic-mgmt/sonic-tool/mars/dbs/community/platform.db </tests_dbs_tarball>
     </execution_block>
 
     <execution_block>
         <block_id> B_ID2 </block_id>
         <entry_points> NGTS </entry_points>
-        <tests_dbs_tarball> sonic-tool/sonic_ngts/tests.db </tests_dbs_tarball>
+        <tests_dbs_tarball> sonic-mgmt/sonic-tool/mars/dbs/canonical/nightly.db </tests_dbs_tarball>
     </execution_block>
 
     <extra_info>
@@ -29,8 +29,8 @@
         <dut_ip> {{dut.ip}} </dut_ip>
         <chip_type> {{dut.chip_type}} </chip_type>
         <port_number> {{dut.port_number}} </port_number>
-        <base_version> /auto/sw_system_release/sonic/201911-latest-internal-sonic-mellanox.bin </base_version>
-        <sonic_branch> 201911 </sonic_branch>
+        <base_version> /auto/sw_system_release/sonic/master-latest-internal-sonic-mellanox.bin </base_version>
+        <sonic_branch> master </sonic_branch>
         <simx> no </simx>
         <target_ip> 1.2.3.4 </target_ip>
         <target_version> </target_version>
@@ -60,9 +60,9 @@
         <json_root_dir> /.autodirect/sw_regression/system/SONIC/MARS/metadata </json_root_dir>
         <verbosity> -vvvv </verbosity>
 
-        <custom_tarball_name> SONIC-all_tests_tarball_master.db.1.tgz </custom_tarball_name>
+        <custom_tarball_name> SONIC_CANONICAL-sonic-mgmt_develop.db.1.tgz </custom_tarball_name>
 
-        <pfcwd_dockers_url> http://arc-build-server/sonic/ </pfcwd_dockers_url>
+        <pfcwd_dockers_url> http://fit69.mtl.labs.mlnx/auto/sw_system_project/sonic/docker/ </pfcwd_dockers_url>
         <skip_weekend_cases> yes </skip_weekend_cases>
 
         <skip_deploy_upgrade_step> no </skip_deploy_upgrade_step>

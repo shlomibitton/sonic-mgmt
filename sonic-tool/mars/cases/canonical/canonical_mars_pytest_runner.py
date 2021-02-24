@@ -2,14 +2,19 @@
 
 # Built-in modules
 import sys
+import os
 
 # Local modules
 from reg2_wrapper.common.error_code import ErrorCode
 from reg2_wrapper.utils.parser.cmd_argument import RunningStage
 from reg2_wrapper.test_wrapper.standalone_wrapper import StandaloneWrapper
 
+sigterm_h_path = os.path.normpath(os.path.join(os.path.split(__file__)[0], "../sig_term_handler"))
+sys.path.append(sigterm_h_path)
+from handler_mixin import TermHandlerMixin
 
-class RunPytest(StandaloneWrapper):
+
+class RunPytest(TermHandlerMixin, StandaloneWrapper):
 
     def configure_parser(self):
         super(RunPytest, self).configure_parser()
@@ -43,4 +48,3 @@ class RunPytest(StandaloneWrapper):
 if __name__ == "__main__":
     run_pytest = RunPytest("RunPytest")
     run_pytest.execute(sys.argv[1:])
-

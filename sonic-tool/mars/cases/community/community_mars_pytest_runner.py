@@ -6,6 +6,7 @@ from __future__ import division
 import json
 import os
 import sys
+import time
 
 # Third-party libs
 from xml.etree import ElementTree
@@ -16,8 +17,12 @@ from reg2_wrapper.common.error_code import ErrorCode
 from reg2_wrapper.utils.parser.cmd_argument import RunningStage
 from reg2_wrapper.test_wrapper.standalone_wrapper import StandaloneWrapper
 
+sigterm_h_path = os.path.normpath(os.path.join(os.path.split(__file__)[0], "../sig_term_handler"))
+sys.path.append(sigterm_h_path)
+from handler_mixin import TermHandlerMixin
 
-class RunPytest(StandaloneWrapper):
+
+class RunPytest(TermHandlerMixin, StandaloneWrapper):
 
     def configure_parser(self):
         super(RunPytest, self).configure_parser()
@@ -153,29 +158,23 @@ class RunPytest(StandaloneWrapper):
                          SONIC_TOPO=self.sonic_topo,
                          REPORT_FILE=self.report_file,
                          OPTIONS=self.raw_options)
+        # Take the first epoint as just one is specified in *.setup file. Currently supported are: SONIC_MGMT or NGTS
+        # Take the first player as just one is specified in *.setup file
+        epoint = self.EPoints[0]
+        player = self.Players[0]
 
-        # all_rc = []
-        # for player in self.Players:
-        #     player.chdir(os.path.join(self.sonic_mgmt_path, "tests"))
-        #     rc, output = player.run_command(cmd, shell=True)
-        #     all_rc.append(rc)
-        #     player.logger.info(output)
-        # if sum(all_rc) == 0:
-        #     return ErrorCode.SUCCESS
-        # else:
-        #     return ErrorCode.FAIL
+        self.Logger.info("Starting pytest on sonic-mgmt player")
+        dic_args = self._get_dic_args_by_running_stage(RunningStage.RUN)
+        dic_args["epoint"] = epoint
+        for i in xrange(self.num_of_processes):
+            epoint.Player.testPath = os.path.join(self.sonic_mgmt_path, "tests")
+            epoint.Player.add_remote_test_path(epoint.Player.testPath)
+            epoint.Player.run_process(cmd, shell=True, disable_realtime_log=False, delete_files=False)
+            # Sleep needed to get logs if tests were not executed or even were not collected and exited immediately.
+            time.sleep(2)
 
-        for epoint in self.EPoints:
-            dic_args = self._get_dic_args_by_running_stage(RunningStage.RUN)
-            dic_args["epoint"] = epoint
-            for i in xrange(self.num_of_processes):
-                epoint.Player.testPath = os.path.join(self.sonic_mgmt_path, "tests")
-                epoint.Player.add_remote_test_path(epoint.Player.testPath)
-                epoint.Player.run_process(cmd, shell=True, disable_realtime_log=False, delete_files=False)
-
-        for player in self.Players:
-            rc = player.wait() or rc
-            player.remove_remote_test_path(player.testPath)
+        rc = player.wait() or rc
+        player.remove_remote_test_path(player.testPath)
         return rc
 
     def run_post_commands(self):
