@@ -49,6 +49,7 @@ class LogAnalyzer:
         @return: True for successfull execution False otherwise
         """
         dest_file = "loganalyzer.py"
+        self.dut_engine.run_cmd("sudo rm -f {}".format(os.path.join(self.dut_run_dir, dest_file)))
         self.dut_engine.copy_file(source_file=DUT_LOGANALYZER_MODULE, dest_file=dest_file, file_system=self.dut_run_dir,
             overwrite_file=True, verify_file=False)
 
@@ -149,6 +150,7 @@ class LogAnalyzer:
         logger.info("Loganalyzer init")
 
         dest_file = "loganalyzer.py"
+        self.dut_engine.run_cmd("sudo rm -f {}".format(os.path.join(self.dut_run_dir, dest_file)))
         self.dut_engine.copy_file(source_file=DUT_LOGANALYZER_MODULE, dest_file=dest_file, file_system=self.dut_run_dir,
             overwrite_file=True, verify_file=False)
 
@@ -320,6 +322,7 @@ class LogAnalyzer:
         cmd = "sudo python3 {} -d \'{}\' -p \'{}\' -s \'{}\' -t \'{}\'".format(dut_module_path, directory, file_prefix,
                                                                                start_string, target_filename)
 
+        self.dut_engine.run_cmd("sudo rm -f {}".format(os.path.join(self.dut_run_dir, module_name)))
         self.dut_engine.copy_file(source_file=EXTRACT_LOG_MODULE, dest_file=module_name, file_system=self.dut_run_dir,
             overwrite_file=True, verify_file=False)
         self.dut_engine.run_cmd(cmd)

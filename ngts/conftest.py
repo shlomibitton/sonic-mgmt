@@ -17,7 +17,7 @@ from ngts.tools.skip_test.skip import ngts_skip
 from distutils.dist import strtobool
 logger = logging.getLogger()
 
-pytest_plugins = ('ngts.tools.sysdumps')
+pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer')
 
 
 @pytest.fixture(scope='session')
@@ -122,10 +122,11 @@ def pytest_sessionfinish(session, exitstatus):
     :param session: pytest buildin
     :param exitstatus: pytest buildin
     """
-    allure_server_ip = '10.215.11.120'
-    allure_server_port = '5050'
-    allure_report_dir = session.config.known_args_namespace.allure_report_dir
-    AllureServer(allure_server_ip, allure_server_port, allure_report_dir).generate_allure_report()
+    if not session.config.getoption("--collectonly"):
+        allure_server_ip = '10.215.11.120'
+        allure_server_port = '5050'
+        allure_report_dir = session.config.known_args_namespace.allure_report_dir
+        AllureServer(allure_server_ip, allure_server_port, allure_report_dir).generate_allure_report()
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)

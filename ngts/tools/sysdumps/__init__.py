@@ -66,7 +66,7 @@ def store_techsupport(request, topology_obj, log_folder, session_id):
                     os.chmod(dest_file, 0o777)
         else:
             logger.info('###  Session ID was not provided, assuming this is manual run,'
-                        ' sysdump will be not create  ###')
+                        ' sysdump will not be created  ###')
 
 
 def get_test_duration(request):
