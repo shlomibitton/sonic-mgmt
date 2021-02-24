@@ -360,18 +360,25 @@ def test_lldp_after_disable_on_host(topology_obj):
     ha_engine = topology_obj.players['ha']['engine']
     cli_object = topology_obj.players['ha']['cli']
     ha_dut_1 = topology_obj.ports['ha-dut-1']
-    cli_object.lldp.disable_lldp_on_interface(ha_engine, ha_dut_1)
-    with allure.step("Expect test LLDP to fail after LLDP was disabled on host interface"):
-        try:
-            verify_lldp_info_for_dut_host_ports(topology_obj)
-            raise Exception("Test passed when expected to fail")
-        except AssertionError as e:
-            logger.info("Test failed as expected")
-    logger.info("Start LLDP on host interface")
-    cli_object.lldp.enable_lldp_on_interface(ha_engine, ha_dut_1)
-    with allure.step("Expect test LLDP to pass after LLDP is enabled on host interface"):
-        retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
+    try:
+        cli_object.lldp.disable_lldp_on_interface(ha_engine, ha_dut_1)
+        with allure.step("Expect test LLDP to fail after LLDP was disabled on host interface"):
+            try:
+                verify_lldp_info_for_dut_host_ports(topology_obj)
+                raise Exception("Test passed when expected to fail")
+            except AssertionError as e:
+                logger.info("Test failed as expected")
+        logger.info("Start LLDP on host interface")
+        cli_object.lldp.enable_lldp_on_interface(ha_engine, ha_dut_1)
+        with allure.step("Expect test LLDP to pass after LLDP is enabled on host interface"):
+            retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
 
+    except Exception as err:
+        raise AssertionError(err)
+
+    finally:
+        # cleanup
+        cli_object.lldp.enable_lldp_on_interface(ha_engine, ha_dut_1)
 
 @pytest.mark.build
 @pytest.mark.lldp
