@@ -16,27 +16,6 @@
     </global>
 
     <case>
-        <info> ANNOUNCE_ROUTES Case </info>
-        <name> announce_routes </name>
-        <tout> 3600 </tout>
-        <cmd>
-            <params>
-                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts test_announce_routes.py </static_args>
-            </params>
-        </cmd>
-
-        <post>
-            <info> wait for routes to be in redis DB </info>
-            <name> wait for routes to be in redis DB </name>
-            <type> reg_exec_cmd </type>
-            <tout> 210 </tout>
-            <params>
-                <exec> sleep 180 </exec>
-            </params>
-        </post>
-    </case>
-
-    <case>
         <info> FIB Case </info>
         <name> fib </name>
         <tout> 3600 </tout>
