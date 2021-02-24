@@ -1263,7 +1263,7 @@
         <InterfaceVlan mode="Access" portname="ethernet 1/18/2" vlanids="136"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/19/1" vlanids="137"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/19/2" vlanids="138"/>
-        <InterfaceVlan mode="Access" portname="ethernet 1/20/1" vlanids="138"/>
+        <InterfaceVlan mode="Access" portname="ethernet 1/20/1" vlanids="139"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/20/2" vlanids="140"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/21/1" vlanids="141"/>
         <InterfaceVlan mode="Access" portname="ethernet 1/21/2" vlanids="142"/>
