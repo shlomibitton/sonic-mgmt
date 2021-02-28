@@ -18,9 +18,6 @@
     <HOSTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{sonic_mgmt.hostname}}">
             <xi:include href="{{sonic_mgmt.hostname}}.xml"/>
         </HOSTS>
-    <HOSTS xmlns:xi="http://www.w3.org/2001/XInclude" name="{{hypervisor.hostname}}">
-            <xi:include href="{{hypervisor.hostname}}.xml"/>
-        </HOSTS>
 
  {% for connection in connections -%}
  <CONNECTIVITY>

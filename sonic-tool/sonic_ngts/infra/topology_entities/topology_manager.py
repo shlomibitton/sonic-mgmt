@@ -415,7 +415,6 @@ class TopologyManager:
         connections = [{'link1': link1, 'link2': link2} for link1, link2 in self.setup_connectivity.items()]
         output = template.render(hosts=self.hosts.values(),
                                  switches=self.switches.values(),
-                                 hypervisor=self.setup_entities['hypervisor'],
                                  ngts=self.setup_entities['ngts'],
                                  sonic_mgmt=self.setup_entities['sonic_mgmt'],
                                  connections=connections)
