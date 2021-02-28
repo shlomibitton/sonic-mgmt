@@ -71,15 +71,15 @@ def is_parameter_contains_value(param) {
 def mgmt_merge_flow() {
     def erros_map = [:]
     try {
-        GITHUB_BRANCH = GITHUB_BRANCH.trim()
+        MGMT_GITHUB_BRANCH = MGMT_GITHUB_BRANCH.trim()
         MGMT_GERRIT_BRANCH = MGMT_GERRIT_BRANCH.trim()
         IMAGE_VERSION = IMAGE_VERSION.trim()
-        IMAGE_BRANCH = IMAGE_BRANCH.trim()
+        IMAGE_GITHUB_BRANCH = IMAGE_GITHUB_BRANCH.trim()
         RUN_COMMUNITY_REGRESSION = RUN_COMMUNITY_REGRESSION.trim()
 
         //Validate branch is defined
-        if (!is_parameter_contains_value(GITHUB_BRANCH)) {
-            erros_map["GITHUB_BRANCH"] = set_error_if_empty(erros_map["GITHUB_BRANCH"], setError("GITHUB_BRANCH is not defined"))
+        if (!is_parameter_contains_value(MGMT_GITHUB_BRANCH)) {
+            erros_map["MGMT_GITHUB_BRANCH"] = set_error_if_empty(erros_map["MGMT_GITHUB_BRANCH"], setError("MGMT_GITHUB_BRANCH is not defined"))
         }
 
         //Validate branch is defined
@@ -87,15 +87,10 @@ def mgmt_merge_flow() {
             erros_map["MGMT_GERRIT_BRANCH"] = set_error_if_empty(erros_map["MGMT_GERRIT_BRANCH"], setError("MGMT_GERRIT_BRANCH is not defined"))
         }
 
-        //Validate branch is defined
-        if (!is_parameter_contains_value(GITHUB_BRANCH)) {
-            erros_map["GITHUB_BRANCH"] = set_error_if_empty(erros_map["GITHUB_BRANCH"], setError("GITHUB_BRANCH is not defined"))
-        }
-
         //Validate image version or image branch are not set together
-        if (is_parameter_contains_value(IMAGE_BRANCH) && is_parameter_contains_value(IMAGE_VERSION)) {
-            erros_map["IMAGE_BRANCH"] = set_error_if_empty(erros_map["IMAGE_BRANCH"], setError("Please define IMAGE_BRANCH or IMAGE_VERSION."))
-            erros_map["IMAGE_VERSION"] = set_error_if_empty(erros_map["IMAGE_VERSION"], setError("Please define IMAGE_BRANCH or IMAGE_VERSION."))
+        if (is_parameter_contains_value(IMAGE_GITHUB_BRANCH) && is_parameter_contains_value(IMAGE_VERSION)) {
+            erros_map["IMAGE_GITHUB_BRANCH"] = set_error_if_empty(erros_map["IMAGE_GITHUB_BRANCH"], setError("Please define IMAGE_GITHUB_BRANCH or IMAGE_VERSION."))
+            erros_map["IMAGE_VERSION"] = set_error_if_empty(erros_map["IMAGE_VERSION"], setError("Please define IMAGE_GITHUB_BRANCH or IMAGE_VERSION."))
         } else {
             if (is_parameter_contains_value(IMAGE_VERSION)) {
                 def bin_path = "/auto/sw_system_release/sonic/"
@@ -121,9 +116,9 @@ def mgmt_merge_flow() {
     }
 
     def htmlAll = "${htmlHead}"
-    def list_of_params = ["GITHUB_BRANCH"   : "${GITHUB_BRANCH}", "MGMT_GERRIT_BRANCH": "${MGMT_GERRIT_BRANCH}",
-                          "IMAGE_VERSION" : "${IMAGE_VERSION}", "IMAGE_BRANCH":"${IMAGE_BRANCH}",
-    "RUN_COMMUNITY_REGRESSION": "${RUN_COMMUNITY_REGRESSION}"]
+    def list_of_params = ["MGMT_GITHUB_BRANCH"   : "${MGMT_GITHUB_BRANCH}", "MGMT_GERRIT_BRANCH": "${MGMT_GERRIT_BRANCH}",
+                          "IMAGE_VERSION" : "${IMAGE_VERSION}", "IMAGE_GITHUB_BRANCH":"${IMAGE_GITHUB_BRANCH}",
+                          "RUN_COMMUNITY_REGRESSION": "${RUN_COMMUNITY_REGRESSION}"]
     list_of_params.each { param, value ->
         htmlAll += "<BR><BR><B>${param}</B></br> &nbsp&nbsp&nbsp${value}</B>"
         if (is_parameter_contains_value(erros_map["${param}"])) {
@@ -135,7 +130,7 @@ def mgmt_merge_flow() {
 }
 
 //Start validation
-GITHUB_BRANCH = GITHUB_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").trim()
+MGMT_GITHUB_BRANCH = MGMT_GITHUB_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").trim()
 MGMT_GERRIT_BRANCH = MGMT_GERRIT_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").trim()
 
 if (MERGE_HTML_VALIDATION && MERGE_HTML_VALIDATION.toBoolean() == true) {

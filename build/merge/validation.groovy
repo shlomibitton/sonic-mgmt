@@ -29,8 +29,8 @@ def pre(name, ci_tools) {
 def run_step(name, ci_tools) {
     try {
         env.MGMT_GERRIT_BRANCH = env.MGMT_GERRIT_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").replaceAll("origin2\\/", "").trim()
-        env.GITHUB_BRANCH = env.GITHUB_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").replaceAll("origin2\\/", "").trim()
-        env.IMAGE_BRANCH = env.IMAGE_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").replaceAll("origin2\\/", "").trim()
+        env.GITHUB_BRANCH = env.MGMT_GITHUB_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").replaceAll("origin2\\/", "").trim()
+        env.IMAGE_BRANCH = env.IMAGE_GITHUB_BRANCH.replaceAll("origin\\/", "").replaceAll("origin1\\/", "").replaceAll("origin2\\/", "").trim()
         env.OVERRIDE_BRANCH_NAME = env.MGMT_GERRIT_BRANCH
 
         //Run client validation
