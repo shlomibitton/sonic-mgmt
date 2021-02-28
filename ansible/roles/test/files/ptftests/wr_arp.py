@@ -304,6 +304,7 @@ class ArpTest(BaseTest):
             if not was_active:
                 pauses[port].append(sorted(data.keys())[-1] - last_inactive)
 
+        self.log("pauses: {}".format(pauses))
         m_pauses = { port:max(pauses[port]) for port in pauses.keys() if max(pauses[port]) > 25 }
         for port in m_pauses.keys():
             self.log("Port eth%d. Max pause in arp_response %d sec" % (port, int(m_pauses[port])))
@@ -317,6 +318,7 @@ class ArpTest(BaseTest):
         pkt, exp_pkt = self.gen_pkts[port]
         testutils.send_packet(self, port, pkt)
         nr_rcvd = testutils.count_matched_packets(self, exp_pkt, port, timeout=0.2)
+        self.log("Port eth%d, received ARP : count %d" % (port, nr_rcvd))
         return nr_rcvd
 
     def req_dut(self, cmd):
