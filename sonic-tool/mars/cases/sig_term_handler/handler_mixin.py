@@ -20,8 +20,12 @@ class TermHandlerMixin(object):
 
         for process in player.processes[:]:
             run_log_file_name = player.process_logger[player.pids[pid_index]][proc_stdout_index]
-            local_tmp_file = os.path.join(files.get_mlxtmp_dir(), self.session_id)
+            local_dir_path = os.path.join(files.get_mlxtmp_dir(), self.session_id)
+            local_tmp_file = os.path.join(local_dir_path, "term_log.txt")
             try:
+                if not os.path.exists(local_dir_path):
+                    os.mkdir(local_dir_path)
+
                 conn = connect(player.player_ip)
                 download(conn, run_log_file_name, local_tmp_file)
 
