@@ -156,6 +156,7 @@ class ReloadTest(BaseTest):
         self.check_param('vnet_pkts', None, required=False)
         self.check_param('target_version', '', required=False)
         self.check_param('bgp_v4_v6_time_diff', 40, required=False)
+        self.check_param('use_fast_io_thread', True, required = False)
         if not self.test_params['preboot_oper'] or self.test_params['preboot_oper'] == 'None':
             self.test_params['preboot_oper'] = None
         if not self.test_params['inboot_oper'] or self.test_params['inboot_oper'] == 'None':
@@ -505,6 +506,7 @@ class ReloadTest(BaseTest):
         self.reboot_type = self.test_params['reboot_type']
         if self.reboot_type not in ['fast-reboot', 'warm-reboot', 'warm-reboot -f']:
             raise ValueError('Not supported reboot_type %s' % self.reboot_type)
+        self.use_fast_io_thread = self.test_params['use_fast_io_thread']
         self.dut_mac = self.test_params['dut_mac']
 
         if self.kvm_test:
@@ -889,11 +891,12 @@ class ReloadTest(BaseTest):
         if self.no_routing_stop - self.reboot_start > datetime.timedelta(seconds=self.test_params['graceful_limit']):
             self.fails['dut'].add("%s cycle must be less than graceful limit %s seconds" % (self.reboot_type, self.test_params['graceful_limit']))
 
-        if 'warm-reboot' in self.reboot_type:
+        if self.use_fast_io_thread:
             if self.total_disrupt_time > self.limit.total_seconds():
                 self.fails['dut'].add("Total downtime period must be less then %s seconds. It was %s" \
                     % (str(self.limit), str(self.total_disrupt_time)))
-
+                    
+        if 'warm-reboot' in self.reboot_type:
             # after the data plane is up, check for routing changes
             if self.test_params['inboot_oper'] and self.sad_handle:
                 self.check_inboot_sad_status()
@@ -906,10 +909,10 @@ class ReloadTest(BaseTest):
                 # verify there are no interface flaps after warm boot
                 self.neigh_lag_status_check()
 
-        if self.reboot_type == 'fast-reboot':
-            self.no_cp_replies = self.extract_no_cpu_replies(self.upper_replies)
-            if self.no_cp_replies < 0.95 * self.nr_vl_pkts:
-                self.fails['dut'].add("Dataplane didn't route to all servers, when control-plane was down: %d vs %d" % (self.no_cp_replies, self.nr_vl_pkts))
+        # if self.reboot_type == 'fast-reboot':
+        #     self.no_cp_replies = self.extract_no_cpu_replies(self.upper_replies)
+        #     if self.no_cp_replies < 0.95 * self.nr_vl_pkts:
+        #         self.fails['dut'].add("Dataplane didn't route to all servers, when control-plane was down: %d vs %d" % (self.no_cp_replies, self.nr_vl_pkts))
 
     def handle_advanced_reboot_health_check_kvm(self):
         self.log("Wait until data plane stops")
@@ -1068,7 +1071,10 @@ class ReloadTest(BaseTest):
                 self.handle_post_reboot_health_check_kvm()
             else:
                 if self.reboot_type == 'fast-reboot':
-                    self.handle_fast_reboot_health_check()
+                    if self.use_fast_io_thread:
+                        self.handle_warm_reboot_health_check()
+                    else:
+                        self.handle_fast_reboot_health_check()
                 if 'warm-reboot' in self.reboot_type:
                     self.handle_warm_reboot_health_check()
                 self.handle_post_reboot_health_check()
