@@ -15,6 +15,7 @@ from ngts.cli_wrappers.linux.linux_cli import LinuxCli
 from ngts.tools.allure_report.allure_server import AllureServer
 from ngts.tools.skip_test.skip import ngts_skip
 from distutils.dist import strtobool
+from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
 logger = logging.getLogger()
 
 pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer')
@@ -144,3 +145,47 @@ def pytest_runtest_makereport(item, call):
     # be "setup", "call", "teardown"
 
     setattr(item, "rep_" + rep.when, rep)
+
+
+@pytest.fixture(scope='session')
+def ha_dut_1_mac(topology_obj):
+    """
+    Pytest fixture which are returning mac address for link: ha-dut-1
+    :param topology_obj: topology object fixture
+    """
+    ha_dut_1 = topology_obj.ports['ha-dut-1']
+    ha_engine = topology_obj.players['ha']['engine']
+    return LinuxMacCli.get_mac_address_for_interface(ha_engine, ha_dut_1)
+
+
+@pytest.fixture(scope='session')
+def ha_dut_2_mac(topology_obj):
+    """
+    Pytest fixture which are returning mac address for link: ha-dut-2
+    :param topology_obj: topology object fixture
+    """
+    ha_dut_2 = topology_obj.ports['ha-dut-2']
+    ha_engine = topology_obj.players['ha']['engine']
+    return LinuxMacCli.get_mac_address_for_interface(ha_engine, ha_dut_2)
+
+
+@pytest.fixture(scope='session')
+def hb_dut_1_mac(topology_obj):
+    """
+    Pytest fixture which are returning mac address for link: hb-dut-1
+    :param topology_obj: topology object fixture
+    """
+    hb_dut_1 = topology_obj.ports['hb-dut-1']
+    hb_engine = topology_obj.players['hb']['engine']
+    return LinuxMacCli.get_mac_address_for_interface(hb_engine, hb_dut_1)
+
+
+@pytest.fixture(scope='session')
+def hb_dut_2_mac(topology_obj):
+    """
+    Pytest fixture which are returning mac address for link: hb-dut-2
+    :param topology_obj: topology object fixture
+    """
+    hb_dut_2 = topology_obj.ports['hb-dut-2']
+    hb_engine = topology_obj.players['hb']['engine']
+    return LinuxMacCli.get_mac_address_for_interface(hb_engine, hb_dut_2)
