@@ -21,11 +21,19 @@
         <name> fg_ecmp </name>
         <tout> 3600 </tout>
         <ignore>
-            <condition>
-                <key> sonic_branch </key>
-                <op> != </op>
-                <value> master </value>
-            </condition>
+            <condition_group>
+                <operand> AND </operand>
+                <condition>
+                    <key> sonic_branch </key>
+                    <op> != </op>
+                    <value> master </value>
+                </condition>
+                <condition>
+                    <key> sonic_branch </key>
+                    <op> != </op>
+                    <value> 202012 </value>
+                </condition>
+            </condition_group>
         </ignore>
         <cmd>
             <params>
