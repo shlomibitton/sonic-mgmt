@@ -455,6 +455,7 @@ def build_results(lab_graph, hostnames, ignore_error=False):
     Refactor code for building json results.
     Code is refactored because same logic is needed in devutil
     """
+    global debug_fname
     device_info = {}
     device_conn = {}
     device_port_vlans = {}
@@ -484,7 +485,7 @@ def build_results(lab_graph, hostnames, ignore_error=False):
             else:
                 device_vlan_map_list[hostname] = {}
 
-                port_name_list_sorted = get_port_name_list(dev['HwSku'])
+                port_name_list_sorted = get_port_name_list(hostname, dev['HwSku'])
                 print_debug_msg(debug_fname, "For %s with hwsku %s, port_name_list is %s" % (hostname, dev['HwSku'], port_name_list_sorted))
                 for a_host_vlan in host_vlan["VlanList"]:
                     # Get the corresponding port for this vlan from the port vlan list for this hostname
