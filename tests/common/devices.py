@@ -7,17 +7,19 @@ modules, we have no other choice, at least for interacting with SONiC, localhost
 
 We can consider using netmiko for interacting with the VMs used in testing.
 """
+import copy
+import inspect
+import ipaddress
 import json
 import logging
 import os
 import re
-import inspect
-import ipaddress
-import copy
+import socket
 import time
-from multiprocessing.pool import ThreadPool
-from datetime import datetime
+
 from collections import defaultdict
+from datetime import datetime
+from multiprocessing.pool import ThreadPool
 
 from ansible import constants
 from ansible.plugins.loader import connection_loader
@@ -25,9 +27,11 @@ from ansible.plugins.loader import connection_loader
 from errors import RunAnsibleModuleFail
 from errors import UnsupportedAnsibleModule
 from tests.common.cache import cached
+from tests.common.helpers.assertions import pytest_assert
 from tests.common.helpers.constants import DEFAULT_ASIC_ID, DEFAULT_NAMESPACE, NAMESPACE_PREFIX
 from tests.common.helpers.dut_utils import is_supervisor_node
 from tests.common.cache import cached
+from tests.common.platform.ssh_utils import ssh_authorize_local_user
 
 # HACK: This is a hack for issue https://github.com/Azure/sonic-mgmt/issues/1941 and issue
 # https://github.com/ansible/pytest-ansible/issues/47
@@ -666,6 +670,43 @@ class SonicHost(AnsibleHostBase):
                 swss_docker_names.append("swss{}".format(asic))
         return swss_docker_names
 
+    def get_namespace_ids(self, container_name):
+        """
+        Gets ids of namespace where the container should reside in.
+
+        Returns:
+            A list contains ids of namespace such as [DEFAULT_ASIC_ID, "0", "1", ...]}
+        """
+        has_global_scope = ""
+        has_per_asic_scope = ""
+        namespace_ids = []
+
+        num_asics = int(self.facts["num_asic"])
+        command_config_entry = "sonic-db-cli CONFIG_DB hgetall \"FEATURE|{}\"".format(container_name)
+        command_output = self.shell(command_config_entry)
+        exit_code = command_output["rc"]
+        if exit_code != 0:
+            return namespace_ids, False
+
+        config_info = command_output["stdout_lines"]
+        for index, item in enumerate(config_info):
+            if item == "has_global_scope":
+                has_global_scope = config_info[index + 1]
+            elif item == "has_per_asic_scope":
+                has_per_asic_scope = config_info[index + 1]
+
+        if num_asics > 1:
+            if has_global_scope == "True":
+                namespace_ids.append(DEFAULT_ASIC_ID)
+            if has_per_asic_scope == "True":
+                for asic_id in range(0, num_asics):
+                    namespace_ids.append(str(asic_id))
+        else:
+            namespace_ids.append(DEFAULT_ASIC_ID)
+
+        return namespace_ids, True
+
+
     def get_up_time(self):
         up_time_text = self.command("uptime -s")["stdout"]
         return datetime.strptime(up_time_text, "%Y-%m-%d %H:%M:%S")
@@ -1143,10 +1184,6 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
 
         return mg_facts
 
-    def get_route(self, prefix):
-        cmd = 'show bgp ipv4' if ipaddress.ip_network(unicode(prefix)).version == 4 else 'show bgp ipv6'
-        return json.loads(self.shell('vtysh -c "{} {} json"'.format(cmd, prefix))['stdout'])
-
     def run_redis_cli_cmd(self, redis_cmd):
         cmd = "/usr/bin/redis-cli {}".format(redis_cmd)
         return self.command(cmd)
@@ -1163,6 +1200,8 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
             asic = "td2"
         elif "Broadcom Limited Device b870" in output:
             asic = "td3"
+        elif "Broadcom Limited Device b980" in output:
+            asic = "th3"
 
         return asic
 
@@ -1297,10 +1336,17 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
         )
 
     def is_bgp_state_idle(self):
+        """
+        Check if all BGP peers are in IDLE state.
+
+        Returns:
+            True or False
+        """
         bgp_summary = self.command("show ip bgp summary")["stdout_lines"]
 
         idle_count = 0
         expected_idle_count = 0
+        bgp_monitor_count = 0
         for line in bgp_summary:
             if "Idle (Admin)" in line:
                 idle_count += 1
@@ -1309,9 +1355,20 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
                 tokens = line.split()
                 expected_idle_count = int(tokens[-1])
 
-        return idle_count == expected_idle_count
+            if "BGPMonitor" in line:
+                bgp_monitor_count += 1
+
+        return idle_count == (expected_idle_count - bgp_monitor_count)
 
     def is_service_running(self, service_name, docker_name):
+        """
+        Check if service is running. Service can be a service within a docker
+
+        Args:
+            service name, docker name
+        Returns:
+            True or False
+        """
         service_status = self.command(
             "docker exec {} supervisorctl status {}".format(
                 docker_name, service_name
@@ -1324,6 +1381,36 @@ default via fc00::1a dev PortChannel0004 proto 186 src fc00:1::32 metric 20  pre
         )
 
         return "RUNNING" in service_status
+
+    def remove_ssh_tunnel_sai_rpc(self):
+        """
+        Removes any ssh tunnels if present created for syncd RPC communication
+
+        Returns:
+            None
+        """
+        try:
+            pid_list = self.shell(
+                'pgrep -f "ssh -o StrictHostKeyChecking=no -fN -L \*:9092"'
+            )["stdout_lines"]
+        except RunAnsibleModuleFail:
+            return
+        for pid in pid_list:
+            self.shell("kill {}".format(pid))
+
+    def get_up_ip_ports(self):
+        """
+        Get a list for all up ip interfaces
+        """
+        up_ip_ports = []
+        ip_intf_facts = self.show_ip_interface()['ansible_facts']['ip_interfaces']
+        for intf in ip_intf_facts:
+            try:
+                if ip_intf_facts[intf]['oper_state'] == 'up':
+                    up_ip_ports.append(intf)
+            except KeyError:
+                pass
+        return up_ip_ports
 
 
 class K8sMasterHost(AnsibleHostBase):
@@ -1764,9 +1851,11 @@ class SonicAsic(object):
         """
         self.sonichost = sonichost
         self.asic_index = asic_index
+        self._ns_arg = ""
         if self.sonichost.is_multi_asic:
             self.namespace = "{}{}".format(NAMESPACE_PREFIX, self.asic_index)
             self.cli_ns_option = "-n {}".format(self.namespace)
+            self._ns_arg = "sudo ip netns exec {} ".format(self.namespace)
         else:
             # set the namespace to DEFAULT_NAMESPACE(None) for single asic
             self.namespace = DEFAULT_NAMESPACE
@@ -1893,7 +1982,7 @@ class SonicAsic(object):
 
     def interface_facts(self, *module_args, **complex_args):
         """Wrapper for the interface_facts ansible module.
-        
+
         Args:
             module_args: other ansible module args passed from the caller
             complex_args: other ansible keyword args
@@ -1905,6 +1994,13 @@ class SonicAsic(object):
         complex_args['namespace'] = self.namespace
         return self.sonichost.interface_facts(*module_args, **complex_args)
 
+    def get_docker_name(self, service):
+        if (not self.sonichost.is_multi_asic or
+            service not in self._DEFAULT_ASIC_SERVICES
+        ):
+            return service
+
+        return self._MULTI_ASIC_DOCKER_NAME.format(service, self.asic_index)
 
     def stop_service(self, service):
         if not self.sonichost.is_multi_asic:
@@ -1939,6 +2035,167 @@ class SonicAsic(object):
                 docker_name, self.asic_index
             )
         return self.sonichost.is_service_running(service_name, docker_name)
+
+    def ping_v4(self, ipv4, count=1):
+        """
+        Returns 'True' if ping to IP address works, else 'False'
+        Args:
+            IPv4 address
+
+        Returns:
+            True or False
+        """
+        try:
+            socket.inet_aton(ipv4)
+        except socket.error:
+            raise Exception("Invalid IPv4 address {}".format(ipv4))
+
+        try:
+            self.sonichost.shell("{}ping -q -c{} {} > /dev/null".format(
+                self._ns_arg, count, ipv4
+            ))
+        except RunAnsibleModuleFail:
+            return False
+        return True
+
+    def get_active_ip_interfaces(self):
+        """
+        Return a dict of active IP (Ethernet or PortChannel) interfaces, with
+        interface and peer IPv4 address.
+
+        Returns:
+            Dict of Interfaces and their IPv4 address
+        """
+        ip_ifs = self.show_ip_interface()["ansible_facts"]
+        ip_ifaces = {}
+        for k,v in ip_ifs["ip_interfaces"].items():
+            if (k.startswith("Ethernet") or
+                (k.startswith("PortChannel") and k.find("400") == -1)
+            ):
+                if (v["admin"] == "up" and v["oper_state"] == "up" and
+                        self.ping_v4(v["peer_ipv4"])
+                    ):
+                    ip_ifaces[k] = {
+                        "ipv4" : v["ipv4"],
+                        "peer_ipv4" : v["peer_ipv4"]
+                    }
+
+        return ip_ifaces
+
+    def bgp_drop_rule(self, ip_version, state="present"):
+        """
+        Programs iptable rule to either add or remove DROP for
+        BGP control frames
+
+        Args:
+            ip_version: IPv4 or IPv6
+            state = "present" or "absent" (add or remove)
+
+        Returns:
+            None
+        """
+        ipcmd = "iptables" if ip_version == "ipv4" else "ip6tables"
+        run_opt = "-I INPUT 1" if state == "present" else "-D INPUT"
+        check_opt = "-C INPUT"
+        cmd = (
+            "{}/sbin/{} -t filter {{}} -p tcp -j DROP --destination-port bgp"
+        ).format(self._ns_arg, ipcmd)
+
+        check_cmd = cmd.format(check_opt)
+        run_cmd = cmd.format(run_opt)
+
+        output = "Rule {} needs no action".format(run_cmd)
+        try:
+            self.sonichost.command(check_cmd)
+            if state == "absent":
+                output = self.sonichost.command(run_cmd)
+        except RunAnsibleModuleFail as e:
+            if state == "present":
+                output = self.sonichost.command(run_cmd)
+
+        logging.debug(output)
+
+    def remove_ssh_tunnel_sai_rpc(self):
+        """
+        Removes any ssh tunnels if present created for syncd RPC communication
+
+        Returns:
+            None
+        """
+        if not self.sonichost.is_multi_asic:
+            return
+        return self.sonichost.remove_ssh_tunnel_sai_rpc()
+
+    def create_ssh_tunnel_sai_rpc(self):
+        """
+        Create ssh tunnel between host and ASIC namespace on syncd RPC
+        port. This is used to forward thrift calls to and from the syncd
+        running on this ASIC.
+
+        Returns:
+            None
+        """
+        if not self.sonichost.is_multi_asic:
+            return
+        self.remove_ssh_tunnel_sai_rpc()
+        ssh_authorize_local_user(self.sonichost)
+
+        ip_ifs = self.show_ip_interface(
+            namespace=self.namespace
+        )["ansible_facts"]
+
+        # create SSH tunnel to ASIC namespace
+        ns_docker_if_ipv4 = ip_ifs["ip_interfaces"]["eth0"]["ipv4"]
+        try:
+            socket.inet_aton(ns_docker_if_ipv4)
+        except socket.error:
+            raise Exception("Invalid V4 address {}".format(ns_docker_if_ipv4))
+
+        self.sonichost.shell(
+            ("ssh -o StrictHostKeyChecking=no -fN"
+             " -L *:9092:{}:9092 localhost"
+            ).format(ns_docker_if_ipv4)
+        )
+
+    def command(self, cmdstr):
+        """
+            Prepend 'ip netns' option for commands meant for this ASIC
+
+            Args:
+                cmdstr
+            Returns:
+                Output from the ansible command module
+        """
+        if not self.sonichost.is_multi_asic or self.namespace == DEFAULT_NAMESPACE:
+            return self.sonichost.command(cmdstr)
+
+        cmdstr = "sudo ip netns exec {} ".format(self.namespace) + cmdstr
+
+        return self.sonichost.command(cmdstr)
+
+    def run_redis_cmd(self, argv=[]):
+        """
+        Runs redis command on DUT.
+
+        Args:
+            argv (list): List of command options to run on duthost
+
+        Returns:
+            stdout (list): List of stdout lines spewed by the invoked command
+        """
+        if self.sonichost.is_multi_asic:
+            db_docker_instance = self.get_docker_name("database")
+            argv = ["docker", "exec", db_docker_instance] + argv
+
+        result = self.sonichost.shell(argv=argv)
+        pytest_assert(
+            result["rc"] == 0,
+            "Failed to run Redis command '{0}' with error '{1}'".format(
+                " ".join(map(str, argv)), result["stderr"]
+            )
+        )
+
+        return result["stdout_lines"]
 
 
 class MultiAsicSonicHost(object):
@@ -2052,6 +2309,11 @@ class MultiAsicSonicHost(object):
 
         return [asic.namespace for asic in self.backend_asics]
 
+    def asic_instance(self, asic_index):
+        if asic_index is None:
+            return self.asics[0]
+        return self.asics[asic_index]
+
     def get_asic_ids(self):
         if self.sonichost.facts['num_asic'] == 1:
             return [DEFAULT_ASIC_ID]
@@ -2065,7 +2327,7 @@ class MultiAsicSonicHost(object):
         return [asic.namespace for asic in self.asics]
 
     def get_asic_id_from_namespace(self, namespace):
-        if self.sonichost.facts['num_asic'] == 1:
+        if self.sonichost.facts['num_asic'] == 1 or namespace == DEFAULT_NAMESPACE:
             return DEFAULT_ASIC_ID
 
         for asic in self.asics:
@@ -2076,7 +2338,7 @@ class MultiAsicSonicHost(object):
         raise ValueError("Invalid namespace '{}' passed as input".format(namespace))
 
     def get_namespace_from_asic_id(self, asic_id):
-        if self.sonichost.facts['num_asic'] == 1:
+        if self.sonichost.facts['num_asic'] == 1 or asic_id == DEFAULT_ASIC_ID:
             return DEFAULT_NAMESPACE
 
         for asic in self.asics:
@@ -2092,6 +2354,15 @@ class MultiAsicSonicHost(object):
             return cmd
         ns_cmd = cmd.replace('vtysh', 'vtysh -n {}'.format(asic_id))
         return ns_cmd
+    
+    def get_route(self, prefix, namespace=DEFAULT_NAMESPACE):
+        asic_id = self.get_asic_id_from_namespace(namespace)
+        if asic_id == DEFAULT_ASIC_ID:
+           ns_prefix = ''
+        else:
+           ns_prefix = '-n ' + str(asic_id)
+        cmd = 'show bgp ipv4' if ipaddress.ip_network(unicode(prefix)).version == 4 else 'show bgp ipv6'
+        return json.loads(self.shell('vtysh {} -c "{} {} json"'.format(ns_prefix, cmd, prefix))['stdout'])
 
     def __getattr__(self, attr):
         """ To support calling an ansible module on a MultiAsicSonicHost.
@@ -2119,7 +2390,7 @@ class MultiAsicSonicHost(object):
 
     def get_asic(self, asic_id):
         if asic_id == DEFAULT_ASIC_ID:
-            return self.asics[0]
+            return self.sonichost
         return self.asics[asic_id]
 
     def stop_service(self, service):

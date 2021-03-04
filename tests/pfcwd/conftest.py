@@ -28,6 +28,29 @@ def pytest_addoption(parser):
     parser.addoption('--fake-storm', action='store', type=bool, default=True,
                      help='Fake storm for most ports instead of using pfc gen')
 
+@pytest.fixture(scope="module", autouse=True)
+def skip_pfcwd_test_dualtor(tbinfo):
+    if 'dualtor' in tbinfo['topo']['name']:
+        pytest.skip("Pfcwd tests skipped on dual tor testbed")
+
+    yield
+
+@pytest.fixture(scope="module")
+def fake_storm(request, duthosts, rand_one_dut_hostname):
+    """
+    Enable/disable fake storm based on platform and input parameters
+
+    Args:
+        request: pytest request object
+        duthosts: AnsibleHost instance for multi DUT
+        rand_one_dut_hostname: hostname of DUT
+
+    Returns:
+        fake_storm: False/True
+    """
+    duthost = duthosts[rand_one_dut_hostname]
+    return request.config.getoption('--fake-storm') if not isMellanoxDevice(duthost) else False
+
 @pytest.fixture(scope="module")
 def fake_storm(request, duthosts, rand_one_dut_hostname):
     """
