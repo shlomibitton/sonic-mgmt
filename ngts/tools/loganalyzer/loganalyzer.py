@@ -6,18 +6,19 @@ import time
 import pprint
 
 from .log_parser import DutLogAnalyzer
-from os.path import join, split
-from os.path import normpath
+from os.path import join, split, dirname, exists
+from os import remove, removedirs
+
 
 logger = logging.getLogger()
 
-DUT_LOGANALYZER_MODULE = os.path.join(os.path.dirname(__file__), "log_parser.py")
-EXTRACT_LOG_MODULE = os.path.join(os.path.dirname(__file__), "extract_log.py")
+LOG_PARSER = join(dirname(__file__), "log_parser.py")
+DUT_LOGANALYZER = "loganalyzer.py"
+EXTRACT_LOG_MODULE = join(dirname(__file__), "extract_log.py")
 COMMON_MATCH = join(split(__file__)[0], "loganalyzer_common_match.txt")
 COMMON_IGNORE = join(split(__file__)[0], "loganalyzer_common_ignore.txt")
 COMMON_EXPECT = join(split(__file__)[0], "loganalyzer_common_expect.txt")
 SYSLOG_TMP_FOLDER = "/tmp/syslog"
-
 
 class LogAnalyzerError(Exception):
     """Raised when loganalyzer found matches during analysis phase."""
@@ -29,7 +30,7 @@ class LogAnalyzer:
     def __init__(self, dut_engine, marker_prefix, dut_run_dir="/tmp", start_marker=None):
         self.dut_engine = dut_engine
         self.dut_run_dir = dut_run_dir
-        self.extracted_syslog = os.path.join(self.dut_run_dir, "syslog")
+        self.extracted_syslog = join(self.dut_run_dir, "syslog")
         self.marker_prefix = marker_prefix.replace(" ", "_")
         # use existing syslog msg as marker to search in logs instead of writing a new one
         self.start_marker = start_marker
@@ -40,7 +41,9 @@ class LogAnalyzer:
         self.ignore_regex = []
         self.expected_matches_target = 0
         self._markers = []
-        self.fail = True
+        self.verify = True
+        # If None - syslog will be printed to the stdout, otherwise written to the file by this path
+        self.permanent_log_file = None # Folder path used to permanently store syslog content
 
     def _add_end_marker(self, marker):
         """
@@ -48,12 +51,12 @@ class LogAnalyzer:
 
         @return: True for successfull execution False otherwise
         """
-        dest_file = "loganalyzer.py"
-        self.dut_engine.run_cmd("sudo rm -f {}".format(os.path.join(self.dut_run_dir, dest_file)))
-        self.dut_engine.copy_file(source_file=DUT_LOGANALYZER_MODULE, dest_file=dest_file, file_system=self.dut_run_dir,
+        self.dut_engine.run_cmd("sudo rm -f {}".format(join(self.dut_run_dir, DUT_LOGANALYZER)))
+        self.dut_engine.copy_file(source_file=LOG_PARSER, dest_file=DUT_LOGANALYZER, file_system=self.dut_run_dir,
             overwrite_file=True, verify_file=False)
 
-        cmd = "python {run_dir}/loganalyzer.py --action add_end_marker --run_id {marker}".format(run_dir=self.dut_run_dir, marker=marker)
+        cmd = "python {run_dir}/{run_module} --action add_end_marker --run_id {marker}".format(run_dir=self.dut_run_dir,
+            run_module=DUT_LOGANALYZER, marker=marker)
 
         logger.info("Adding end marker '{}'".format(marker))
         self.dut_engine.run_cmd(cmd)
@@ -62,7 +65,7 @@ class LogAnalyzer:
         """
         Pass additional arguments when the instance is called
         """
-        self.fail = kwargs.get("fail", True)
+        self.verify = kwargs.get("verify", True)
         self.start_marker = kwargs.get("start_marker", None)
         return self
 
@@ -76,7 +79,7 @@ class LogAnalyzer:
         """
         Analyze syslog messages.
         """
-        self.analyze(self._markers.pop(), fail=self.fail)
+        self.analyze(self._markers.pop(), verify=self.verify)
 
     def _verify_log(self, result):
         """
@@ -96,6 +99,40 @@ class LogAnalyzer:
         if (self.expect_regex and (self.expected_matches_target > 0)
            and result["total"]["expected_match"] != self.expected_matches_target):
             raise LogAnalyzerError(result)
+
+    def rm_log_file(self):
+        """
+        @summary: Remove stored log file and its folder
+        """
+        try:
+            # Remove log file
+            logger.info("Removing file {}".format(self.log_file_path))
+            remove(self.log_file_path)
+        except Exception as err:
+            logger.warning("Can't delete file '{}'. {}".format(self.log_file_path, err))
+        try:
+            # Remove test folder
+            logger.info("Removing folder {}".format(dirname(self.log_file_path)))
+            removedirs(dirname(self.log_file_path))
+        except Exception as err:
+            logger.warning("Can't delete folder '{}'. {}".format(dirname(self.log_file_path), err))
+
+    def get_log_file_path(self):
+        """
+        @summary: Get local file path to store syslog file. If empty, syslog will be printed to the stdout.
+
+        @return: If not empty - return syslog file path, None otherwise
+        """
+        if self.permanent_log_file is not None:
+            return self.permanent_log_file
+        else:
+            return None
+
+    def del_log_file_path(self):
+        """
+        @summary: Clear custom folder name where syslog is storing. Now syslog will be printed to the stdout.
+        """
+        self.permanent_log_file = None
 
     def update_marker_prefix(self, marker_prefix):
         """
@@ -130,18 +167,18 @@ class LogAnalyzer:
         @return: Callback execution result
         """
         marker = self.init()
-        fail = kwargs.pop("fail", True)
+        verify = kwargs.pop("verify", True)
         try:
             call_result = callback(*args, **kwargs)
         except Exception as err:
             logger.error("Error during callback execution:\n{}".format(err))
-            logger.info("Log analysis result\n".format(self.analyze(marker, fail=fail)))
+            logger.info("Log analysis result\n".format(self.analyze(marker, verify=verify)))
             raise err
-        self.analyze(marker, fail=fail)
+        self.analyze(marker, verify=verify)
 
         return call_result
 
-    def init(self):
+    def init(self, log_folder, log_file):
         """
         @summary: Add start marker into syslog on the DUT.
 
@@ -149,9 +186,17 @@ class LogAnalyzer:
         """
         logger.info("Loganalyzer init")
 
-        dest_file = "loganalyzer.py"
-        self.dut_engine.run_cmd("sudo rm -f {}".format(os.path.join(self.dut_run_dir, dest_file)))
-        self.dut_engine.copy_file(source_file=DUT_LOGANALYZER_MODULE, dest_file=dest_file, file_system=self.dut_run_dir,
+        if exists(log_folder):
+            self.log_file_path = os.path.join(log_folder, log_file)
+            self.print_log = False
+        else:
+            self.print_log = True
+            self.log_file_path = ".".join((SYSLOG_TMP_FOLDER, time.strftime("%Y-%m-%d-%H:%M:%S", time.gmtime())))
+            logger.error("{} - folder does not exist.\nPrinting the log analyzer output to the stdout".format(log_folder))
+        logger.info("Loganalyzer log file - {}".format(self.log_file_path))
+
+        self.dut_engine.run_cmd("sudo rm -f {}".format(join(self.dut_run_dir, DUT_LOGANALYZER)))
+        self.dut_engine.copy_file(source_file=LOG_PARSER, dest_file=DUT_LOGANALYZER, file_system=self.dut_run_dir,
             overwrite_file=True, verify_file=False)
 
         return self._setup_marker()
@@ -161,20 +206,23 @@ class LogAnalyzer:
         Adds the marker to the syslog
         """
         start_marker = ".".join((self.marker_prefix, time.strftime("%Y-%m-%d-%H:%M:%S", time.gmtime())))
-        cmd = "python {run_dir}/loganalyzer.py --action init --run_id {start_marker}".format(run_dir=self.dut_run_dir, start_marker=start_marker)
+        cmd = "python {run_dir}/{run_module} --action init --run_id {start_marker}".format(run_dir=self.dut_run_dir,
+            run_module=DUT_LOGANALYZER, start_marker=start_marker)
 
         logger.info("Adding start marker '{}'".format(start_marker))
         self.dut_engine.run_cmd(cmd)
         return start_marker
 
-    def analyze(self, marker, fail=True):
+    def analyze(self, marker, verify=True):
         """
-        @summary: Extract syslog logs based on the start/stop markers and compose one file. Download composed file, analyze file based on defined regular expressions.
+        @summary: Extract syslog logs based on the start/stop markers and compose one file.
+                  Download composed file, analyze file based on defined regular expressions.
 
         @param marker: Marker obtained from "init" method.
-        @param fail: Flag to enable/disable raising exception when loganalyzer find error messages.
+        @param verify: Flag to enable/disable raising exception when loganalyzer find error messages.
 
-        @return: If "fail" is False - return dictionary of parsed syslog summary, if dictionary can't be parsed - return empty dictionary. If "fail" is True and if found match messages - raise exception.
+        @return: If "verify" is False - return dictionary of parsed syslog summary, if dictionary can't be parsed - return empty dictionary.
+        If "verify" is True and if found match messages - raise exception.
         """
         logger.info("Loganalyzer analyze")
         analyzer_summary = {"total": {"match": 0, "expected_match": 0, "expected_missing_match": 0},
@@ -183,7 +231,10 @@ class LogAnalyzer:
                             "expect_messages": {},
                             "unused_expected_regexp": []
                             }
-        tmp_folder = ".".join((SYSLOG_TMP_FOLDER, time.strftime("%Y-%m-%d-%H:%M:%S", time.gmtime())))
+
+        if self.log_file_path is None:
+            raise LogAnalyzerError('Init was not called, log file path is empty - {}'.format(self.log_file_path))
+
         marker = marker.replace(' ', '_')
         self.dut_loganalyzer.run_id = marker
 
@@ -230,8 +281,8 @@ class LogAnalyzer:
             logger.warning('Extracted file was not created - \'{}\''.format(self.extracted_syslog))
 
         # Download extracted logs from the DUT to the temporal folder
-        logger.info('Download extracted file into \'{}\''.format(tmp_folder))
-        self.save_extracted_log(dest=tmp_folder)
+        logger.info('Download extracted file into \'{}\''.format(self.log_file_path))
+        self.save_extracted_log(dest=self.log_file_path)
 
         # Remove extracted file on DUT
         self.remove_extracted_log()
@@ -240,13 +291,7 @@ class LogAnalyzer:
         ignore_messages_regex = re.compile('|'.join(self.ignore_regex)) if len(self.ignore_regex) else None
         expect_messages_regex = re.compile('|'.join(self.expect_regex)) if len(self.expect_regex) else None
 
-        analyzer_parse_result = self.dut_loganalyzer.analyze_file_list([tmp_folder], match_messages_regex, ignore_messages_regex, expect_messages_regex)
-        # Print syslog file content and remove the file
-        with open(tmp_folder) as fo:
-            logger.info("Syslog content:\n\n{}".format(fo.read()))
-
-        logger.info('Remove temporal file \'{}\''.format(tmp_folder))
-        os.remove(tmp_folder)
+        analyzer_parse_result = self.dut_loganalyzer.analyze_file_list([self.log_file_path], match_messages_regex, ignore_messages_regex, expect_messages_regex)
 
         total_match_cnt = 0
         total_expect_cnt = 0
@@ -272,8 +317,15 @@ class LogAnalyzer:
         analyzer_summary["total"]["expected_missing_match"] = len(unused_regex_messages)
         analyzer_summary["unused_expected_regexp"] = unused_regex_messages
 
-        if fail:
-            self._verify_log(analyzer_summary)
+        if verify:
+            self.print_logs()
+            try:
+                self._verify_log(analyzer_summary)
+            except LogAnalyzerError as err:
+                raise err
+            else:
+                # Loganalyzer didn't match errors, performing cleanup
+                self.rm_log_file()
         else:
             return analyzer_summary
 
@@ -283,7 +335,7 @@ class LogAnalyzer:
 
         @param dest: File path to store downloaded log file.
         """
-        folder, src_file = os.path.split(self.extracted_syslog)
+        folder, src_file = split(self.extracted_syslog)
         self.dut_engine.copy_file(source_file=src_file, dest_file=dest, file_system=folder,
             overwrite_file=True, verify_file=False, direction='get', disable_md5=True)
 
@@ -317,12 +369,21 @@ class LogAnalyzer:
         @param start_string: string which is used as a start tag for extracting log information
         @param target_filename: file name where the extracted lines will be saved
         """
-        module_name = os.path.split(EXTRACT_LOG_MODULE)[-1]
-        dut_module_path = os.path.join(self.dut_run_dir, module_name)
+        module_name = split(EXTRACT_LOG_MODULE)[-1]
+        dut_module_path = join(self.dut_run_dir, module_name)
         cmd = "sudo python3 {} -d \'{}\' -p \'{}\' -s \'{}\' -t \'{}\'".format(dut_module_path, directory, file_prefix,
                                                                                start_string, target_filename)
 
-        self.dut_engine.run_cmd("sudo rm -f {}".format(os.path.join(self.dut_run_dir, module_name)))
+        self.dut_engine.run_cmd("sudo rm -f {}".format(join(self.dut_run_dir, module_name)))
         self.dut_engine.copy_file(source_file=EXTRACT_LOG_MODULE, dest_file=module_name, file_system=self.dut_run_dir,
             overwrite_file=True, verify_file=False)
         self.dut_engine.run_cmd(cmd)
+
+    def print_logs(self):
+        """
+        @summary: Print to stdout content of collected syslog logs
+        """
+        if self.print_log:
+            # Print log content
+            with open(self.log_file_path) as fo:
+                logger.info("Syslog content:\n\n{}".format(fo.read()))

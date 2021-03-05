@@ -19,7 +19,7 @@ from ngts.tools.skip_test.skip import ngts_skip
 from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
 logger = logging.getLogger()
 
-pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer', 'pytester')
+pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer', 'ngts.tools.infra', 'pytester')
 
 
 def pytest_addoption(parser):
