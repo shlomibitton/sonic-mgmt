@@ -234,12 +234,15 @@
         <name> fwutil </name>
         <tout> 5200 </tout>
         <ignore>
-            <bug> 2382365 </bug>
-            <condition>
-                <key> dut_name </key>
-                <op> == </op>
-                <value> "r-boxer-sw01" </value>
-            </condition>
+            <condition_group>
+                <bug> 2382365 </bug>
+                <operand> AND </operand>
+                <condition>
+                    <key> dut_name </key>
+                    <op> in </op>
+                    <value> ["r-bulldog-02", "r-bulldog-03", "r-bulldog-04"] </value>
+                </condition>
+            </condition_group>
         </ignore>
         <cmd>
              <params>
