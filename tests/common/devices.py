@@ -2388,11 +2388,6 @@ class MultiAsicSonicHost(object):
             return self.asics[0]
         return self.asics[asic_id]
 
-    def get_asic(self, asic_id):
-        if asic_id == DEFAULT_ASIC_ID:
-            return self.sonichost
-        return self.asics[asic_id]
-
     def stop_service(self, service):
         if service in self._DEFAULT_SERVICES:
             return self.sonichost.stop_service(service, service)
