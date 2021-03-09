@@ -46,7 +46,6 @@ class TestSfpApi(PlatformApiTestBase):
 
     EXPECTED_XCVR_INFO_KEYS = [
         'type',
-        'type_abbrv_name',
         'manufacturer',
         'model',
         'hardware_rev',
