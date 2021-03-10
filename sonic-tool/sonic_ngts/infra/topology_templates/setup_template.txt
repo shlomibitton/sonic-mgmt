@@ -49,7 +49,7 @@
 
         <docker_ngts_registry_url> harbor.mellanox.com/sonic </docker_ngts_registry_url>
         <sonic_ngts_docker_name> docker-ngts </sonic_ngts_docker_name>
-        <sonic_ngts_docker_tag> 1.2.2 </sonic_ngts_docker_tag>
+        <sonic_ngts_docker_tag> 1.2.14 </sonic_ngts_docker_tag>
 
         <sonic_tool_repo_url> http://10.7.77.140:8080/switchx/sonic/sonic-tool  </sonic_tool_repo_url>
         <sonic_tool_repo_name> sonic-tool </sonic_tool_repo_name>

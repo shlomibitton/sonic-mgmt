@@ -55,6 +55,8 @@ class ConfigDbJsonConst:
     ENABLED = 'enabled'
     DEVICE_METADATA = "DEVICE_METADATA"
     LOCALHOST = "localhost"
+    TYPE = 'type'
+    TOR_ROUTER = 'ToRRouter'
     HOSTNAME = "hostname"
     MAC = "mac"
     HWSKU = "hwsku"

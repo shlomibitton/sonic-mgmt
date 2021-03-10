@@ -263,6 +263,7 @@ def load_port_configuration_into_initial_switch_configuration(init_config_db_jso
     init_config_db_json = set_lldp(init_config_db_json)
     init_config_db_json = remove_redundant_port(init_config_db_json, port_configuration_dict)
     init_config_db_json = set_switch_hostname(init_config_db_json, switch_hostname)
+    init_config_db_json = set_switch_type(init_config_db_json)
     return init_config_db_json
 
 
@@ -329,6 +330,11 @@ def set_switch_hostname(init_config_db_json, switch_hostname):
     init_config_db_json[ConfigDbJsonConst.DEVICE_METADATA][ConfigDbJsonConst.LOCALHOST][ConfigDbJsonConst.HOSTNAME] = switch_hostname
     return init_config_db_json
 
+
+def set_switch_type(init_config_db_json):
+    init_config_db_json[ConfigDbJsonConst.DEVICE_METADATA][ConfigDbJsonConst.LOCALHOST][ConfigDbJsonConst.TYPE] =\
+        ConfigDbJsonConst.TOR_ROUTER
+    return init_config_db_json
 
 def save_port_config_ini_file(args):
     file_name = 'basic_port_config.ini' if args.is_basic_config else 'port_config.ini'
