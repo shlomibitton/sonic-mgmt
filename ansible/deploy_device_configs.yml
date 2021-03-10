@@ -37,3 +37,12 @@
     dest: "{{ item.value.dest }}"
   become: true
   with_dict: "{{ dut_configs|default({}) }}"
+
+- name: Deploy specific device configs to local fodler
+  copy:
+    src: "{{ item.value.src }}"
+    dest: "{{ '/usr/share/sonic/device/x86_64-kvm_x86_64-r0/%s/port_config.ini' | format(dut_hwsku) }}"
+  become: true
+  with_dict: "{{ dut_configs|default({}) }}"
+  delegate_to: localhost
+  when: item.key == "port_config"
