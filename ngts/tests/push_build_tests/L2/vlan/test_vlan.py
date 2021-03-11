@@ -21,15 +21,16 @@ logger = logging.getLogger()
 class TestVLAN:
 
     @pytest.fixture(autouse=True)
-    def setup(self, topology_obj, ha_dut_1_mac, ha_dut_2_mac, hb_dut_1_mac, hb_dut_2_mac):
+    def setup(self, topology_obj, engines, players, interfaces, ha_dut_1_mac, ha_dut_2_mac, hb_dut_1_mac, hb_dut_2_mac):
         self.topology_obj = topology_obj
-        self.dut_engine = topology_obj.players['dut']['engine']
-        self.cli_object = self.topology_obj.players['dut']['cli']
+        self.players = players
+        self.dut_engine = engines.dut
+        self.cli_object = self.players['dut']['cli']
 
-        self.dut_hb_1 = topology_obj.ports['dut-hb-1']
-        self.dut_ha_2 = topology_obj.ports['dut-ha-2']
-        self.hb_dut_1 = topology_obj.ports['hb-dut-1']
-        self.ha_dut_2 = topology_obj.ports['ha-dut-2']
+        self.dut_hb_1 = interfaces.dut_hb_1
+        self.dut_ha_2 = interfaces.dut_ha_2
+        self.hb_dut_1 = interfaces.hb_dut_1
+        self.ha_dut_2 = interfaces.ha_dut_2
 
         self.ha_dut_1_mac = ha_dut_1_mac
         self.ha_dut_2_mac = ha_dut_2_mac
@@ -88,7 +89,7 @@ class TestVLAN:
                               ]
                           }
             logger.info('Sending 3 untagged packets from bond0 to {} VLAN {}'.format(self.hb_dut_1, self.vlan_30))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
         with allure.step('Vlan access mode: verify tagged traffic with the same VLAN as port access configured - pass'):
             validation = {'sender': 'ha', 'send_args': {'interface': 'bond0',
@@ -105,7 +106,7 @@ class TestVLAN:
             logger.info('Sending 3 tagged packets from bond0 with VLAN tag {} to {} VLAN {}'.format(self.vlan_30,
                                                                                                     self.hb_dut_1,
                                                                                                     self.vlan_30))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
         with allure.step('Vlan access mode: verify tagged traffic with wlan != to access vlan - is dropped'):
             validation = {'sender': 'ha', 'send_args': {'interface': 'bond0',
@@ -122,7 +123,7 @@ class TestVLAN:
             logger.info('Sending 3 tagged packets from bond0 with VLAN tag {} to {} VLAN {}'.format(self.vlan_800,
                                                                                                     self.hb_dut_1,
                                                                                                     self.vlan_800))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
     @pytest.mark.build
     @pytest.mark.push_gate
@@ -157,7 +158,7 @@ class TestVLAN:
                           }
             logger.info('Sending 3 tagged packets in VLAN {} from {} to {} VLAN {}'.format(self.vlan_30, self.hb_dut_1,
                                                                                            self.ha_dut_2, self.vlan_30))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
         with allure.step('Vlan trunk mode: verify tagged traffic with VLAN {} can reach from '
                          '{} to bond0 on HA without VLAN tag'.format(self.vlan_30, self.hb_dut_1)):
@@ -175,7 +176,7 @@ class TestVLAN:
                           }
             logger.info('Sending 3 tagged packets with VLAN {} from {} to bond0 on HA'.format(self.vlan_30,
                                                                                               self.hb_dut_1))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
         with allure.step('Vlan trunk mode: verify tagged traffic is dropped '
                          'when vlan {} is not configured on dut-ha-2'
@@ -197,7 +198,7 @@ class TestVLAN:
                                                                                              self.ha_dut_2,
                                                                                              self.hb_dut_1,
                                                                                              self.vlan_800))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
         with allure.step('Vlan trunk mode: verify untagged traffic is dropped'):
             validation = {'sender': 'hb', 'send_args': {'interface': self.hb_dut_1,
@@ -212,7 +213,7 @@ class TestVLAN:
                           }
             logger.info('Sending 3 untagged packets from {} to {} VLAN {}'.format(self.hb_dut_1, self.ha_dut_2,
                                                                                   self.vlan_30))
-            ScapyChecker(self.topology_obj.players, validation).run_validation()
+            ScapyChecker(self.players, validation).run_validation()
 
     @pytest.mark.build
     @pytest.mark.push_gate
@@ -268,7 +269,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 untagged packets from bond0 to {} VLAN {} via split ports'.format(self.hb_dut_1,
                                                                                                          self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
         except Exception as e:
             raise e
@@ -329,7 +330,7 @@ class TestVLAN:
                                   ]
                               }
                 logger.info('Sending 3 untagged packets from bond0 to {} VLAN {}'.format(self.hb_dut_1, self.vlan_4095))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             logger.info("Configure Vlan {} on the dut {}".format(self.vlan_4094, self.dut_engine.ip))
             self.cli_object.vlan.add_vlan(self.dut_engine, self.vlan_4094)
@@ -361,7 +362,7 @@ class TestVLAN:
                                   ]
                               }
                 logger.info('Sending 3 untagged packets from bond0 to {} VLAN {}'.format(self.hb_dut_1, self.vlan_4094))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan access mode: verify tagged traffic with the same VLAN as port access configured - pass'):
                 validation = {'sender': 'ha',
@@ -378,7 +379,7 @@ class TestVLAN:
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 to {} VLAN {}'.format(self.vlan_4094,
                                                                                                self.hb_dut_1,
                                                                                                self.vlan_4094))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan access mode: verify tagged traffic with wlan != to access vlan - is dropped'):
                 validation = {'sender': 'ha',
@@ -395,7 +396,7 @@ class TestVLAN:
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 to {} VLAN {}'.format(self.vlan_800,
                                                                                                self.hb_dut_1,
                                                                                                self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
         except Exception as e:
             raise e
@@ -404,6 +405,7 @@ class TestVLAN:
             # cleanup
             self.cli_object.vlan.del_port_from_vlan(self.dut_engine, self.po_iface, self.vlan_4094)
             self.cli_object.vlan.del_port_from_vlan(self.dut_engine, self.dut_hb_1, self.vlan_4094)
+            self.cli_object.vlan.del_vlan(self.dut_engine, self.vlan_4094)
             self.cli_object.vlan.add_port_to_vlan(self.dut_engine, self.po_iface, self.vlan_30, mode='access')
 
     @pytest.mark.build
@@ -451,7 +453,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 to hb-dut-1 VLAN {}'.format(self.vlan_30,
                                                                                                      self.vlan_30))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan trunk mode: verify tagged traffic with vlan {} from bond0 can reach '
                              'hb-dut-1 VLAN {}'.format(self.vlan_800, self.vlan_800)):
@@ -468,7 +470,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 to hb-dut-1 VLAN {}'.format(self.vlan_800,
                                                                                                      self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan trunk mode: verify untagged traffic is dropped'):
                 validation = {'sender': 'ha',
@@ -483,7 +485,7 @@ class TestVLAN:
                                   ]
                               }
                 logger.info('Sending 3 untagged packets from bond0 (ha-dut-1) to hb-dut-1')
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan trunk mode: verify tagged traffic is dropped '
                              'when vlan {} is not configured on dut-ha-2'
@@ -501,7 +503,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 (ha-dut-1) to ha-dut-2 VLAN {}'.format(
                     self.vlan_800, self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             logger.info("remove port dut-ha-1 vlan trunk mode configuration.")
             SonicVlanCli.del_port_from_vlan(self.dut_engine, self.po_iface, self.vlan_30)
@@ -533,7 +535,7 @@ class TestVLAN:
                                   ]
                               }
                 logger.info('Sending 3 untagged packets from bond0 (ha-dut-1) to hb-dut-1 VLAN {}'.format(self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan access mode: verify tagged traffic with the same VLAN as port access configured - pass'):
                 validation = {'sender': 'ha',
@@ -549,7 +551,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 (ha-dut-1) to hb-dut-1 VLAN {}'.format(
                     self.vlan_800, self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan access mode: verify tagged traffic with wlan != to access vlan - is dropped'):
                 validation = {'sender': 'ha',
@@ -565,7 +567,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 (ha-dut-1) to hb-dut-1 VLAN {}'.format(
                     self.vlan_30, self.vlan_30))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             logger.info("Switch port dut-ha-1 vlan mode to access with vlan {}.".format(self.vlan_30))
             SonicVlanCli.del_port_from_vlan(self.dut_engine, self.po_iface, self.vlan_800)
@@ -594,7 +596,7 @@ class TestVLAN:
                                   ]
                               }
                 logger.info('Sending 3 untagged packets from bond0 (ha-dut-1) to hb-dut-1 VLAN {}'.format(self.vlan_30))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan access mode: verify tagged traffic with the same VLAN as port access configured - pass'):
                 validation = {'sender': 'ha',
@@ -610,7 +612,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 (ha-dut-1) to hb-dut-1 VLAN {}'.format(
                     self.vlan_30, self.vlan_30))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
             with allure.step('Vlan access mode: verify tagged traffic with wlan != to access vlan - is dropped'):
                 validation = {'sender': 'ha',
@@ -626,7 +628,7 @@ class TestVLAN:
                               }
                 logger.info('Sending 3 tagged packets VLAN {} from bond0 (ha-dut-1) to hb-dut-1 VLAN {}'.format(
                     self.vlan_800, self.vlan_800))
-                ScapyChecker(self.topology_obj.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
         except Exception as e:
             raise e

@@ -13,21 +13,20 @@ logger = logging.getLogger()
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test show LLDP table information')
-def test_show_lldp_table_output(topology_obj):
+def test_show_lldp_table_output(topology_obj, engines):
     """
     Compare the LLDP info in the "show lldp table" to the topology expected connectivity
     :param topology_obj: topology object fixture
     :return: None, raise error in case of unexpacted lldp result
     """
     with allure.step("Verifying the output of \"show lldp table\" command match the expected setup Noga topology"):
-        dut_engine = topology_obj.players['dut']['engine']
         cli_object = topology_obj.players['dut']['cli']
         dut_ports_interconnects = get_dut_ports_interconnects(topology_obj.ports_interconnects)
         retry_call(verify_lldp_ports_match_topology_ports, fargs=[dut_ports_interconnects, topology_obj], tries=6,
                    delay=5, logger=logger)
-        lldp_table_info = cli_object.lldp.parse_lldp_table_info(dut_engine)
-        port_aliases_dict = cli_object.interface.parse_ports_aliases_on_sonic(dut_engine)
-        dut_hostname = cli_object.chassis.get_hostname(dut_engine)
+        lldp_table_info = cli_object.lldp.parse_lldp_table_info(engines.dut)
+        port_aliases_dict = cli_object.interface.parse_ports_aliases_on_sonic(engines.dut)
+        dut_hostname = cli_object.chassis.get_hostname(engines.dut)
         for port_noga_alias, neighbor_port_noga_alias in dut_ports_interconnects.items():
             port = topology_obj.ports[port_noga_alias]
             port_neighbor = topology_obj.ports[neighbor_port_noga_alias]
@@ -192,7 +191,7 @@ def verify_port_capability(topo_neighbor_port_capability, lldp_neighbor_port_cap
 @pytest.mark.lldp
 @pytest.mark.build
 @allure.title('test show LLDP neighbors information')
-def test_show_lldp_neighbors_output(topology_obj):
+def test_show_lldp_neighbors_output(topology_obj, engines):
     """
     Compare the LLDP info in the "show lldp neighbors" command to the topology expected connectivity
     :param topology_obj: topology object fixture
@@ -200,15 +199,14 @@ def test_show_lldp_neighbors_output(topology_obj):
     """
     with allure.step("Verifying the output of \"show lldp neighbors\" command"
                      " match the expected setup Noga topology"):
-        dut_engine = topology_obj.players['dut']['engine']
         cli_object = topology_obj.players['dut']['cli']
         dut_ports_interconnects = get_dut_ports_interconnects(topology_obj.ports_interconnects)
-        dut_hostname = cli_object.chassis.get_hostname(dut_engine)
-        dut_mac = cli_object.mac.get_mac_address_for_interface(dut_engine, "eth0")
+        dut_hostname = cli_object.chassis.get_hostname(engines.dut)
+        dut_mac = cli_object.mac.get_mac_address_for_interface(engines.dut, "eth0")
         for port_noga_alias, neighbor_port_noga_alias in dut_ports_interconnects.items():
             port = topology_obj.ports[port_noga_alias]
             port_neighbor = topology_obj.ports[neighbor_port_noga_alias]
-            lldp_info = cli_object.lldp.parse_lldp_info_for_specific_interface(dut_engine, port)
+            lldp_info = cli_object.lldp.parse_lldp_info_for_specific_interface(engines.dut, port)
             with allure.step("Validating topology neighbor ports {}: {} and {}: {}"
                              .format(port_noga_alias, port, neighbor_port_noga_alias, port_neighbor)):
                 if is_port_connected_to_host(port_noga_alias):
@@ -287,27 +285,26 @@ def verify_remote_device_id(topo_remote_device_id, lldp_remote_device_id):
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP after disable on dut')
-def test_lldp_after_disable_on_dut(topology_obj):
+def test_lldp_after_disable_on_dut(topology_obj, engines):
     """
     Verify LLDP is up after being disabled.
     Lldp should be disabled after a disabled command and should be up after enable in 30 sec or less
     :param topology_obj: topology object fixture
     :return: None, raise assertion error if lldp info doesn't match the expected output
     """
-    dut_engine = topology_obj.players['dut']['engine']
     cli_object = topology_obj.players['dut']['cli']
-    cli_object.lldp.disable_lldp(dut_engine)
+    cli_object.lldp.disable_lldp(engines.dut)
     logger.info("Verify lldp is disabled in \"show_feature_status\"")
-    check_lldp_feature_status(dut_engine, cli_object, expected_res=r"lldp\s+disabled")
+    check_lldp_feature_status(engines.dut, cli_object, expected_res=r"lldp\s+disabled")
     with allure.step("Expect test LLDP to fail after being disabled"):
         try:
             verify_lldp_info_for_dut_host_ports(topology_obj)
             raise Exception("Test passed when expected to fail")
         except AssertionError as e:
             logger.info("Test failed as expected")
-    cli_object.lldp.enable_lldp(dut_engine)
+    cli_object.lldp.enable_lldp(engines.dut)
     logger.info("Verify LLDP service start")
-    check_lldp_feature_status(dut_engine, cli_object)
+    check_lldp_feature_status(engines.dut, cli_object)
     with allure.step("Expect test LLDP to pass after LLDP is enabled"):
         retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
 
@@ -352,16 +349,14 @@ def verify_lldp_info_for_dut_host_ports(topology_obj):
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP after disable on host')
-def test_lldp_after_disable_on_host(topology_obj):
+def test_lldp_after_disable_on_host(topology_obj, engines, interfaces):
     """
     :param topology_obj: topology object fixture
     :return: None, raise AssertionError in case of validation fails
     """
-    ha_engine = topology_obj.players['ha']['engine']
     cli_object = topology_obj.players['ha']['cli']
-    ha_dut_1 = topology_obj.ports['ha-dut-1']
     try:
-        cli_object.lldp.disable_lldp_on_interface(ha_engine, ha_dut_1)
+        cli_object.lldp.disable_lldp_on_interface(engines.ha, interfaces.ha_dut_1)
         with allure.step("Expect test LLDP to fail after LLDP was disabled on host interface"):
             try:
                 verify_lldp_info_for_dut_host_ports(topology_obj)
@@ -369,7 +364,7 @@ def test_lldp_after_disable_on_host(topology_obj):
             except AssertionError as e:
                 logger.info("Test failed as expected")
         logger.info("Start LLDP on host interface")
-        cli_object.lldp.enable_lldp_on_interface(ha_engine, ha_dut_1)
+        cli_object.lldp.enable_lldp_on_interface(engines.ha, interfaces.ha_dut_1)
         with allure.step("Expect test LLDP to pass after LLDP is enabled on host interface"):
             retry_call(verify_lldp_info_for_dut_host_ports, fargs=[topology_obj], tries=4, delay=10, logger=logger)
 
@@ -378,28 +373,29 @@ def test_lldp_after_disable_on_host(topology_obj):
 
     finally:
         # cleanup
-        cli_object.lldp.enable_lldp_on_interface(ha_engine, ha_dut_1)
+        cli_object.lldp.enable_lldp_on_interface(engines.ha, interfaces.ha_dut_1)
+
 
 @pytest.mark.build
 @pytest.mark.lldp
 @pytest.mark.push_gate
 @allure.title('test LLDP when changing tx-interval on dut')
-def test_lldp_change_transmit_delay(topology_obj):
+def test_lldp_change_transmit_delay(topology_obj, engines):
     """
     this test changes the lldp transmit interval and
     verify lldp information update on neigbor host within the configuered interval.
     :param topology_obj: topology object fixture
     :return: None, raise AssertionError in case of validation fails
     """
-    dut_engine = topology_obj.players['dut']['engine']
+    # dut_engine = topology_obj.players['dut']['engine']
     cli_object = topology_obj.players['dut']['cli']
     checked_intervals = [120, 60, 30]
     for interval in checked_intervals:
         with allure.step("Check lldp when changing transmit delay to {} seconds.".format(interval)):
-            cli_object.lldp.change_lldp_tx_interval(dut_engine, interval=interval)
-            cli_object.lldp.verify_lldp_tx_interval(dut_engine, expected_transmit_interval=interval)
-            cli_object.lldp.pause_lldp(dut_engine)
-            cli_object.lldp.resume_lldp(dut_engine)
+            cli_object.lldp.change_lldp_tx_interval(engines.dut, interval=interval)
+            cli_object.lldp.verify_lldp_tx_interval(engines.dut, expected_transmit_interval=interval)
+            cli_object.lldp.pause_lldp(engines.dut)
+            cli_object.lldp.resume_lldp(engines.dut)
             logger.info("Verify LLDP service resume within {} seconds".format(interval))
             with allure.step("Expect test LLDP to pass within {} seconds after LLDP is resume".format(interval)):
                 retry_call(verify_lldp_info_for_host_dut_ports, fargs=[topology_obj],

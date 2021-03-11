@@ -1,0 +1,67 @@
+# In this file stored expected reboot/reload time per platform, which used during the test validation
+# Time stored in seconds
+# YAML file have next structure:
+#MSN3420:               <<< platform
+#  fast-reboot: 30      <<< fast-reboot - reboot type, 30 - expected reboot time
+#  warm-reboot: 110     <<< warm-reboot - reboot type, 100 - expected reboot time
+#  reboot: 120          <<< reboot - reboot type, 120 - expected reboot time
+#  config_reload: 20    <<< config_reload - reload type, 120 - expected conf reload time
+
+# SPC1
+MSN2010:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 130
+  reboot: 130
+  config_reload: 120
+MSN2100:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 130
+  reboot: 130
+  config_reload: 120
+MSN2410:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 110
+  reboot: 120
+  config_reload: 120
+SN2700:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 120
+  reboot: 130
+  config_reload: 120
+# SPC2
+MSN3420:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 110
+  reboot: 120
+  config_reload: 120
+MSN3700:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 110
+  reboot: 120
+  config_reload: 120
+MSN3700C:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 110
+  reboot: 120
+  config_reload: 120
+MSN3800:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 110
+  reboot: 120
+  config_reload: 120
+# SPC3
+MSN4410:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 150
+  reboot: 140
+  config_reload: 140
+MSN4600:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 110
+  reboot: 120
+  config_reload: 120
+MSN4700:
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 160
+  reboot: 150
+  config_reload: 140

@@ -8,27 +8,18 @@ Defines the methods and fixtures which will be used by pytest
 
 import pytest
 import logging
+import re
+from dotted_dict import DottedDict
 
 from infra.tools.topology_tools.topology_setup_utils import get_topology_by_setup_name
 from ngts.cli_wrappers.sonic.sonic_cli import SonicCli
 from ngts.cli_wrappers.linux.linux_cli import LinuxCli
 from ngts.tools.allure_report.allure_server import AllureServer
 from ngts.tools.skip_test.skip import ngts_skip
-from distutils.dist import strtobool
 from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
 logger = logging.getLogger()
 
-pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer')
-
-
-@pytest.fixture(scope='session')
-def is_simx(request):
-    """
-    Method for getting base version from pytest arguments
-    :param request: pytest builtin
-    :return: setup name
-    """
-    return strtobool(request.config.getoption('--simx'))
+pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer', 'pytester')
 
 
 def pytest_addoption(parser):
@@ -39,8 +30,39 @@ def pytest_addoption(parser):
     logger.info('Parsing pytest options')
     parser.addoption('--setup_name', action='store', required=True, default=None,
                      help='Setup name, example: sonic_tigris_r-tigris-06')
-    logger.info("Parsing if simx setup")
-    parser.addoption('--simx', default="False", help='value indicating if the setup is a simx setup')
+    parser.addoption('--base_version', action='store', default=None, help='Path to base SONiC version')
+    parser.addoption('--target_version', action='store', default=None, help='Path to target SONiC version')
+    parser.addoption('--wjh_deb_url', action='store', default=None, help='URL path to WJH deb package')
+
+
+@pytest.fixture(scope="session")
+def base_version(request):
+    """
+    Method for getting base version from pytest arguments
+    :param request: pytest builtin
+    :return: base_version argument value
+    """
+    return request.config.getoption('--base_version')
+
+
+@pytest.fixture(scope="session")
+def target_version(request):
+    """
+    Method for getting target version from pytest arguments
+    :param request: pytest builtin
+    :return: target_version argument value
+    """
+    return request.config.getoption('--target_version')
+
+
+@pytest.fixture(scope="session")
+def wjh_deb_url(request):
+    """
+    Method for getting what-just-happend deb file URL from pytest arguments
+    :param request: pytest builtin
+    :return: wjh_deb_url argument value
+    """
+    return request.config.getoption('--wjh_deb_url')
 
 
 @pytest.fixture(scope='session')
@@ -148,44 +170,125 @@ def pytest_runtest_makereport(item, call):
 
 
 @pytest.fixture(scope='session')
-def ha_dut_1_mac(topology_obj):
+def ha_dut_1_mac(engines, interfaces):
     """
     Pytest fixture which are returning mac address for link: ha-dut-1
-    :param topology_obj: topology object fixture
     """
-    ha_dut_1 = topology_obj.ports['ha-dut-1']
-    ha_engine = topology_obj.players['ha']['engine']
-    return LinuxMacCli.get_mac_address_for_interface(ha_engine, ha_dut_1)
+    return LinuxMacCli.get_mac_address_for_interface(engines.ha, interfaces.ha_dut_1)
 
 
 @pytest.fixture(scope='session')
-def ha_dut_2_mac(topology_obj):
+def ha_dut_2_mac(engines, interfaces):
     """
     Pytest fixture which are returning mac address for link: ha-dut-2
-    :param topology_obj: topology object fixture
     """
-    ha_dut_2 = topology_obj.ports['ha-dut-2']
-    ha_engine = topology_obj.players['ha']['engine']
-    return LinuxMacCli.get_mac_address_for_interface(ha_engine, ha_dut_2)
+    return LinuxMacCli.get_mac_address_for_interface(engines.ha, interfaces.ha_dut_2)
 
 
 @pytest.fixture(scope='session')
-def hb_dut_1_mac(topology_obj):
+def hb_dut_1_mac(engines, interfaces):
     """
     Pytest fixture which are returning mac address for link: hb-dut-1
-    :param topology_obj: topology object fixture
     """
-    hb_dut_1 = topology_obj.ports['hb-dut-1']
-    hb_engine = topology_obj.players['hb']['engine']
-    return LinuxMacCli.get_mac_address_for_interface(hb_engine, hb_dut_1)
+    return LinuxMacCli.get_mac_address_for_interface(engines.hb, interfaces.hb_dut_1)
 
 
 @pytest.fixture(scope='session')
-def hb_dut_2_mac(topology_obj):
+def hb_dut_2_mac(engines, interfaces):
     """
     Pytest fixture which are returning mac address for link: hb-dut-2
-    :param topology_obj: topology object fixture
     """
-    hb_dut_2 = topology_obj.ports['hb-dut-2']
-    hb_engine = topology_obj.players['hb']['engine']
-    return LinuxMacCli.get_mac_address_for_interface(hb_engine, hb_dut_2)
+    return LinuxMacCli.get_mac_address_for_interface(engines.hb, interfaces.hb_dut_2)
+
+
+@pytest.fixture(scope='session')
+def hwsku(show_platform_summary):
+    """
+    Pytest fixture which are returning hwsku
+    :param show_platform_summary: show_platform_summary fixture
+    """
+    hwsku = re.search(r'HwSKU:\s(.*)', show_platform_summary, re.IGNORECASE).group(1)
+    return hwsku
+
+
+@pytest.fixture(scope='session')
+def platform(show_platform_summary):
+    """
+    Pytest fixture which are returning platform
+    :param show_platform_summary: show_platform_summary fixture
+    """
+    platform = re.search(r'Platform:\s*(.*)', show_platform_summary, re.IGNORECASE).group(1)
+    return platform
+
+
+@pytest.fixture(scope='session')
+def sonic_version(engines):
+    """
+    Pytest fixture which are returning current SONiC installed version
+    :param engines: dictionary with available engines
+    :return: string with current SONiC version
+    """
+    show_version_output = engines.dut.run_cmd('sudo show version')
+    sonic_ver = re.search(r'SONiC\sSoftware\sVersion:\s(.*)', show_version_output, re.IGNORECASE).group(1)
+    return sonic_ver
+
+
+@pytest.fixture(scope='session')
+def engines(topology_obj):
+    engines_data = DottedDict()
+    engines_data.dut = topology_obj.players['dut']['engine']
+    engines_data.ha = topology_obj.players['ha']['engine']
+    engines_data.hb = topology_obj.players['hb']['engine']
+    return engines_data
+
+
+@pytest.fixture(scope='session')
+def interfaces(topology_obj):
+    interfaces_data = DottedDict()
+    interfaces_data.ha_dut_1 = topology_obj.ports['ha-dut-1']
+    interfaces_data.ha_dut_2 = topology_obj.ports['ha-dut-2']
+    interfaces_data.hb_dut_1 = topology_obj.ports['hb-dut-1']
+    interfaces_data.hb_dut_2 = topology_obj.ports['hb-dut-2']
+    interfaces_data.dut_ha_1 = topology_obj.ports['dut-ha-1']
+    interfaces_data.dut_ha_2 = topology_obj.ports['dut-ha-2']
+    interfaces_data.dut_hb_1 = topology_obj.ports['dut-hb-1']
+    interfaces_data.dut_hb_2 = topology_obj.ports['dut-hb-2']
+    return interfaces_data
+
+
+@pytest.fixture(scope='session')
+def platform_params(platform, hwsku, setup_name):
+    """
+    Method for getting all platform related data
+    :return: dictionary with platform data
+    """
+    platform_data = DottedDict()
+    platform_data.platform = platform
+    platform_data.hwsku = hwsku
+    platform_data.setup_name = setup_name
+    return platform_data
+
+
+@pytest.fixture(scope="session")
+def upgrade_params(base_version, target_version, wjh_deb_url):
+    """
+    Method for getting all upgrade related parameters
+    :return: dictionary with upgrade parameters
+    """
+    upgrade_data = DottedDict()
+
+    upgrade_data.base_version = base_version
+    upgrade_data.target_version = target_version
+    upgrade_data.wjh_deb_url = wjh_deb_url
+    upgrade_data.is_upgrade_required = False
+    if base_version and target_version:
+        upgrade_data.is_upgrade_required = True
+    else:
+        logger.info('Either one or all the upgrade arguments is missing, skipping the upgrade flow')
+    return upgrade_data
+
+
+@pytest.fixture(scope="session")
+def players(topology_obj):
+    return topology_obj.players
+

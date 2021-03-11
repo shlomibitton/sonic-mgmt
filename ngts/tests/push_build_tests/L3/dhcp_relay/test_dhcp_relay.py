@@ -38,13 +38,14 @@ dhcp_option_53 = 'udp[250:1]'
 class TestDHCPRelay:
 
     @pytest.fixture(autouse=True)
-    def setup(self, topology_obj):
+    def setup(self, topology_obj, engines, players, interfaces):
         self.topology = topology_obj
-        self.dut_engine = topology_obj.players['dut']['engine']
-        self.dhcp_client_engine = topology_obj.players['ha']['engine']
-        self.dhcp_server_engine = topology_obj.players['hb']['engine']
+        self.players = players
+        self.dut_engine = engines.dut
+        self.dhcp_client_engine = engines.ha
+        self.dhcp_server_engine = engines.hb
         self.dhclient_vlan = '690'
-        self.hadut2 = topology_obj.ports['ha-dut-2']
+        self.hadut2 = interfaces.ha_dut_2
         self.dhclient_iface = '{}.{}'.format(self.hadut2, self.dhclient_vlan)
         self.dut_vlan_iface = 'Vlan' + self.dhclient_vlan
         self.dhcp_server_iface = 'bond0.69'
@@ -103,7 +104,7 @@ class TestDHCPRelay:
                                                                           'filter': tcpdump_filter_release, 'count': 1}}
                                   ]
                               }
-                ScapyChecker(self.topology.players, validation).run_validation()
+                ScapyChecker(self.players, validation).run_validation()
 
         except BaseException as err:
             raise AssertionError(err)
@@ -130,7 +131,7 @@ class TestDHCPRelay:
                                                             'filter': tcpdump_filter_nak, 'count': 1}}
                                                   ]
                                               }
-                ScapyChecker(self.topology.players, validation_nak_default_vrf).run_validation()
+                ScapyChecker(self.players, validation_nak_default_vrf).run_validation()
         except BaseException as err:
             raise AssertionError(err)
 
@@ -154,7 +155,7 @@ class TestDHCPRelay:
                                                                             'count': 1}}
                                                       ]
                                                   }
-                ScapyChecker(self.topology.players, validation_decline_default_vrf).run_validation()
+                ScapyChecker(self.players, validation_decline_default_vrf).run_validation()
         except BaseException as err:
             raise AssertionError(err)
 
@@ -177,7 +178,7 @@ class TestDHCPRelay:
                                                                            'filter': tcpdump_filter_inform, 'count': 1}}
                                                      ]
                                                  }
-                ScapyChecker(self.topology.players, validation_inform_default_vrf).run_validation()
+                ScapyChecker(self.players, validation_inform_default_vrf).run_validation()
         except BaseException as err:
             raise AssertionError(err)
 
@@ -231,7 +232,7 @@ class TestDHCPRelay:
                                                                                'count': 1}}
                                                          ]
                                                      }
-                ScapyChecker(self.topology.players, validation_custom_request_src_prt).run_validation()
+                ScapyChecker(self.players, validation_custom_request_src_prt).run_validation()
         except BaseException as err:
             raise AssertionError(err)
 
@@ -263,7 +264,7 @@ class TestDHCPRelay:
                                                                            'count': 1}}
                                                      ]
                                                  }
-                scapy_checker = ScapyChecker(self.topology.players, validation_empty_dhcp_request)
+                scapy_checker = ScapyChecker(self.players, validation_empty_dhcp_request)
                 retry_call(scapy_checker.run_validation, fargs=[], tries=3, delay=5, logger=logger)
         except BaseException as err:
             raise AssertionError(err)
@@ -277,7 +278,7 @@ class TestDHCPRelay:
             with allure.step('Validate UDP message with SRC and DST port the same as DHCP not forwarded to DHCP server'):
                 # PING below need to prevent issue when packet not forwarded to host from switch
                 validation_ping = {'sender': 'ha', 'args': {'count': 3,  'dst': '30.0.0.1'}}
-                PingChecker(self.topology.players, validation_ping).run_validation()
+                PingChecker(self.players, validation_ping).run_validation()
 
                 validation_udp_packet = {'sender': 'ha', 'send_args': {'interface': self.dhclient_iface,
                                                                        'packets': udp_pkt, 'count': 3},
@@ -291,7 +292,7 @@ class TestDHCPRelay:
                                                                    'filter': tcpdump_filter_src_1_2_3_4, 'count': 0}}
                                              ]
                                          }
-                ScapyChecker(self.topology.players, validation_udp_packet).run_validation()
+                ScapyChecker(self.players, validation_udp_packet).run_validation()
         except BaseException as err:
             raise AssertionError(err)
 
@@ -319,7 +320,7 @@ class TestDHCPRelay:
                                                                         'count': 1}}
                                                   ]
                                               }
-                ScapyChecker(self.topology.players, validation_invalid_payload).run_validation()
+                ScapyChecker(self.players, validation_invalid_payload).run_validation()
         except BaseException as err:
             raise AssertionError(err)
 

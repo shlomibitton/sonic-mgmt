@@ -286,13 +286,13 @@ def test_crm_nexthop_group_and_member(env, cleanup):
 @pytest.mark.push_gate
 @pytest.mark.ngts_skip({'rm_ticket_list': [2497916]})
 @allure.title('Test CRM FDB counters')
-def test_crm_fdb_entry(env, cleanup, topology_obj):
+def test_crm_fdb_entry(env, cleanup, topology_obj, interfaces):
     """
     Test doing verification of used and available CRM counters for the following resources:
     fdb_entry
     """
     vlan_id = int(env.vlan_iface_40.replace('Vlan', ''))
-    iface = topology_obj.ports['dut-ha-2']
+    iface = interfaces.dut_ha_2
     fdb_resource = 'fdb_entry'
     fdb_clear_cmd = 'fdbclear'
 

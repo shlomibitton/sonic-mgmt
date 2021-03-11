@@ -9,18 +9,11 @@ class GeneralCliCommon(GeneralCliInterface):
         pass
 
     @staticmethod
-    def verify_cmd_rc(engine, error_message):
-        rc = engine.run_cmd('echo $?')
-        assert int(rc) == 0, error_message
-
-    @staticmethod
     def start_service(engine, service):
-        output = engine.run_cmd('sudo service {} start'.format(service))
-        GeneralCliCommon.verify_cmd_rc(engine, 'Unable to start service {}'.format(service))
+        output = engine.run_cmd('sudo service {} start'.format(service), validate=True)
         return output
 
     @staticmethod
     def stop_service(engine, service):
-        output = engine.run_cmd('sudo service {} stop'.format(service))
-        GeneralCliCommon.verify_cmd_rc(engine, 'Unable to stop service {}'.format(service))
+        output = engine.run_cmd('sudo service {} stop'.format(service), validate=True)
         return output

@@ -1,0 +1,30 @@
+# In this file stored data for check allowed difference in config_db.json during upgrade
+# For compare JSON configs we use next library: https://pypi.org/project/deepdiff/
+# Example below expect that we did manufacturing to version 201911 and the upgrade to 202012
+# After upgrade we expect that 2 new items will be added to config_db.json:
+# First  {...... "KDUMP": {HERE SOME VALUIES}, ........}
+# Second {...... "VLAN": {"Vlan69": {"vlanid"}}, ......}
+# One item will be removed from config_db.json - {...... "VLAN": {"Vlan690": {"vlanid"}}, ......}
+# One item will be changed in config_db.json - {..... "FEATURE": {"what-just-happened": {"state" : value_changed}}, ...}
+# Please see full description on example below:
+# "201911":                                                <<< Base version(branch) from which we do upgrade
+#  "202012":                                               <<< Target version(branch) to which we do upgrade
+#    dictionary_item_added:                                <<< List with allowed new lines after upgrade
+#      - root['KDUMP']                                     <<< Line which is allowed to be added after upgrade
+#      - root['VLAN']['Vlan69']['vlanid']                  <<< Line which is allowed to be added after upgrade
+#    dictionary_item_removed:                              <<< List with allowed removed lines after upgrade
+#      - root['VLAN']['Vlan690']['vlanid']                 <<< Line which is allowed to be removed after upgrade
+#    values_changed:                                       <<< List with allowed changed lines after upgrade
+#      - root['FEATURE']['what-just-happened']['state']    <<< Line which is allowed to be changed after upgrade
+
+"201911":
+  "202012":
+    dictionary_item_added:
+      - root['KDUMP']
+  "master":
+    dictionary_item_added:
+      - root['KDUMP']
+"202012":
+  "202012":
+    dictionary_item_added:
+      - root['KDUMP']
