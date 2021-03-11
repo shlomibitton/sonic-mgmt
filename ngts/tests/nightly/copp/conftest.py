@@ -1,7 +1,7 @@
 import pytest
 import logging
 import allure
-
+import os
 from retry.api import retry_call
 from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
 from ngts.config_templates.ip_config_template import IpConfigTemplate
@@ -9,6 +9,20 @@ from ngts.config_templates.ip_config_template import IpConfigTemplate
 
 logger = logging.getLogger()
 CONFIG_DB_COPP_CONFIG = '/etc/sonic/copp_cfg.json'
+
+
+@pytest.fixture(autouse=True)
+def ignore_expected_loganalyzer_exceptions(loganalyzer):
+    """
+    expanding the ignore list of the loganalyzer for these tests because of reboot.
+    :param loganalyzer: loganalyzer utility fixture
+    :return: None
+    """
+    if loganalyzer:
+        ignore_regex_list = \
+            loganalyzer.parse_regexp_file(src=str(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                               "copp_loganalyzer_ignore.txt")))
+        loganalyzer.ignore_regex.extend(ignore_regex_list)
 
 
 @pytest.fixture(scope='module', autouse=True)
