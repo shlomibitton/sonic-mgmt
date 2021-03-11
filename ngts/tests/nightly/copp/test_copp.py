@@ -213,7 +213,7 @@ class CoppBase:
         with allure.step('Send traffic'):
             start_time = time.time()
             ScapyChecker(self.topology.players, self.validation).run_validation()
-            self.dispatch_time = time.time() - start_time
+            self.dispatch_time = dispatch_time_correction(time.time() - start_time)
             time.sleep(1)
 
     # -------------------------------------------------------------------------------
@@ -536,3 +536,41 @@ def update_limit_values(copp_dict, trap_group, cir_value, cbs_value):
         copp_dict[COPP_GROUP][trap_group]['cbs'] = cbs_value
     else:
         copp_dict[COPP_GROUP][trap_group].update({'cbs': cbs_value})
+
+# -------------------------------------------------------------------------------
+
+
+def dispatch_time_correction(current_dispatch_time):
+    """
+    This function correct the rate traffic dispatch time from some network/scapy delays.
+    :param current_dispatch_time: current dispatch time of traffic
+    :return: dispatch time after correction
+    """
+    if current_dispatch_time >= 10:
+        return rate_dispatch_time_correction(current_dispatch_time)
+    else:
+        return burst_dispatch_time_correction(current_dispatch_time)
+
+# -------------------------------------------------------------------------------
+
+
+def rate_dispatch_time_correction(current_dispatch_time):
+    """
+    The rate traffic time is 10 seconds. So the dispatch time can't be bigger then 11 seconds
+    :param current_dispatch_time: current dispatch time of traffic
+    :return: dispatch time after correction
+    """
+    max_rate_dispatch_time = 11
+    return min(current_dispatch_time, max_rate_dispatch_time)
+
+# -------------------------------------------------------------------------------
+
+
+def burst_dispatch_time_correction(current_dispatch_time):
+    """
+    The burst traffic time is 1 second. So the dispatch time can't be bigger then 1.1 seconds
+    :param current_dispatch_time: current dispatch time of traffic
+    :return: dispatch time after correction
+    """
+    max_burst_dispatch_time = 1.1
+    return min(current_dispatch_time, max_burst_dispatch_time)
