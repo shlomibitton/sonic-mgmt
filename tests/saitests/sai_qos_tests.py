@@ -1,13 +1,11 @@
 """
 SONiC Dataplane Qos tests
 """
-
 import time
 import logging
 import ptf.packet as scapy
 import socket
 import ptf.dataplane as dataplane
-import ptf.testutils as testutils
 import sai_base_test
 import operator
 import sys
@@ -16,7 +14,8 @@ from ptf.testutils import (ptf_ports,
                            simple_arp_packet,
                            send_packet,
                            simple_tcp_packet,
-                           simple_qinq_tcp_packet)
+                           simple_qinq_tcp_packet,
+                           simple_ip_packet)
 from ptf.mask import Mask
 from switch import (switch_init,
                     sai_thrift_create_scheduler_profile,
@@ -65,7 +64,7 @@ def get_rx_port(dp, device_number, src_port_id, dst_mac, dst_ip, src_ip):
     ip_id = 0xBABE
     tos = (0 << 2) | 1
     src_port_mac = dp.dataplane.get_mac(device_number, src_port_id)
-    pkt = testutils.simple_ip_packet(pktlen=64,
+    pkt = simple_ip_packet(pktlen=64,
                             eth_dst=dst_mac,
                             eth_src=src_port_mac,
                             ip_src=src_ip,
@@ -75,7 +74,7 @@ def get_rx_port(dp, device_number, src_port_id, dst_mac, dst_ip, src_ip):
 
     send_packet(dp, src_port_id, pkt, 1)
 
-    exp_pkt = testutils.simple_ip_packet(pktlen=48,
+    exp_pkt = simple_ip_packet(pktlen=48,
                             eth_dst=dst_mac,
                             eth_src=src_port_mac,
                             ip_src=src_ip,
@@ -225,7 +224,7 @@ class DscpMappingPB(sai_base_test.ThriftInterfaceDataPlane):
             for dscp in range(0, 64):
                 tos = (dscp << 2)
                 tos |= 1
-                pkt = testutils.simple_ip_packet(pktlen=64,
+                pkt = simple_ip_packet(pktlen=64,
                                         eth_dst=pkt_dst_mac,
                                         eth_src=src_port_mac,
                                         ip_src=src_port_ip,
@@ -616,18 +615,30 @@ class PFCtest(sai_base_test.ThriftInterfaceDataPlane):
         pkts_num_trig_pfc = int(self.test_params['pkts_num_trig_pfc'])
         pkts_num_trig_ingr_drp = int(self.test_params['pkts_num_trig_ingr_drp'])
 
+        pkt_dst_mac = router_mac if router_mac != '' else dst_port_mac
+
         # Prepare TCP packet data
         tos = dscp << 2
         tos |= ecn
         ttl = 64
         default_packet_length = 64
-        pkt = simple_tcp_packet(pktlen=default_packet_length,
-                                eth_dst=router_mac if router_mac != '' else dst_port_mac,
+        pkt = simple_ip_packet(pktlen=default_packet_length,
+                                eth_dst=pkt_dst_mac,
                                 eth_src=src_port_mac,
                                 ip_src=src_port_ip,
                                 ip_dst=dst_port_ip,
                                 ip_tos=tos,
                                 ip_ttl=ttl)
+
+        print >> sys.stderr, "test dst_port_id: {}, src_port_id: {}".format(
+            dst_port_id, src_port_id
+        )
+        # in case dst_port_id is part of LAG, find out the actual dst port
+        # for given IP parameters
+        dst_port_id = get_rx_port(
+            self, 0, src_port_id, pkt_dst_mac, dst_port_ip, src_port_ip
+        )
+        print >> sys.stderr, "actual dst_port_id: {}".format(dst_port_id)
 
         # get a snapshot of counter values at recv and transmit ports
         # queue_counters value is not of our interest here
@@ -925,7 +936,7 @@ class HdrmPoolSizeTest(sai_base_test.ThriftInterfaceDataPlane):
         if self.pkts_num_trig_pfc:
             print >> sys.stderr, ("pkts num: leak_out: %d, trig_pfc: %d, hdrm_full: %d, hdrm_partial: %d, pkt_size %d" % (self.pkts_num_leak_out, self.pkts_num_trig_pfc, self.pkts_num_hdrm_full, self.pkts_num_hdrm_partial, self.pkt_size))
         elif self.pkts_num_trig_pfc_shp:
-            print >> sys.stderr, ("pkts num: leak_out: {}, trig_pfc: {}, hdrm_full: {}, hdrm_partial: {}, pkt_size {}".format(self.pkts_num_leak_out, self.pkts_num_trig_pfc_shp, self.pkts_num_hdrm_full, self.pkts_num_hdrm_partial, self.pkt_size))            
+            print >> sys.stderr, ("pkts num: leak_out: {}, trig_pfc: {}, hdrm_full: {}, hdrm_partial: {}, pkt_size {}".format(self.pkts_num_leak_out, self.pkts_num_trig_pfc_shp, self.pkts_num_hdrm_full, self.pkts_num_hdrm_partial, self.pkt_size))
 
         # used only for headroom pool watermark
         if all(key in self.test_params for key in ['hdrm_pool_wm_multiplier', 'buf_pool_roid', 'cell_size', 'max_headroom']):
@@ -1626,7 +1637,7 @@ class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             time.sleep(8)
             q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])
             print >> sys.stderr, "Init pkts num sent: %d, min: %d, actual watermark value to start: %d" % ((pkts_num_leak_out + pkts_num_fill_min), pkts_num_fill_min, pg_shared_wm_res[pg])
-            # pkts_num_fill_min should be zero for lossless and lossy on Mellanox platform 
+            # pkts_num_fill_min should be zero for lossless and lossy on Mellanox platform
             if asic_type == 'mellanox' or pkts_num_fill_min:
                 assert(pg_shared_wm_res[pg] == 0)
             else:

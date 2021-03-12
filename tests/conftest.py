@@ -12,15 +12,22 @@ import jinja2
 
 from datetime import datetime
 from tests.common.fixtures.conn_graph_facts import conn_graph_facts
-from tests.common.devices import Localhost
-from tests.common.devices import PTFHost, EosHost, FanoutHost, K8sMasterHost, K8sMasterCluster
+from tests.common.devices.local import Localhost
+from tests.common.devices.ptf import PTFHost
+from tests.common.devices.eos import EosHost
+from tests.common.devices.fanout import FanoutHost
+from tests.common.devices.k8s import K8sMasterHost
+from tests.common.devices.k8s import K8sMasterCluster
+from tests.common.devices.duthosts import DutHosts
+from tests.common.devices.vmhost import VMHost
+
 from tests.common.helpers.constants import ASIC_PARAM_TYPE_ALL, ASIC_PARAM_TYPE_FRONTEND, DEFAULT_ASIC_ID
 from tests.common.helpers.dut_ports import encode_dut_port_name
-from tests.common.devices import DutHosts
 from tests.common.testbed import TestbedInfo
 from tests.common.utilities import get_inventory_files
 from tests.common.utilities import get_host_vars
 from tests.common.utilities import get_host_visible_vars
+from tests.common.utilities import get_test_server_host
 from tests.common.helpers.dut_utils import is_supervisor_node, is_frontend_node
 from tests.common.cache import FactsCache
 
@@ -368,6 +375,15 @@ def fanouthosts(ansible_adhoc, conn_graph_facts, creds):
     except:
         pass
     return fanout_hosts
+
+
+@pytest.fixture(scope="session")
+def vmhost(ansible_adhoc, request, tbinfo):
+    server = tbinfo["server"]
+    inv_files = request.config.option.ansible_inventory
+    vmhost = get_test_server_host(inv_files, server)
+    return VMHost(ansible_adhoc, vmhost.name)
+
 
 @pytest.fixture(scope='session')
 def eos():
