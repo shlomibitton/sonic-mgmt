@@ -73,7 +73,7 @@ class TestRebootReload:
                                     "reboot_time": reboot_time
             }
             logger.info('Uploading test results to MySQL DB')
-            # DB().insert(table='reboot_time', columns_values=mysql_columns_values)
+            DB().insert(table='reboot_time', columns_values=mysql_columns_values)
 
     def test_push_gate_config_reload(self, request):
         """
@@ -107,4 +107,4 @@ class TestRebootReload:
                                     "reload_time": reload_time
             }
             logger.info('Uploading test results to MySQL DB')
-            # DB().insert(table='reload_time', columns_values=mysql_columns_values)
+            DB().insert(table='reload_time', columns_values=mysql_columns_values)

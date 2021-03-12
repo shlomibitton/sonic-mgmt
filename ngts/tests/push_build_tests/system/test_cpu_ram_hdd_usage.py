@@ -56,7 +56,7 @@ class TestCpuRamHddUsage:
                                     "total": total_size
             }
             logger.info('Uploading test results to MySQL DB')
-            # DB().insert(table='disk_usage', columns_values=mysql_columns_values)
+            DB().insert(table='disk_usage', columns_values=mysql_columns_values)
 
     @pytest.mark.build
     @pytest.mark.push_gate
@@ -115,7 +115,7 @@ class TestCpuRamHddUsage:
             }
             mysql_columns_values.update(cpu_usage_per_process)
             logger.info('Uploading test results to MySQL DB')
-            # DB().insert(table='cpu_usage', columns_values=mysql_columns_values)
+            DB().insert(table='cpu_usage', columns_values=mysql_columns_values)
 
     @pytest.mark.build
     @pytest.mark.push_gate
@@ -182,7 +182,7 @@ class TestCpuRamHddUsage:
             }
             mysql_columns_values.update(ram_usage_per_process)
             logger.info('Uploading test results to MySQL DB')
-            # DB().insert(table='ram_usage', columns_values=mysql_columns_values)
+            DB().insert(table='ram_usage', columns_values=mysql_columns_values)
 
 
 def get_cpu_usage_and_processes(dut_engine):
