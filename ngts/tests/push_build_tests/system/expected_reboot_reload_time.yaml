@@ -10,7 +10,7 @@
 # SPC1
 MSN2010:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
-  warm-reboot: 130
+  warm-reboot: 150
   reboot: 130
   config_reload: 120
 MSN2100:
@@ -20,9 +20,9 @@ MSN2100:
   config_reload: 120
 MSN2410:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
-  warm-reboot: 110
-  reboot: 120
-  config_reload: 120
+  warm-reboot: 130
+  reboot: 150
+  config_reload: 160
 SN2700:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 120

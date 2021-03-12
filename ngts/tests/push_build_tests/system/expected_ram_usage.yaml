@@ -30,7 +30,7 @@ MSN2010:
   vxlanmgrd: 2
   sensord: 4
 MSN2100:
-  total: 2500
+  total: 3000
   sx_sdk: 500
   syncd: 70
   redis-server: 50
@@ -236,7 +236,7 @@ MSN4700:
   redis-server: 50
   snmpd: 10
   zebra: 15
-  bgpd: 15
+  bgpd: 20
   bgpcfgd: 15
   bgpmon: 10
   fpmsyncd: 2
