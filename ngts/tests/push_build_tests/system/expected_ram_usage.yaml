@@ -136,7 +136,7 @@ MSN3700:
   intfmgrd: 5
   portmgrd: 2
   buffermgrd: 5
-  vrfmgrd: 2
+  vrfmgrd: 5
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 4
@@ -158,7 +158,7 @@ MSN3700C:
   intfmgrd: 5
   portmgrd: 2
   buffermgrd: 5
-  vrfmgrd: 2
+  vrfmgrd: 5
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 4
