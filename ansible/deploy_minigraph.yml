@@ -46,6 +46,16 @@
             src: "minigraph/{{ dut_minigraph }}"
             dest: "/etc/sonic/minigraph.xml"
 
+        - name: Deploy script which enables dynamic buffer calculation after reloading minigraph
+          copy:
+            src: "roles/sonicv2/files/mlnx/enable-dynamic-buffer.py"
+            dest: "/usr/local/bin"
+
+        - name: Set the mode of the script
+          file:
+            path: "/usr/local/bin/enable-dynamic-buffer.py"
+            mode: "0755"
+
         - name: Deploy specific device configuration files
           include: deploy_device_configs.yml
           vars:
@@ -54,6 +64,9 @@
 
         - name: Reload minigraph.
           shell: config load_minigraph -y
+
+        - name: Enable dynamic buffer calculation
+          shell: "enable-dynamic-buffer.py"
 
         - name: Save config.
           shell: config save -y
