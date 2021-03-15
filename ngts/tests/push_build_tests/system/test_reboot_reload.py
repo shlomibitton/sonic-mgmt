@@ -47,7 +47,7 @@ class TestRebootReload:
                       github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/4793'])
 
         start_time = time.time()
-        reboot_time = ''
+        reboot_time = 0.0
         try:
             with allure.step('Rebooting the dut using reboot cmd: "sudo {}"'.format(reboot_type)):
                 self.dut_engine.reload(reload_cmd_set=['sudo {}'.format(reboot_type)], wait_after_ping=0)
@@ -81,7 +81,7 @@ class TestRebootReload:
         :param request: pytest buildin
         """
         start_time = time.time()
-        reload_time = ''
+        reload_time = 0.0
         try:
             with allure.step('Reloading the DUT config by cmd: "config reload -y"'):
                 self.cli_object.general.reload_configuration(self.dut_engine)

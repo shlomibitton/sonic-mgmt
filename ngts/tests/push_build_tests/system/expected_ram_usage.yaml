@@ -12,242 +12,242 @@ MSN2010:
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN2100:
   total: 3000
   sx_sdk: 500
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 20
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 40
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
   vrfmgrd: 5
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN2410:
   total: 3000
   sx_sdk: 500
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 SN2700:
   total: 3000
   sx_sdk: 500
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 # SPC2
 MSN3420:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN3700:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
   intfmgrd: 5
-  portmgrd: 2
+  portmgrd: 5
   buffermgrd: 5
   vrfmgrd: 5
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN3700C:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
   intfmgrd: 5
-  portmgrd: 2
+  portmgrd: 5
   buffermgrd: 5
   vrfmgrd: 5
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN3800:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 # SPC3
 MSN4410:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 4
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN4600:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 15
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
-  vxlanmgrd: 2
-  sensord: 4
+  vrfmgrd: 5
+  nbrmgrd: 5
+  vxlanmgrd: 5
+  sensord: 10
 MSN4700:
   total: 3500
   sx_sdk: 900
   syncd: 70
   redis-server: 50
-  snmpd: 10
-  zebra: 15
-  bgpd: 20
-  bgpcfgd: 15
-  bgpmon: 10
-  fpmsyncd: 2
-  orchagent: 10
-  ntpd: 2
-  neighsyncd: 2
-  vlanmgrd: 2
-  intfmgrd: 2
-  portmgrd: 2
+  snmpd: 20
+  zebra: 30
+  bgpd: 30
+  bgpcfgd: 30
+  bgpmon: 20
+  fpmsyncd: 5
+  orchagent: 20
+  ntpd: 5
+  neighsyncd: 5
+  vlanmgrd: 5
+  intfmgrd: 5
+  portmgrd: 5
   buffermgrd: 5
-  vrfmgrd: 2
-  nbrmgrd: 2
+  vrfmgrd: 5
+  nbrmgrd: 5
   vxlanmgrd: 5
-  sensord: 4
+  sensord: 10
