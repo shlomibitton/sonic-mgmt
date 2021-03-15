@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> Dynamic Buffer Calculation with Shared Headroom Pool Test </info>
+            <!--Must be the test case name in sonic-mgmt/ansible/roles/test/vars/testcases.yml-->
+            <name> dynamic-buffer-calculation-with-shared-headroom-pool </name>
+            <owner> </owner>
+        </Test>
+        <Case>
+            <tags> DYNAMIC_BUFFER_CALC_SHP </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 3600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <ignore>
+            <condition>
+                <!-- Run on ptf topology as test doesn't support others. -->
+                <key> topology </key>
+                <op> in </op>
+                <value> ["t0", "t0-64", "t0-116", "t1", "t1-lag"] </value>
+            </condition>
+        </ignore>
+
+        <info> Dynamic-Buffer-Calc-SHP Case </info>
+        <name> dynamic-buffer-calculation-with-shared-headroom-pool </name>
+        <tout> 3600 </tout>
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no --enable_shared_headroom_pool=true -ra --showlocals -k \"not test_buffer_model_test and not test_exceeding_headroom and not test_shared_headroom_pool_configure\"\'" --test-scripts qos/test_buffer.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+</CASEDEF>
