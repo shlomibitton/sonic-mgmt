@@ -353,27 +353,23 @@ def deploy_minigprah(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, rec
 
 
 @separate_logger
-def apply_canonical_config(topo, dut_name):
+def apply_canonical_config(topo, dut_name, ngts_engine):
     """
     Method which call script: sonic_split_configuration_script.py with args
     """
     setup_name_index = -2
-    script_path = os.path.dirname(__file__)
-    dut_ip = socket.gethostbyname(dut_name)
+    sonic_mgmt_path = '/workspace/{setup_name}/sonic-mgmt/'
     setup_name = topo.split('/')[setup_name_index]
+    dut_ip = socket.gethostbyname(dut_name)
+    sonic_mgmt_dir = sonic_mgmt_path.format(setup_name=setup_name)
+    cmd = "PYTHONPATH=/devts:{sonic_mgmt_dir} python3 {sonic_mgmt_dir}ngts/scripts/sonic_split_configuration_script.py --switch {dut_ip} " \
+          "--setup_name {setup_name} --noga".format(sonic_mgmt_dir=sonic_mgmt_dir, dut_ip=dut_ip, setup_name=setup_name)
 
-    cmd = "PYTHONPATH=/auto/app/Python-3.6.2/ {}/sonic_split_configuration_script.py --switch {} " \
-          "--setup_name {} --noga".format(script_path, dut_ip, setup_name)
-
-    logger.info("Running CMD: {}".format(cmd))
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    process.wait()
-    print(process.stdout.read())
-
-    if process.returncode != 0:
-        raise Exception("Encountered an error during application of configuration files on the DUT, please review the "
-                        "error logs")
-
+    res = ngts_engine.run(cmd)
+    if res.failed:
+        raise Exception(
+            "Encountered an error during application of configuration files on the DUT, please review the - error logs")
+    logger.info("apply_canonical_config finished successfully")
 
 @separate_logger
 def post_install_check(ansible_path, mgmt_docker_engine, dut_name, sonic_topo):
@@ -446,6 +442,7 @@ def main():
     topo = parse_topology(args.topo)
     sonic_mgmt_device = topo.get_device_by_topology_id(constants.SONIC_MGMT_DEVICE_ID)
     hypervisor_device = topo.get_device_by_topology_id(constants.TEST_SERVER_DEVICE_ID)
+    ngts_device = topo.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
 
     mgmt_docker_engine = Connection(sonic_mgmt_device.BASE_IP, user=sonic_mgmt_device.USERS[0].USERNAME,
                                     config=Config(overrides={"run": {"echo": True}}),
@@ -454,6 +451,10 @@ def main():
     hypervisor_engine = Connection(hypervisor_device.BASE_IP, user=hypervisor_device.USERS[0].USERNAME,
                                    config=Config(overrides={"run": {"echo": True}}),
                                    connect_kwargs={"password": hypervisor_device.USERS[0].PASSWORD})
+
+    ngts_docker_engine = Connection(ngts_device.BASE_IP, user=ngts_device.USERS[0].USERNAME,
+                                    config=Config(overrides={"run": {"echo": True}}),
+                                    connect_kwargs={"password": ngts_device.USERS[0].PASSWORD})
 
     image_urls = prepare_images(args.base_version, args.target_version, args.serve_files)
 
@@ -469,7 +470,7 @@ def main():
 
     # For Canonical setups do not apply minigraph - just apply configs from shared location
     if args.sonic_topo == 'ptf-any':
-        apply_canonical_config(topo=args.topo, dut_name=args.dut_name)
+        apply_canonical_config(topo=args.topo, dut_name=args.dut_name, ngts_engine=ngts_docker_engine)
     else:
         deploy_minigprah(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                          sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
