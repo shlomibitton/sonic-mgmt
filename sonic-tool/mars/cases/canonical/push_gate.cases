@@ -3,14 +3,14 @@
   <global>
     <Test>
       <group> onyx </group>
-      <name> SONiC Push Gate </name>
-      <info> SONiC Push Gate test</info>
+      <name> SONiC Build and PushGate </name>
+      <info> SONiC Build and PushGate test</info>
       <owner> petrop </owner>
     </Test>
     <Case>
       <tags> push_gate </tags>
       <wrapper> canonical_mars_pytest_runner.py </wrapper>
-      <tout> 1500 </tout>
+      <tout> 3600 </tout>
       <tags>ALL</tags>
     </Case>
   </global>
