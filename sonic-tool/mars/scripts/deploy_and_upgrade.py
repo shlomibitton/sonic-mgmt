@@ -442,7 +442,6 @@ def main():
     topo = parse_topology(args.topo)
     sonic_mgmt_device = topo.get_device_by_topology_id(constants.SONIC_MGMT_DEVICE_ID)
     hypervisor_device = topo.get_device_by_topology_id(constants.TEST_SERVER_DEVICE_ID)
-    ngts_device = topo.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
 
     mgmt_docker_engine = Connection(sonic_mgmt_device.BASE_IP, user=sonic_mgmt_device.USERS[0].USERNAME,
                                     config=Config(overrides={"run": {"echo": True}}),
@@ -451,10 +450,6 @@ def main():
     hypervisor_engine = Connection(hypervisor_device.BASE_IP, user=hypervisor_device.USERS[0].USERNAME,
                                    config=Config(overrides={"run": {"echo": True}}),
                                    connect_kwargs={"password": hypervisor_device.USERS[0].PASSWORD})
-
-    ngts_docker_engine = Connection(ngts_device.BASE_IP, user=ngts_device.USERS[0].USERNAME,
-                                    config=Config(overrides={"run": {"echo": True}}),
-                                    connect_kwargs={"password": ngts_device.USERS[0].PASSWORD})
 
     image_urls = prepare_images(args.base_version, args.target_version, args.serve_files)
 
@@ -470,6 +465,10 @@ def main():
 
     # For Canonical setups do not apply minigraph - just apply configs from shared location
     if args.sonic_topo == 'ptf-any':
+        ngts_device = topo.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
+        ngts_docker_engine = Connection(ngts_device.BASE_IP, user=ngts_device.USERS[0].USERNAME,
+                                        config=Config(overrides={"run": {"echo": True}}),
+                                        connect_kwargs={"password": ngts_device.USERS[0].PASSWORD})
         apply_canonical_config(topo=args.topo, dut_name=args.dut_name, ngts_engine=ngts_docker_engine)
     else:
         deploy_minigprah(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,

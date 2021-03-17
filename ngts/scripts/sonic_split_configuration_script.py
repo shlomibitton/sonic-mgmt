@@ -152,7 +152,6 @@ def get_switch_resource_from_user(args):
     :param args: script arguments
     :return:  ssh engine to switch and path to port_config.ini file
     """
-    topology_obj = get_topology_by_setup_name(args.setup_name, slow_cli=False)
     engine = ProxySshEngine(device_type=LinuxConsts.linux,
                             ip=args.switch_ip,
                             username=args.switch_username,
