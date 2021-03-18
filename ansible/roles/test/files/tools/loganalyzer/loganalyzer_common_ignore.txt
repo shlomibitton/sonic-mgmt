@@ -40,3 +40,4 @@ r, ".* WARNING syncd#SDK:.*Not supported attribute SAI_SWITCH_ATTR_AVAILABLE_IPM
 r, ".* ERR swss#orchagent: :- getResAvailableCounters: Failed to get switch attribute.*"
 r, ".* ERR pmon#xcvrd.* Receive PMPE error event on module \d+: status 3 error type 0"
 r, ".* WARNING pmon#syseepromd.*Failed to load data from eeprom using sonic_platform package due to.*retrying using deprecated plugin method"
+r, ".* ERR pmon#pcied.* PCIe device status check"
