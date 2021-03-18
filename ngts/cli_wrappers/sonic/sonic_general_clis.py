@@ -147,12 +147,13 @@ class SonicGeneralCli(GeneralCliCommon):
         if deploy_type == 'onie':
             SonicGeneralCli.deploy_onie(dut_engine, image_path)
 
-        SonicGeneralCli.verify_dockers_are_up(dut_engine)
-
         if apply_base_config:
             SonicGeneralCli.apply_basic_config(dut_engine, setup_name, platform, hwsku)
+
         if wjh_deb_url:
             SonicGeneralCli.install_wjh(dut_engine, wjh_deb_url)
+            
+        SonicGeneralCli.verify_dockers_are_up(dut_engine)
 
     @staticmethod
     def deploy_sonic(dut_engine, image_path):
