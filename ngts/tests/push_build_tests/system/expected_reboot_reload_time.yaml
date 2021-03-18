@@ -15,7 +15,7 @@ MSN2010:
   config_reload: 120
 MSN2100:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
-  warm-reboot: 130
+  warm-reboot: 180
   reboot: 140
   config_reload: 120
 MSN2410:
@@ -36,12 +36,12 @@ MSN3420:
   config_reload: 120
 MSN3700:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
-  warm-reboot: 110
+  warm-reboot: 180
   reboot: 120
   config_reload: 120
 MSN3700C:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
-  warm-reboot: 110
+  warm-reboot: 180
   reboot: 120
   config_reload: 120
 MSN3800:
