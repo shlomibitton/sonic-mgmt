@@ -104,7 +104,7 @@ function read_csv
   vm_base=${line_arr[8]}
   dut=${line_arr[9]//;/,}
   duts=${dut//[\[\] ]/}
-  inventory=${line_arr[10]}
+  #inventory=${line_arr[10]}
 }
 
 function read_yaml
@@ -145,7 +145,7 @@ function read_yaml
   vm_base=${line_arr[8]}
   dut=${line_arr[9]}
   duts=$(python -c "from __future__ import print_function; print(','.join(eval(\"$dut\")))")
-  inventory=${line_arr[10]}
+  #inventory=${line_arr[10]}
 }
 
 function read_file
