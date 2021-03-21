@@ -8,9 +8,11 @@ from ptf.testutils import verify_no_packet_any, simple_ip_only_packet, simple_ip
 from tests.common.helpers.assertions import pytest_assert
 from collections import OrderedDict
 from tests.common.platform.device_utils import fanout_switch_port_lookup
+from tests.common.platform.processes_utils import wait_critical_processes
 from tests.common.utilities import wait, wait_until
 import json
 
+SUCCESS_CODE = 0
 
 logger = logging.getLogger(__name__)
 pytest.CHANNEL_CONF = None
@@ -99,7 +101,7 @@ def check_for_daemon_error(stderr_lines):
 def get_raw_table_output(duthost, command="show what-just-happened"):
     stdout = duthost.command(command)
     check_for_daemon_error(stdout['stderr_lines'])
-    if stdout['rc'] != 0:
+    if stdout['rc'] != SUCCESS_CODE:
         raise Exception(stdout['stdout'] + stdout['stderr'])
     table_output = parse_wjh_table(stdout['stdout'])
     return table_output
@@ -108,7 +110,7 @@ def get_raw_table_output(duthost, command="show what-just-happened"):
 def get_agg_table_output(duthost, command="show what-just-happened poll --aggregate"):
     stdout = duthost.command(command)
     check_for_daemon_error(stdout['stderr_lines'])
-    if stdout['rc'] != 0:
+    if stdout['rc'] != SUCCESS_CODE:
         raise Exception(stdout['stdout'] + stdout['stderr'])
     splitted_table = stdout['stdout'].splitlines()[3:]
     table = "\n".join(splitted_table)
@@ -414,3 +416,17 @@ def test_l1_agg_fanout_port_down(duthost, fanouthosts):
         #     pytest.fail("Could not find L1 drop on WJH aggregated table.")
     finally:
         fanout.no_shutdown(fanout_port)
+
+
+def test_wjh_starts_after_config_reload(duthost):
+    stdout = duthost.command('config reload -y', module_ignore_errors=True)
+    if stdout['rc'] != SUCCESS_CODE:
+        raise Exception(stdout['stdout'] + stdout['stderr'])
+    wait_critical_processes(duthost)
+    stdout = duthost.shell('docker ps | grep "what-just-happened"', module_ignore_errors=True)
+    if stdout['rc'] != SUCCESS_CODE:
+        raise Exception(stdout['stdout'] + stdout['stderr'])
+    stdout = stdout['stdout']
+    # if what-just-happened container is not up - fail
+    if stdout == "":
+        pytest.fail("what-just-happened container did not start up after config reload\nAborting!")
