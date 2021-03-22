@@ -40,6 +40,9 @@ MTBC-R730-04 ansible_host=mtbc-r730-04
 [vm_host_15]
 ARC-HOST70 ansible_host=arc-host70
 
+[vm_host_16]
+R-MGTSWH-185 ansible_host=r-mgtswh-185
+
 [vm_host_50]
 DEV-R-VRT-232 ansible_host=dev-r-vrt-232
 
@@ -64,6 +67,7 @@ vm_host_12
 vm_host_13
 vm_host_14
 vm_host_15
+vm_host_16
 vm_host_50
 vm_host_52
 vm_host_54
@@ -516,6 +520,40 @@ VM1530 ansible_host=10.215.22.91
 VM1531 ansible_host=10.215.22.92
 VM1532 ansible_host=10.215.22.93
 
+[vms_16]
+VM1601 ansible_host=10.213.14.63
+VM1602 ansible_host=10.213.14.64
+VM1603 ansible_host=10.213.14.65
+VM1604 ansible_host=10.213.14.66
+VM1605 ansible_host=10.213.14.67
+VM1606 ansible_host=10.213.14.68
+VM1607 ansible_host=10.213.14.69
+VM1608 ansible_host=10.213.14.70
+VM1609 ansible_host=10.213.14.71
+VM1610 ansible_host=10.213.14.72
+VM1611 ansible_host=10.213.14.73
+VM1612 ansible_host=10.213.14.74
+VM1613 ansible_host=10.213.14.75
+VM1614 ansible_host=10.213.14.76
+VM1615 ansible_host=10.213.14.77
+VM1616 ansible_host=10.213.14.78
+VM1617 ansible_host=10.213.14.79
+VM1618 ansible_host=10.213.14.80
+VM1619 ansible_host=10.213.14.81
+VM1620 ansible_host=10.213.14.82
+VM1621 ansible_host=10.213.14.83
+VM1622 ansible_host=10.213.14.84
+VM1623 ansible_host=10.213.14.85
+VM1624 ansible_host=10.213.14.86
+VM1625 ansible_host=10.213.14.87
+VM1626 ansible_host=10.213.14.88
+VM1627 ansible_host=10.213.14.89
+VM1628 ansible_host=10.213.14.90
+VM1629 ansible_host=10.213.14.91
+VM1630 ansible_host=10.213.14.92
+VM1631 ansible_host=10.213.14.93
+VM1632 ansible_host=10.213.14.94
+
 [vms_50]
 VM5001 ansible_host=10.212.232.5
 VM5002 ansible_host=10.212.232.6
@@ -549,6 +587,7 @@ vms_12
 vms_13
 vms_14
 vms_15
+vms_16
 vms_50
 vms_52
 vms_54
@@ -652,6 +691,13 @@ vms_15
 [server_15:vars]
 host_var_file=host_vars/ARC-HOST70.yml
 
+[server_16:children]
+vm_host_16
+vms_16
+
+[server_16:vars]
+host_var_file=host_vars/R-MGTSWH-185.yml
+
 [server_50:children]
 vm_host_50
 vms_50
@@ -700,6 +746,7 @@ server_12
 server_13
 server_14
 server_15
+server_16
 server_50
 server_52
 server_54

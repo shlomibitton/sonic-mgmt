@@ -50,6 +50,12 @@
             {%- else %}
           <Speed>{{ iface_speed }}</Speed>
             {%- endif %}
+        {%- elif inventory_hostname == "r-tigon-11" %}
+            {%- if index >= 62 %}
+          <Speed>50000</Speed>
+            {%- else %}
+          <Speed>{{ iface_speed }}</Speed>
+            {%- endif %}
         {%- else %}
           <Speed>{{ iface_speed }}</Speed>
         {%- endif %}
