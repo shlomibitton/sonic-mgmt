@@ -284,6 +284,7 @@ def verify_remote_device_id(topo_remote_device_id, lldp_remote_device_id):
 @pytest.mark.build
 @pytest.mark.lldp
 @pytest.mark.push_gate
+@pytest.mark.ngts_skip({'github_ticket_list': ['https://github.com/Azure/sonic-buildimage/issues/6119']})
 @allure.title('test LLDP after disable on dut')
 def test_lldp_after_disable_on_dut(topology_obj, engines):
     """
