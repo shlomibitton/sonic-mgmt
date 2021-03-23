@@ -52,7 +52,7 @@ MSN3800:
 # SPC3
 MSN4410:
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
-  warm-reboot: 150
+  warm-reboot: 160
   reboot: 140
   config_reload: 140
 MSN4600:
