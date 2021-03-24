@@ -19,7 +19,7 @@
     <info> </info>
     <cmd>
       <params>
-          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/copp --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals --disable_loganalyzer\'"</static_args>
+          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/copp --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals\'"</static_args>
       </params>
     </cmd>
   </case>
@@ -29,7 +29,7 @@
     <info> </info>
     <cmd>
       <params>
-          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/dhcp_relay --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals --disable_loganalyzer\'"</static_args>
+          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/dhcp_relay --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals\'"</static_args>
       </params>
     </cmd>
   </case>
@@ -39,7 +39,7 @@
     <info> </info>
     <cmd>
       <params>
-          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/dynamic_port_breakout --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals --disable_loganalyzer\'"</static_args>
+          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/dynamic_port_breakout --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals\'"</static_args>
       </params>
     </cmd>
     <ignore>
@@ -52,7 +52,7 @@
     <info> </info>
     <cmd>
       <params>
-          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/static_route --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals --disable_loganalyzer\'"</static_args>
+          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/nightly/static_route --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals\'"</static_args>
       </params>
     </cmd>
     <ignore>
