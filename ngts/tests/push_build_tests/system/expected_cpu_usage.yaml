@@ -7,7 +7,7 @@
 #  syncd: 5             <<< CPU usage expected by process syncd
 
 # SPC1
-MSN2010:
+MSN2010: # Boxer
   total: 20
   sx_sdk: 10
   syncd: 5
@@ -29,7 +29,7 @@ MSN2010:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN2100:
+MSN2100: # Bulldog
   total: 20
   sx_sdk: 10
   syncd: 5
@@ -51,7 +51,7 @@ MSN2100:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN2410:
+MSN2410: # Spider
   total: 40
   sx_sdk: 30
   syncd: 5
@@ -73,7 +73,7 @@ MSN2410:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-SN2700:
+SN2700: # Panther
   total: 40
   sx_sdk: 30
   syncd: 5
@@ -96,7 +96,7 @@ SN2700:
   vxlanmgrd: 2
   sensord: 2
 # SPC2
-MSN3420:
+MSN3420: # Lionfish
   total: 20
   sx_sdk: 10
   syncd: 5
@@ -118,7 +118,7 @@ MSN3420:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN3700:
+MSN3700: # Anaconda
   total: 20
   sx_sdk: 10
   syncd: 5
@@ -140,7 +140,7 @@ MSN3700:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN3700C:
+MSN3700C: # Anaconda C
   total: 20
   sx_sdk: 10
   syncd: 5
@@ -162,7 +162,7 @@ MSN3700C:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN3800:
+MSN3800: # Tigris
   total: 20
   sx_sdk: 10
   syncd: 5
@@ -185,7 +185,7 @@ MSN3800:
   vxlanmgrd: 2
   sensord: 2
 # SPC3
-MSN4410:
+MSN4410: # Ocelot
   total: 10
   sx_sdk: 5
   syncd: 2
@@ -207,7 +207,7 @@ MSN4410:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN4600:
+MSN4600: # Liger
   total: 10
   sx_sdk: 5
   syncd: 2
@@ -229,7 +229,29 @@ MSN4600:
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
-MSN4700:
+MSN4600C: # Tigon
+  total: 10
+  sx_sdk: 5
+  syncd: 2
+  redis-server: 2
+  snmpd: 2
+  zebra: 2
+  bgpd: 2
+  bgpcfgd: 2
+  bgpmon: 2
+  fpmsyncd: 2
+  orchagent: 2
+  ntpd: 2
+  neighsyncd: 2
+  vlanmgrd: 2
+  intfmgrd: 2
+  portmgrd: 2
+  buffermgrd: 2
+  vrfmgrd: 2
+  nbrmgrd: 2
+  vxlanmgrd: 2
+  sensord: 2
+MSN4700: # Leopard
   total: 10
   sx_sdk: 5
   syncd: 2
