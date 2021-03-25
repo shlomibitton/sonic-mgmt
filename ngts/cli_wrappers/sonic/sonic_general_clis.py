@@ -29,6 +29,16 @@ class SonicGeneralCli(GeneralCliCommon):
         return engine.run_cmd('show feature status')
 
     @staticmethod
+    def set_feature_state(engine, feature_name, state):
+        """
+        This method to set feature state on the sonic switch
+        :param engine: ssh engine object
+        :param feature_name: the feature name
+        :param state: state
+        """
+        engine.run_cmd('sudo config feature state {} {}'.format(feature_name, state), validate=True)
+
+    @staticmethod
     def get_installer_delimiter(engine):
         dash_installer = 'sonic-installer'
         delimiter = '_'
@@ -280,6 +290,6 @@ class SonicGeneralCli(GeneralCliCommon):
         wjh_package_local_name = '/home/admin/wjh.deb'
         dut_engine.run_cmd('sudo curl {} -o {}'.format(wjh_deb_url, wjh_package_local_name))
         dut_engine.run_cmd('sudo dpkg -i {}'.format(wjh_package_local_name), validate=True)
-        dut_engine.run_cmd('sudo config feature state what-just-happened enabled', validate=True)
-        dut_engine.run_cmd('sudo config save -y', validate=True)
+        SonicGeneralCli.set_feature_state(dut_engine, 'what-just-happened', 'enabled')
+        SonicGeneralCli.save_configuration(dut_engine)
         dut_engine.run_cmd('sudo rm -f {}'.format(wjh_package_local_name))
