@@ -58,13 +58,13 @@ MSN4410: # Ocelot
 MSN4600: # Liger
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 160
-  reboot: 150
+  reboot: 160
   config_reload: 120
 MSN4600C: # Tigon
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 110
   reboot: 150
-  config_reload: 120
+  config_reload: 150
 MSN4700: # Leopard
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 160
