@@ -246,25 +246,10 @@
         <tout> 5200 </tout>
         <ignore>
             <condition_group>
-                <operand> OR </operand>
-                <condition_group>
-                    <bug> 2382365 </bug>
-                    <operand> AND </operand>
-                    <condition>
-                        <key> dut_name </key>
-                        <op> in </op>
-                        <value> ["r-bulldog-02", "r-bulldog-03", "r-bulldog-04"] </value>
-                    </condition>
-                </condition_group>
-                <condition_group>
-                    <bug> 2403424 </bug>
-                    <operand> AND </operand>
-                    <condition>
-                        <key> dut_name </key>
-                        <op> in </op>
-                        <value> ["r-lionfish-07", "r-ocelot-02"] </value>
-                    </condition>
-                </condition_group>
+                <operand> AND </operand>
+                <bug> 2403424 </bug>
+                <bug> 2589957 </bug>
+                <bug> 2437505 </bug>
             </condition_group>
         </ignore>
         <cmd>
