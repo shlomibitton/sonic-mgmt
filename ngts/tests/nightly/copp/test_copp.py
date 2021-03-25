@@ -115,7 +115,7 @@ class CoppBase:
         if protocol_for_reboot_flow.lower() == self.get_tested_protocol_name():
             with allure.step('Check functionality of configured limits after reboot'):
                 self.dut_cli_object.general.save_configuration(self.dut_engine)
-                self.dut_cli_object.general.reboot_flow(self.dut_engine)
+                self.dut_cli_object.general.reboot_flow(self.dut_engine, topology_obj=self.topology)
                 self.pre_rx_counts = self.dut_cli_object.ifconfig.\
                     get_interface_ifconfig_details(self.dut_engine, self.dut_iface).rx_packets
                 time.sleep(10)  # to make sure all services are Up

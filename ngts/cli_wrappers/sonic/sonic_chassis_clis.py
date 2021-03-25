@@ -12,22 +12,22 @@ class SonicChassisCli(ChassisCliCommon):
     @staticmethod
     def get_platform(engine):
         """
-        This method excute command "show platform summery" and return the dut platform type
+        This method excute command "show platform summary" and return the dut platform type
         :param engine: ssh engine object
         :return: the dut platform type
         """
-        output = SonicChassisCli.show_platform_summery(engine)
+        output = SonicChassisCli.show_platform_summary(engine)
         pattern = "Platform:\s*(.*)"
         try:
             platform = re.search(pattern, output, re.IGNORECASE).group(1)
             return platform
-        except e:
+        except Exception:
             raise AssertionError("Could not match platform type for switch {}".format(engine.ip))
 
     @staticmethod
-    def show_platform_summery(engine):
+    def show_platform_summary(engine):
         """
-        This method excute command "show platform summery" on dut
+        This method excute command "show platform summary" on dut
         :param engine: ssh engine object
         :return: the cmd output
         """

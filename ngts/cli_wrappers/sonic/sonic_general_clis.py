@@ -80,19 +80,25 @@ class SonicGeneralCli(GeneralCliCommon):
         engine.run_cmd('sudo curl {} -o {}'.format(url, target_file_path), validate=True)
 
     @staticmethod
-    def reboot_flow(engine, reboot_type=''):
+    def reboot_flow(engine, reboot_type='', ports_list=None, topology_obj=None):
         """
-        Rebooting switch by given way(reboot, fast-reboot, warm-reboot)
+        Rebooting switch by given way(reboot, fast-reboot, warm-reboot) and validate dockers and ports state
         :param engine: ssh engine object
         :param reboot_type: reboot type
+        :param ports_list: list of the ports to check status after reboot
+        :param topology_obj: topology object
         :return: None, raise error in case of unexpected result
         """
+        if not (ports_list or topology_obj):
+            raise Exception('ports_list or topology_obj must be passed to reboot_flow method')
         if not reboot_type:
             reboot_type = random.choice(['reboot', 'fast-reboot', 'warm-reboot'])
+        if not ports_list:
+            ports_list = topology_obj.players_all_ports['dut']
         with allure.step('Reboot switch by CLI - sudo {}'.format(reboot_type)):
             engine.reload(['sudo {}'.format(reboot_type)])
             SonicGeneralCli.verify_dockers_are_up(engine, SonicConst.DOCKERS_LIST)
-            SonicGeneralCli.check_link_state(engine)
+            SonicGeneralCli.check_link_state(engine, ports_list)
 
     @staticmethod
     @retry(Exception, tries=12, delay=10)
@@ -109,16 +115,18 @@ class SonicGeneralCli(GeneralCliCommon):
             engine.run_cmd('docker ps | grep {}'.format(docker), validate=True)
 
     @staticmethod
-    def check_link_state(engine, iface='Ethernet0'):
+    def check_link_state(engine, ifaces=None):
         """
-        Verify that link in UP state. Default interface is  Ethernet0, this link exist in each Canonical setup
+        Verify that links in UP state. Default interface is  Ethernet0, this link exist in each Canonical setup
         :param engine: ssh engine object
-        :param iface: interface to check
+        :param ifaces: list of interfaces to check
         :return: None, raise error in case of unexpected result
         """
+        if ifaces is None:
+            ifaces = ['Ethernet0']
         with allure.step('Check that link in UP state'):
             retry_call(SonicInterfaceCli.check_ports_status,
-                       fargs=[engine, [iface]],
+                       fargs=[engine, ifaces],
                        tries=5,
                        delay=10,
                        logger=logger)

@@ -163,14 +163,15 @@ class SonicInterfaceCli(InterfaceCliCommon):
         This method verifies that each iinterface is in expected oper state
         :param engine: ssh engine object
         :param ports_list: list with port names which should be in UP state
-        :param expected_status_up: 'up' if expected UP, or 'down' if expected DOWN
+        :param expected_status: 'up' if expected UP, or 'down' if expected DOWN
         :return Assertion exception in case of failure
         """
         logger.info('Checking that ifaces: {} in expected state: {}'.format(ports_list, expected_status))
         ports_status = SonicInterfaceCli.parse_interfaces_status(engine)
 
         for port in ports_list:
-            assert ports_status[port]['Oper'] == expected_status
+            assert ports_status[port]['Oper'] == expected_status,\
+                'Interface {} in unexpected state, expected is {}'.format(port, expected_status)
 
     def configure_dpb_on_ports(self, engine, conf, expect_error=False, force=False):
         for breakout_mode, ports_list in conf.items():

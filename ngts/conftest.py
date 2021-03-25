@@ -292,3 +292,12 @@ def upgrade_params(base_version, target_version, wjh_deb_url):
 def players(topology_obj):
     return topology_obj.players
 
+
+def cleanup_last_config_in_stack(cleanup_list):
+    """
+    Execute the last function in the cleanup stack
+    :param cleanup_list: list with functions to cleanup
+    :return: None
+    """
+    func, args = cleanup_list.pop()
+    func(*args)
