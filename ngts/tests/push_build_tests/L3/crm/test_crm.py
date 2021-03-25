@@ -6,13 +6,13 @@ import os
 import json
 import copy
 import tempfile
-from ngts.tools.skip_test.skip import ngts_skip
 
 from retry.api import retry_call
 
 
 logger = logging.getLogger()
 MAX_CRM_UPDATE_TIME = 5
+AVAILABLE_TOLERANCE = 0.02
 
 
 class ValidationParamError(Exception):
@@ -30,6 +30,7 @@ def get_main_crm_stat(env, resource):
     crm_resources_all = env.sonic_cli.crm.parse_resources_table(env.dut_engine)
     res = crm_resources_all['main_resources'][resource]
     return int(res['Used Count']), int(res['Available Count'])
+
 
 def get_acl_crm_stat(env, resource):
     """
@@ -56,7 +57,8 @@ def get_acl_crm_stat(env, resource):
 
     return int(current_used), int(current_available)
 
-def verify_counters(env, resource, used, used_sign, available, available_sign):
+
+def verify_counters(env, resource, used, used_sign, available):
     """
     Verifies used and available counters for specific CRM resource
     :param env: pytest fixture
@@ -77,9 +79,11 @@ def verify_counters(env, resource, used, used_sign, available, available_sign):
             resource, used_sign, used, current_used
         )
 
-    assert eval('{} {} {}'.format(current_available, available_sign, available)),\
-        'Unexpected available count for \'{}\': expected \'{}\' {}; actual received - {}'.format(
-            resource, available_sign, available, current_available
+    low_treshold = available - int(available * AVAILABLE_TOLERANCE)
+    high_treshold = available + int(available * AVAILABLE_TOLERANCE)
+    assert low_treshold <= current_available <= high_treshold,\
+        'Unexpected available count for \'{}\': expected range {}...{}; actual received - {}'.format(
+            resource, low_treshold, high_treshold, current_available
         )
 
 
@@ -128,7 +132,6 @@ def apply_acl_config(env, entry_num=1):
 
 @pytest.mark.build
 @pytest.mark.push_gate
-@pytest.mark.ngts_skip({'rm_ticket_list': [2457577, 2497916]})
 @pytest.mark.parametrize('ip_ver,dst,mask', [('4', '2.2.2.0', 24), ('6', '2001::', 126)], ids=['ipv4', 'ipv6'])
 @allure.title('Test CRM route counters')
 def test_crm_route(env, cleanup, ip_ver, dst, mask):
@@ -148,7 +151,7 @@ def test_crm_route(env, cleanup, ip_ver, dst, mask):
     cleanup.append((env.sonic_cli.route.del_route, env.dut_engine, dst, vlan_iface, mask))
     with allure.step('Verify CRM {} counters'.format(crm_resource)):
         retry_call(
-            verify_counters, fargs=[env, crm_resource, used+1, '==', available-1, '<='],
+            verify_counters, fargs=[env, crm_resource, used+1, '==', available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     cleanup.pop()
@@ -158,14 +161,13 @@ def test_crm_route(env, cleanup, ip_ver, dst, mask):
 
     with allure.step('Verify CRM {} counters'.format(crm_resource)):
         retry_call(
-            verify_counters, fargs=[env, crm_resource, used, '==', available, '=='],
+            verify_counters, fargs=[env, crm_resource, used, '==', available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
 
 @pytest.mark.build
 @pytest.mark.push_gate
-@pytest.mark.ngts_skip({'rm_ticket_list': [2497916]})
 @pytest.mark.parametrize("ip_ver,neighbor,neigh_mac_addr", [("4", "2.2.2.2", "11:22:33:44:55:66"), ("6", "2001::1", "11:22:33:44:55:66")])
 @allure.title('Test CRM neighbor and nexthop counters')
 def test_crm_neighbor_and_nexthop(env, cleanup, ip_ver, neighbor, neigh_mac_addr):
@@ -189,12 +191,12 @@ def test_crm_neighbor_and_nexthop(env, cleanup, ip_ver, neighbor, neigh_mac_addr
     cleanup.append((env.sonic_cli.ip.add_ip_neigh, env.dut_engine, neighbor, neigh_mac_addr, vlan_iface))
     with allure.step('Verify CRM {} counters'.format(nexthop_resource)):
         retry_call(
-            verify_counters, fargs=[env, nexthop_resource, nexthop_used+1, '>=', nexthop_available-1, '<='],
+            verify_counters, fargs=[env, nexthop_resource, nexthop_used+1, '>=', nexthop_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     with allure.step('Verify CRM {} counters'.format(neighbor_resource)):
         retry_call(
-            verify_counters, fargs=[env, neighbor_resource, neighbor_used+1, '>=', neighbor_available-1, '<='],
+            verify_counters, fargs=[env, neighbor_resource, neighbor_used+1, '>=', neighbor_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     cleanup.pop()
@@ -204,19 +206,18 @@ def test_crm_neighbor_and_nexthop(env, cleanup, ip_ver, neighbor, neigh_mac_addr
 
     with allure.step('Verify CRM {} counters'.format(nexthop_resource)):
         retry_call(
-            verify_counters, fargs=[env, nexthop_resource, nexthop_used, '==', nexthop_available, '=='],
+            verify_counters, fargs=[env, nexthop_resource, nexthop_used, '==', nexthop_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     with allure.step('Verify CRM {} counters'.format(neighbor_resource)):
         retry_call(
-            verify_counters, fargs=[env, neighbor_resource, neighbor_used, '==', neighbor_available, '=='],
+            verify_counters, fargs=[env, neighbor_resource, neighbor_used, '==', neighbor_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
 
 @pytest.mark.build
 @pytest.mark.push_gate
-@pytest.mark.ngts_skip({'rm_ticket_list': [2497916]})
 @allure.title('Test CRM nexthop and nexthop group counters')
 def test_crm_nexthop_group_and_member(env, cleanup):
     """
@@ -255,12 +256,12 @@ def test_crm_nexthop_group_and_member(env, cleanup):
 
     with allure.step('Verify CRM nexthop_group_member counters'):
         retry_call(
-            verify_counters, fargs=[env, group_member_res, group_member_used+2, '==', group_member_available-2, '<='],
+            verify_counters, fargs=[env, group_member_res, group_member_used+2, '==', group_member_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     with allure.step('Verify CRM nexthop_group counters'):
         retry_call(
-            verify_counters, fargs=[env, group_res, group_used+1, '==', group_available-1, '<='],
+            verify_counters, fargs=[env, group_res, group_used+1, '==', group_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
@@ -272,21 +273,20 @@ def test_crm_nexthop_group_and_member(env, cleanup):
 
     with allure.step('Verify CRM nexthop_group_member counters'):
         retry_call(
-            verify_counters, fargs=[env, group_member_res, group_member_used, '==', group_member_available, '<='],
+            verify_counters, fargs=[env, group_member_res, group_member_used, '==', group_member_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     with allure.step('Verify CRM nexthop_group counters'):
         retry_call(
-            verify_counters, fargs=[env, group_res, group_used, '==', group_available, '<='],
+            verify_counters, fargs=[env, group_res, group_used, '==', group_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
 
 @pytest.mark.build
 @pytest.mark.push_gate
-@pytest.mark.ngts_skip({'rm_ticket_list': [2497916]})
 @allure.title('Test CRM FDB counters')
-def test_crm_fdb_entry(env, cleanup, topology_obj, interfaces):
+def test_crm_fdb_entry(env, cleanup, interfaces):
     """
     Test doing verification of used and available CRM counters for the following resources:
     fdb_entry
@@ -303,7 +303,7 @@ def test_crm_fdb_entry(env, cleanup, topology_obj, interfaces):
 
     with allure.step('Verify CRM {} counters'.format(fdb_resource)):
         retry_call(
-            verify_counters, fargs=[env, fdb_resource, fdb_used+1, '==', fdb_available-1, '=='],
+            verify_counters, fargs=[env, fdb_resource, fdb_used+1, '==', fdb_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
@@ -314,14 +314,13 @@ def test_crm_fdb_entry(env, cleanup, topology_obj, interfaces):
 
     with allure.step('Verify CRM {} counters'.format(fdb_resource)):
         retry_call(
-            verify_counters, fargs=[env, fdb_resource, fdb_used, '==', fdb_available, '=='],
+            verify_counters, fargs=[env, fdb_resource, fdb_used, '==', fdb_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
 
 @pytest.mark.build
 @pytest.mark.push_gate
-@pytest.mark.ngts_skip({'rm_ticket_list': [2497916]})
 @allure.title('Test CRM ACL counters')
 def test_crm_acl(env, cleanup):
     """
@@ -344,12 +343,12 @@ def test_crm_acl(env, cleanup):
 
     with allure.step('Verify CRM {} counters'.format(acl_entry_resource)):
         retry_call(
-            verify_counters, fargs=[env, acl_entry_resource, acl_entry_used + 2, '==', acl_entry_available - 2, '=='],
+            verify_counters, fargs=[env, acl_entry_resource, acl_entry_used + 2, '==', acl_entry_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     with allure.step('Verify CRM {} counters'.format(acl_counter_resource)):
         retry_call(
-            verify_counters, fargs=[env, acl_counter_resource, acl_counter_used + 2, '==', acl_counter_available - 2, '=='],
+            verify_counters, fargs=[env, acl_counter_resource, acl_counter_used + 2, '==', acl_counter_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
 
@@ -358,12 +357,12 @@ def test_crm_acl(env, cleanup):
 
     with allure.step('Verify CRM {} counters'.format(acl_entry_resource)):
         retry_call(
-            verify_counters, fargs=[env, acl_entry_resource, acl_entry_used, '==', acl_entry_available, '=='],
+            verify_counters, fargs=[env, acl_entry_resource, acl_entry_used, '==', acl_entry_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     with allure.step('Verify CRM {} counters'.format(acl_counter_resource)):
         retry_call(
-            verify_counters, fargs=[env, acl_counter_resource, acl_counter_used, '==', acl_counter_available, '=='],
+            verify_counters, fargs=[env, acl_counter_resource, acl_counter_used, '==', acl_counter_available],
             tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
         )
     cleanup.append((env.sonic_cli.acl.delete_config, env))
