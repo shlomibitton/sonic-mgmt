@@ -232,8 +232,8 @@ class MinigraphFacts:
 
 
     def compose_minigraph_facts(self):
-        start_marker = "    global port_alias_to_name_map"
-        end_marker = "for child in root:\n        if child.tag == str(QName(ns, \"DpgDec\")):\n"
+        start_marker = "    global port_alias_asic_map"
+        end_marker = "    port_alias_to_name_map, port_alias_asic_map = get_port_alias_to_name_map(hostname, hwsku, asic_id)"
 
         with open(self.mgmt_minigraph_path) as mg_file:
             minigraph_facts = ""
