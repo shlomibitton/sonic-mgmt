@@ -1,4 +1,4 @@
-def _port_alias_to_name_map_50G(all_ports, s100G_ports):
+def _port_alias_to_name_map_50G(all_ports, s100G_ports,):
     new_map = {}
     # 50G ports
     s50G_ports = list(set(all_ports) - set(s100G_ports))
@@ -12,16 +12,16 @@ def _port_alias_to_name_map_50G(all_ports, s100G_ports):
 
     return new_map
 
-
-def get_port_alias_to_name_map(hostname, hwsku):
+def get_port_alias_to_name_map(hostname, hwsku, asic_id=None):
     port_alias_to_name_map = {}
+    port_alias_asic_map = {}
     if hwsku == "Force10-S6000":
         for i in range(0, 128, 4):
             port_alias_to_name_map["fortyGigE0/%d" % i] = "Ethernet%d" % i
     elif hwsku == "Force10-S6100":
         for i in range(0, 4):
             for j in range(0, 16):
-                port_alias_to_name_map["fortyGigE1/%d/%d" % (i+1, j+1)] = "Ethernet%d" % (i * 16 + j)
+                port_alias_to_name_map["fortyGigE1/%d/%d" % (i + 1, j + 1)] = "Ethernet%d" % (i * 16 + j)
     elif hwsku == "Force10-Z9100":
         for i in range(0, 128, 4):
             port_alias_to_name_map["hundredGigE1/%d" % (i / 4 + 1)] = "Ethernet%d" % i
@@ -373,21 +373,21 @@ def get_port_alias_to_name_map(hostname, hwsku):
                 port_alias_to_name_map["etp%d" % i] = "Ethernet%d" % ((i - 1) * 4)
     elif hwsku == "Arista-7060CX-32S-D48C8":
         # All possible breakout 50G port numbers:
-        all_ports = [ x for x in range(1, 33)]
+        all_ports = [x for x in range(1, 33)]
 
         # 100G ports
-        s100G_ports = [ x for x in range(7, 11) ]
-        s100G_ports += [ x for x in range(23, 27) ]
+        s100G_ports = [x for x in range(7, 11)]
+        s100G_ports += [x for x in range(23, 27)]
 
-        port_alias_to_name_map = port_alias_to_name_map_50G(all_ports, s100G_ports)
+        port_alias_to_name_map = _port_alias_to_name_map_50G(all_ports, s100G_ports)
     elif hwsku == "Arista-7260CX3-D108C8":
         # All possible breakout 50G port numbers:
-        all_ports = [ x for x in range(1, 65)]
+        all_ports = [x for x in range(1, 65)]
 
         # 100G ports
-        s100G_ports = [ x for x in range(13, 21) ]
+        s100G_ports = [x for x in range(13, 21)]
 
-        port_alias_to_name_map = port_alias_to_name_map_50G(all_ports, s100G_ports)
+        port_alias_to_name_map = _port_alias_to_name_map_50G(all_ports, s100G_ports)
     elif hwsku == "INGRASYS-S9100-C32":
         for i in range(1, 33):
             port_alias_to_name_map["Ethernet%d/1" % i] = "Ethernet%d" % ((i - 1) * 4)
@@ -422,8 +422,33 @@ def get_port_alias_to_name_map(hostname, hwsku):
     elif hwsku == "newport":
         for i in range(0, 256, 8):
             port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
+    elif hwsku == "multi_asic_hwksu":
+        if asic_id is not None:
+            asic_offset = int(asic_id) * 16
+            backplane_offset = 15
+            for i in range(1, 17):
+                port_alias_to_name_map["Ethernet1/%d"%(asic_offset+i)] = "Ethernet%d"%((asic_offset + i -1) *4)
+                port_alias_asic_map["Eth%d-ASIC%d"%(i-1, int(asic_id))] = "Ethernet%d"%((asic_offset + i -1) *4)
+                port_alias_to_name_map["Eth%d-ASIC%d"%((backplane_offset+i), int(asic_id))] = "Ethernet-BP%d"%((asic_offset + i -1) *4)
+                port_alias_asic_map["Eth%d-ASIC%d"%((backplane_offset+i), int(asic_id))] = "Ethernet-BP%d"%((asic_offset + i -1) *4)
     else:
         for i in range(0, 128, 4):
             port_alias_to_name_map["Ethernet%d" % i] = "Ethernet%d" % i
 
-    return port_alias_to_name_map
+    return port_alias_to_name_map, port_alias_asic_map
+
+
+def get_port_indices_for_asic(asic_id, port_name_list_sorted):
+    front_end_port_name_list = [p for p in port_name_list_sorted if 'BP' not in p]
+    back_end_port_name_list = [p for p in port_name_list_sorted if 'BP' in p]
+    index_offset = 0
+   # Create mapping between port alias and physical index
+    port_index_map = {}
+    if asic_id:
+        index_offset = int(asic_id) *len(front_end_port_name_list)
+    for idx, val in enumerate(front_end_port_name_list, index_offset):
+        port_index_map[val] = idx
+    for idx, val in enumerate(back_end_port_name_list, index_offset):
+        port_index_map[val] = idx
+
+    return port_index_map
