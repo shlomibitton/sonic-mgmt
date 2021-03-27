@@ -42,7 +42,7 @@ ptf-r-tigon-11   ansible_host=10.213.14.62 ansible_ssh_user=root ansible_ssh_pas
 mts-ptf     ansible_host=10.9.78.237 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc01  ansible_host=10.75.206.220 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc02  ansible_host=10.75.207.41 ansible_ssh_user=root ansible_ssh_pass=root
-ptf-mtbc03  ansible_host=10.75.207.38 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-mtbc03  ansible_host=10.75.207.7 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-mtbc04  ansible_host=10.75.205.201 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-232-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
 ptf-233-010 ansible_host=10.212.232.9 ansible_ssh_user=root ansible_ssh_pass=root
