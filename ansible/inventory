@@ -537,8 +537,8 @@ ptf-mtbc02 ansible_host=10.75.207.41 ansible_ssh_user=root ansible_ssh_pass=root
 10.75.207.41 ansible_host=10.75.207.41 ansible_ssh_user=root ansible_ssh_pass=root
 
 # MTBC mtbc-sonic-03-2700 PTF host
-ptf-mtbc03 ansible_host=10.75.207.7 ansible_ssh_user=root ansible_ssh_pass=root
-10.75.207.7 ansible_host=10.75.207.7 ansible_ssh_user=root ansible_ssh_pass=root
+ptf-mtbc03 ansible_host=10.75.207.38 ansible_ssh_user=root ansible_ssh_pass=root
+10.75.207.38 ansible_host=10.75.207.38 ansible_ssh_user=root ansible_ssh_pass=root
 
 # MTBC mtbc-3700c-01 PTF host
 ptf-mtbc04 ansible_host=10.75.205.201 ansible_ssh_user=root ansible_ssh_pass=root
