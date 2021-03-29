@@ -150,6 +150,8 @@ def setup_fdb(ptfadapter, vlan_table, router_mac, pkt_type):
             # put in set learned dummy MACs
             fdb[member].update(dummy_macs)
 
+            logger.info("dummy macs added to vlan {}: \n {}".format(member, fdb[member]))
+
     time.sleep(FDB_POPULATE_SLEEP_TIMEOUT)
     # Flush dataplane
     ptfadapter.dataplane.flush()
