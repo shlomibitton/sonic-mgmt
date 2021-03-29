@@ -3,13 +3,19 @@ import logging
 import random
 import time
 import pexpect
-
+import netmiko
+import shlex
+import sys
 from retry import retry
 from retry.api import retry_call
 from ngts.cli_wrappers.common.general_clis_common import GeneralCliCommon
 from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
+from ngts.helpers.run_process_on_host import run_process_on_host
 from infra.tools.validations.traffic_validations.ping.send import ping_till_alive
+from infra.tools.connection_tools.onie_engine import OnieEngine
+from infra.tools.exceptions.real_issue import RealIssue
 from ngts.constants.constants import SonicConst, InfraConst
+from ngts.constants.constants import LinuxConsts, ConfigDbJsonConst, SonicConst
 
 logger = logging.getLogger()
 
@@ -155,23 +161,26 @@ class SonicGeneralCli(GeneralCliCommon):
             return output.splitlines()[-1]
 
     @staticmethod
-    def deploy_image(dut_engine, image_path, apply_base_config=False, setup_name=None, platform=None, hwsku=None,
+    def deploy_image(topology_obj, image_path, apply_base_config=False, setup_name=None,
+                     platform=None, hwsku=None,
                      wjh_deb_url=None, deploy_type='sonic'):
+        dut_engine = topology_obj.players['dut']['engine']
         if not image_path.startswith('http'):
             image_path = '{}{}'.format(InfraConst.HTTP_SERVER, image_path)
+        in_onie = SonicGeneralCli.prepare_for_installation(topology_obj)
 
         if deploy_type == 'sonic':
             SonicGeneralCli.deploy_sonic(dut_engine, image_path)
 
         if deploy_type == 'onie':
-            SonicGeneralCli.deploy_onie(dut_engine, image_path)
+            SonicGeneralCli.deploy_onie(dut_engine, image_path, in_onie)
 
         if apply_base_config:
             SonicGeneralCli.apply_basic_config(dut_engine, setup_name, platform, hwsku)
 
         if wjh_deb_url:
             SonicGeneralCli.install_wjh(dut_engine, wjh_deb_url)
-            
+
         SonicGeneralCli.verify_dockers_are_up(dut_engine)
 
     @staticmethod
@@ -201,31 +210,18 @@ class SonicGeneralCli(GeneralCliCommon):
                 assert 'Current: {}'.format(image_binary) in image_list
 
     @staticmethod
-    def deploy_onie(dut_engine, image_path):
-        SonicGeneralCli.set_next_boot_entry_to_onie(dut_engine)
-        dut_engine.reload(['sudo reboot'], wait_after_ping=5, ssh_after_reload=False)
+    def deploy_onie(dut_engine, image_path, in_onie=False):
+        if not in_onie:
+            SonicGeneralCli.set_next_boot_entry_to_onie(dut_engine)
+            dut_engine.reload(['sudo reboot'], wait_after_ping=15, ssh_after_reload=False)
         SonicGeneralCli.install_image_onie(dut_engine.ip, image_path)
 
     @staticmethod
     def install_image_onie(dut_ip, image_url):
         sonic_cli_ssh_connect_timeout = 10
 
-        def _build_command(host, user='root'):
-            _ssh_command = ['ssh', '-tt', '-q']
-            _ssh_command += ['-o', 'ControlMaster=auto',
-                             '-o', 'ControlPersist=60s',
-                             '-o', 'ControlPath=/tmp/ansible-ssh-%h-%p-%r']
-            _ssh_command += ['-o', 'StrictHostKeyChecking=no']
-            _ssh_command += ['-o', 'UserKnownHostsFile=/dev/null']
-            _ssh_command += ['-o', 'GSSAPIAuthentication=no',
-                             '-o', 'PubkeyAuthentication=no']
-            _ssh_command += ['-o', 'ConnectTimeout=30']
-            _ssh_command += ['-l', user, host]
-            return _ssh_command
-
         def install_image(host, url, timeout=300, num_retry=1):
-            cmd = _build_command(host)
-            client = pexpect.spawn(' '.join(cmd), env={'TERM': 'dumb'})
+            client = OnieEngine(host, 'root').create_engine()
             client.expect(['#'])
 
             client.timeout = timeout
@@ -271,6 +267,62 @@ class SonicGeneralCli(GeneralCliCommon):
         with allure.step('Waiting for CLI bring-up after reload'):
             logger.info('Waiting for CLI bring-up after reload')
             time.sleep(sonic_cli_ssh_connect_timeout)
+
+
+    @staticmethod
+    def check_is_alive_and_revive(topology_obj):
+        ip = topology_obj.players['dut']['engine'].ip
+        try:
+            logger.info('Checking whether device is alive')
+            ping_till_alive(should_be_alive=True, destination_host=ip, tries=2)
+            logger.info('Device is alive')
+        except RealIssue:
+            logger.info('Device is not alive, reviving')
+            SonicGeneralCli.remote_reboot(topology_obj)
+            logger.info('Device is revived')
+        return True
+
+    @staticmethod
+    def remote_reboot(topology_obj):
+        ip = topology_obj.players['dut']['engine'].ip
+        logger.info('Executing remote reboot')
+        cmd = topology_obj.players['dut']['attributes'].noga_query_data['attributes']['Specific']['remote_reboot']
+        _, _, rc = run_process_on_host(cmd)
+        if rc == InfraConst.RC_SUCCESS:
+            ping_till_alive(should_be_alive=True, destination_host=ip)
+        else:
+            raise Exception('Remote reboot rc is other then 0')
+
+    @staticmethod
+    def check_in_onie(ip, cmd):
+        client = OnieEngine(ip, 'root').create_engine()
+        client.expect(['#'])
+
+        client.timeout = 10
+        prompts = ["ONIE:.+ #", pexpect.EOF]
+        stdout = ""
+        logger.info('Executing command {}'.format(cmd))
+        client.sendline(cmd)
+        client.expect(prompts)
+        stdout += client.before.decode('ascii')
+        logger.info(stdout)
+
+
+    @staticmethod
+    def prepare_for_installation(topology_obj):
+        switch_in_onie = False
+        dut_engine = topology_obj.players['dut']['engine']
+        SonicGeneralCli.check_is_alive_and_revive(topology_obj)
+        dummy_command = 'echo dummy_command'
+        try:
+            # Checking if device is in sonic
+            dut_engine.run_cmd(dummy_command, validate=True)
+        except netmiko.ssh_exception.NetmikoAuthenticationException:
+            # Check switch is in onie
+            SonicGeneralCli.check_in_onie(dut_engine.ip, dummy_command)
+            switch_in_onie = True
+            logger.info('Login to onie succeed!')
+        return switch_in_onie
 
     @staticmethod
     def apply_basic_config(dut_engine, setup_name, platform, hwsku):

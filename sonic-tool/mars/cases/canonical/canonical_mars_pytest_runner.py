@@ -30,7 +30,7 @@ class RunPytest(TermHandlerMixin, StandaloneWrapper):
     def run_commands(self):
         rc = ErrorCode.SUCCESS
 
-        cmd = 'pytest --setup_name={} {} {}'.format(self.setup_name, self.raw_options, self.test_script)
+        cmd = '/ngts_venv/bin/pytest --setup_name={} {} {}'.format(self.setup_name, self.raw_options, self.test_script)
 
         for epoint in self.EPoints:
             dic_args = self._get_dic_args_by_running_stage(RunningStage.RUN)

@@ -2,6 +2,8 @@
 SONIC_MARS_BASE_PATH = "/.autodirect/sw_regression/system/SONIC/MARS"
 
 SONIC_MGMT_DEVICE_ID = "SONIC_MGMT"
+NGTS_PATH_PYTEST = "/ngts_venv/bin/pytest"
+NGTS_PATH_PYTHON = "/ngts_venv/bin/python"
 TEST_SERVER_DEVICE_ID = "TEST_SERVER"
 NGTS_DEVICE_ID = "NGTS"
 DUT_DEVICE_ID = "DUT"
@@ -15,7 +17,8 @@ SONIC_MGMT_MOUNTPOINTS = {
     '/auto/sw_system_project': '/auto/sw_system_project',
     '/auto/sw_system_release': '/auto/sw_system_release',
     '/auto/sw_regression/system/SONIC/MARS': '/auto/sw_regression/system/SONIC/MARS',
-    '/workspace': '/workspace'
+    '/workspace': '/workspace',
+    '/.autodirect/LIT/SCRIPTS': '/.autodirect/LIT/SCRIPTS'
 }
 
 VER_SDK_PATH = "/opt/ver_sdk"

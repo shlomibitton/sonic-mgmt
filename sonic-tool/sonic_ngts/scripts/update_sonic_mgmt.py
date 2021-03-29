@@ -6,6 +6,7 @@ import logging
 import re
 import sys
 import shutil
+import json
 
 from collections import OrderedDict
 from xml.etree.ElementTree import Element
@@ -252,13 +253,14 @@ def get_hwsku_from_noga_res(noga_resource):
     @summary: Parse HWSKU value from Noga HWSKU string
     """
     hwsku = None
-    hwsku = noga_resource["attributes"]["Specific"]["switch_type"]
-    for item in hwsku.split():
-        if re.findall("\d{4}", item):
-            hwsku = item
-            break
-    else:
-        logger.error("HWSKU has unexpected format: {}".format(hwsku))
+    try:
+        hwsku = json.loads(noga_resource["attributes"]["Specific"]["devdescription"])["hwsku"]
+    except json.decoder.JSONDecodeError:
+        err_msg = 'NOGA Attribute Devdescription is empty! Fetched data: {}' \
+                  ' It should look like: {"hwsku":"ACS-MSN3700","platform":' \
+                  '"x86_64-mlnx_msn3700-r0"}'.format(noga_resource["attributes"]["Specific"]["devdescription"])
+        raise (err_msg)
+
     return hwsku
 
 

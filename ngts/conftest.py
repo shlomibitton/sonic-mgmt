@@ -9,6 +9,7 @@ Defines the methods and fixtures which will be used by pytest
 import pytest
 import logging
 import re
+import json
 from dotted_dict import DottedDict
 
 from infra.tools.topology_tools.topology_setup_utils import get_topology_by_setup_name
@@ -101,11 +102,20 @@ def update_topology_with_cli_class(topology):
 
 @pytest.fixture(scope='session')
 def show_platform_summary(topology_obj):
-    return topology_obj.players['dut']['engine'].run_cmd('show platform summary')
+    try:
+        show_platform_summary_dict = json.loads(
+            topology_obj.players['dut']['attributes'].noga_query_data['attributes']['Specific']['devdescription'])
+    except json.decoder.JSONDecodeError:
+        err_msg = 'NOGA Attribute Devdescription is empty! Fetched data: {}' \
+                  ' It should look like: {"hwsku":"ACS-MSN3700","platform":' \
+                  '"x86_64-mlnx_msn3700-r0"}'.format(
+            topology_obj.players['dut']['attributes'].noga_query_data['attributes']['Specific']['devdescription'])
+        raise Exception(err_msg)
+    return show_platform_summary_dict
 
 
 @pytest.fixture(autouse=True)
-def skip_test_according_to_ngts_skip(request, show_platform_summary):
+def skip_test_according_to_ngts_skip(request, platform_params):
     """
     This fixture doing skip for test cases according to BUG ID in Redmine/GitHub or platform
     :param request: pytest buildin
@@ -118,7 +128,7 @@ def skip_test_according_to_ngts_skip(request, show_platform_summary):
         platform_prefix_list = request.node.get_closest_marker(skip_marker).args[0].get('platform_prefix_list')
         operand = request.node.get_closest_marker(skip_marker).args[0].get('operand', 'or')
 
-        ngts_skip(show_platform_summary, rm_ticket_list, github_ticket_list, platform_prefix_list, operand)
+        ngts_skip(platform_params.platform, rm_ticket_list, github_ticket_list, platform_prefix_list, operand)
 
 
 def pytest_runtest_setup(item):
@@ -202,26 +212,6 @@ def hb_dut_2_mac(engines, interfaces):
 
 
 @pytest.fixture(scope='session')
-def hwsku(show_platform_summary):
-    """
-    Pytest fixture which are returning hwsku
-    :param show_platform_summary: show_platform_summary fixture
-    """
-    hwsku = re.search(r'HwSKU:\s(.*)', show_platform_summary, re.IGNORECASE).group(1)
-    return hwsku
-
-
-@pytest.fixture(scope='session')
-def platform(show_platform_summary):
-    """
-    Pytest fixture which are returning platform
-    :param show_platform_summary: show_platform_summary fixture
-    """
-    platform = re.search(r'Platform:\s*(.*)', show_platform_summary, re.IGNORECASE).group(1)
-    return platform
-
-
-@pytest.fixture(scope='session')
 def sonic_version(engines):
     """
     Pytest fixture which are returning current SONiC installed version
@@ -257,14 +247,14 @@ def interfaces(topology_obj):
 
 
 @pytest.fixture(scope='session')
-def platform_params(platform, hwsku, setup_name):
+def platform_params(show_platform_summary, setup_name):
     """
     Method for getting all platform related data
     :return: dictionary with platform data
     """
     platform_data = DottedDict()
-    platform_data.platform = platform
-    platform_data.hwsku = hwsku
+    platform_data.platform = show_platform_summary['platform']
+    platform_data.hwsku = show_platform_summary['hwsku']
     platform_data.setup_name = setup_name
     return platform_data
 

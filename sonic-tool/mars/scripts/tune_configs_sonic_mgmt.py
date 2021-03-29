@@ -49,12 +49,13 @@ if __name__ == "__main__":
     topo_file = args.topo
     topo_obj = parse_topology(topo_file)
 
-    ngts_container_info = topo_obj.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
+    sonic_mgmt_container_info = topo_obj.get_device_by_topology_id(constants.SONIC_MGMT_DEVICE_ID)
+    print('sonic_mgmt_repo_path : {}'.format(sonic_mgmt_repo_path))
 
-    ngts_container = Connection(ngts_container_info.BASE_IP, user=ngts_container_info.USERS[0].USERNAME,
-                             config=Config(overrides={"run": {"echo": True}}),
-                             connect_kwargs={"password": ngts_container_info.USERS[0].PASSWORD})
-    cmd = "python3 {mgmt_repo}/sonic-tool/sonic_ngts/scripts/update_sonic_mgmt.py --dut=\"{dut}\" --mgmt_repo=\"{mgmt_repo}\" \
-            --topo_dir=\"{topo_dir}\"".format(dut=args.dut_name, mgmt_repo=sonic_mgmt_repo_path,
+    sonic_mgmt_container = Connection(sonic_mgmt_container_info.BASE_IP, user=sonic_mgmt_container_info.USERS[0].USERNAME,
+                                      config=Config(overrides={"run": {"echo": True}}),
+                                      connect_kwargs={"password": sonic_mgmt_container_info.USERS[0].PASSWORD})
+    cmd = "PYTHONPATH={mgmt_repo}/sonic-tool/sonic_ngts {ngts_path} {mgmt_repo}/sonic-tool/sonic_ngts/scripts/update_sonic_mgmt.py --dut=\"{dut}\" --mgmt_repo=\"{mgmt_repo}\" \
+            --topo_dir=\"{topo_dir}\"".format(ngts_path=constants.NGTS_PATH_PYTHON, dut=args.dut_name, mgmt_repo=sonic_mgmt_repo_path,
                                               topo_dir=get_topo_dir(topo_file))
-    ngts_container.run(cmd)
+    sonic_mgmt_container.run(cmd)

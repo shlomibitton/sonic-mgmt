@@ -20,6 +20,8 @@ class InfraConst:
     MYSQL_USER = 'sonic'
     MYSQL_PASSWORD = 'sonic11'
     MYSQL_DB = 'sonic'
+    RC_SUCCESS = 0
+    NGTS_PATH_PYTEST = '/ngts_venv/bin/pytest'
 
 
 class LinuxConsts:

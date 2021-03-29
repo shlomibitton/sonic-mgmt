@@ -8,7 +8,7 @@ logger = logging.getLogger()
 
 
 @allure.title('Deploy sonic image')
-def test_deploy_sonic_image(topology_obj, setup_name, platform, hwsku, base_version, wjh_deb_url, deploy_type):
+def test_deploy_sonic_image(topology_obj, setup_name, platform_params, base_version, wjh_deb_url, deploy_type):
     """
     This script will deploy sonic image on the dut.
     :param topology_obj: topology object fixture
@@ -18,9 +18,9 @@ def test_deploy_sonic_image(topology_obj, setup_name, platform, hwsku, base_vers
     :param base_version: path to sonic version to be installed
     :return: raise assertion error in case of script failure
     """
-    dut_engine = topology_obj.players['dut']['engine']
     try:
-        SonicGeneralCli.deploy_image(dut_engine, base_version, apply_base_config=True, setup_name=setup_name,
-                                     platform=platform, hwsku=hwsku, wjh_deb_url=wjh_deb_url, deploy_type=deploy_type)
+        SonicGeneralCli.deploy_image(topology_obj, base_version, apply_base_config=True, setup_name=setup_name,
+                                     platform=platform_params['platform'], hwsku=platform_params['hwsku'],
+                                     wjh_deb_url=wjh_deb_url, deploy_type=deploy_type)
     except Exception as err:
         raise AssertionError(err)

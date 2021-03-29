@@ -56,6 +56,8 @@ def _parse_args():
                         help="Specify the location of sonic-mgmt repo on sonic-mgmt docker container.")
     parser.add_argument("--port-number", nargs="?", default="", dest="port_number",
                         help="Specify the test setup's number of ports. Default: ''")
+    parser.add_argument("--setup-name", default="", dest="setup_name",
+                        help="Specify the test setup name. Default: ''")
     parser.add_argument("--wjh-deb-url", help="Specify url to WJH debian package",
                         dest="wjh_deb_url", default="")
     parser.add_argument("--recover_by_reboot", help="If post validation install validation has failed, "
@@ -316,17 +318,29 @@ def recover_topology(ansible_path, mgmt_docker_engine, hypervisor_engine, dut_na
 
 
 @separate_logger
-def install_image(ansible_path, mgmt_docker_engine, dut_name, sonic_topo, image_url, upgrade_type='onie'):
+def install_image(ansible_path, mgmt_docker_engine, dut_name, topo, sonic_topo, image_url, setup_name, upgrade_type='onie'):
     """
     Method which doing installation of image on DUT via ONIE or via SONiC cli
     """
     logger.info("Upgrade switch using SONiC upgrade playbook using upgrade type: {}".format(upgrade_type))
-    with mgmt_docker_engine.cd(ansible_path):
+
+    if sonic_topo == 'ptf-any':
+        sonic_mgmt_path = '/workspace/{setup_name}/sonic-mgmt/'
+        sonic_mgmt_dir = sonic_mgmt_path.format(setup_name=setup_name)
+
+        cmd = "PYTHONPATH=/devts:{sonic_mgmt_dir} {ngts_pytest} --setup_name={setup_name} --rootdir={sonic_mgmt_dir}/ngts" \
+              " -c {sonic_mgmt_dir}/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results" \
+              " --base_version={base_version} --deploy_type={deploy_type} --disable_loganalyzer" \
+              " {sonic_mgmt_dir}/ngts/scripts/sonic_deploy/test_sonic_deploy_image.py".format(ngts_pytest=constants.NGTS_PATH_PYTEST, sonic_mgmt_dir=sonic_mgmt_dir, setup_name=setup_name,
+                                                                                              base_version=image_url, deploy_type=upgrade_type)
+    else:
         cmd = 'ansible-playbook -i inventory --limit {dut}-{topo} upgrade_sonic.yml ' \
               '-e "upgrade_type={upgrade_type}" -e "image_url={image_url}" -vvvvv'.format(dut=dut_name,
                                                                                           topo=sonic_topo,
                                                                                           upgrade_type=upgrade_type,
                                                                                           image_url=image_url)
+
+    with mgmt_docker_engine.cd(ansible_path):
         logger.info("Running CMD: {}".format(cmd))
         mgmt_docker_engine.run(cmd)
 
@@ -458,16 +472,11 @@ def main():
                          hypervisor_engine=hypervisor_engine, dut_name=args.dut_name, sonic_topo=args.sonic_topo)
 
     install_image(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                  sonic_topo=args.sonic_topo, image_url=image_urls["base_version"], upgrade_type=args.upgrade_type)
+                  topo=args.topo, sonic_topo=args.sonic_topo, setup_name=args.setup_name,
+                  image_url=image_urls["base_version"], upgrade_type=args.upgrade_type)
 
-    # For Canonical setups do not apply minigraph - just apply configs from shared location
-    if args.sonic_topo == 'ptf-any':
-        ngts_device = topo.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
-        ngts_docker_engine = Connection(ngts_device.BASE_IP, user=ngts_device.USERS[0].USERNAME,
-                                        config=Config(overrides={"run": {"echo": True}}),
-                                        connect_kwargs={"password": ngts_device.USERS[0].PASSWORD})
-        apply_canonical_config(topo=args.topo, dut_name=args.dut_name, ngts_engine=ngts_docker_engine)
-    else:
+    # For Canonical setups do not apply minigraph - just apply configs from shared location - it is part of install phase
+    if args.sonic_topo != 'ptf-any':
         generate_minigraph(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                            sonic_topo=args.sonic_topo, port_number=args.port_number)
         deploy_minigprah(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
@@ -480,7 +489,8 @@ def main():
         logger.info("Target version is defined, upgrade switch again to the target version.")
 
         install_image(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                      sonic_topo=args.sonic_topo, image_url=image_urls["target_version"], upgrade_type='sonic')
+                      topo=args.topo, sonic_topo=args.sonic_topo, setup_name=args.setup_name,
+                      image_url=image_urls["target_version"], upgrade_type='sonic')
 
         post_install_check(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                            sonic_topo=args.sonic_topo)
