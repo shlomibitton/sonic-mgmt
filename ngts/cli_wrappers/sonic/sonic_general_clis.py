@@ -283,7 +283,7 @@ class SonicGeneralCli(GeneralCliCommon):
         dut_engine.run_cmd(
             'sudo curl {}/{} -o {}'.format(shared_path, SonicConst.MINIGRAPH_XML, SonicConst.MINIGRAPH_XML_PATH))
 
-        SonicGeneralCli.reload_configuration(dut_engine)
+        dut_engine.reload(['sudo reboot'])
 
     @staticmethod
     def install_wjh(dut_engine, wjh_deb_url):
