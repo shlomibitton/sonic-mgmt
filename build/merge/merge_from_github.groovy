@@ -17,7 +17,26 @@ def run_step(name, ci_tools) {
         }
         mgmt_tools = ci_tools.load_project_lib("${env.SHARED_LIB_FILE}")
         ci_tools.run_sh("git remote add upstream ${env.GITHUB_REPOSITORY} && git fetch upstream")
-        ci_tools.run_sh("git merge upstream/${env.GITHUB_BRANCH}")
+        try {
+            ci_tools.run_sh("git merge upstream/${env.GITHUB_BRANCH}")
+        } catch (Throwable ex) {
+            print "Merge conflicts were found. Verifying if all conflicts are in 'permitted to override' list."
+            def conflict_files = ci_tools.run_sh_return_output("git diff --name-only --diff-filter=U")
+            def merge_our_files = ci_tools.run_sh_return_output("cat build/merge/merge_overwrite_conflicts")
+            merge_our_files = merge_our_files.split("\n")
+            conflict_files = conflict_files.split("\n")
+            for (conflict in conflict_files) {
+                for (file in merge_our_files) {
+                    if (conflict.contains(file)){
+                        print "File ${conflict} will be taken from 'our' git"
+                        ci_tools.run_sh("git checkout HEAD -- ${conflict}")
+                    }
+                }
+            }
+            print "All permitted automatic fixes for conflicts were done.\nTrying to commit the conflicts solutions.\n" +
+                    "Will fail if there are still more conflicts!"
+            ci_tools.run_sh("git commit -m 'Merge remote-tracking branch 'upstream/${env.GITHUB_BRANCH}' into ${env.MGMT_GERRIT_BRANCH}'")
+        }
         //Check if there are new changes
 
         def new_commit = ci_tools.run_sh_return_output("git rev-parse ${env.MGMT_GERRIT_BRANCH}").trim()
