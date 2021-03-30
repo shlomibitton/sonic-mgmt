@@ -321,6 +321,7 @@ def test_crm_fdb_entry(env, cleanup, interfaces):
 
 @pytest.mark.build
 @pytest.mark.push_gate
+@pytest.mark.ngts_skip({'rm_ticket_list': [2599134]})
 @allure.title('Test CRM ACL counters')
 def test_crm_acl(env, cleanup):
     """
