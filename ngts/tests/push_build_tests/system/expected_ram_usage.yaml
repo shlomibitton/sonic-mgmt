@@ -119,7 +119,7 @@ MSN2700: # Simx Panther
   sensord: 10
 # SPC2
 MSN3420: # Lionfish
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -141,7 +141,7 @@ MSN3420: # Lionfish
   vxlanmgrd: 5
   sensord: 10
 MSN3700: # Anaconda
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -163,7 +163,7 @@ MSN3700: # Anaconda
   vxlanmgrd: 5
   sensord: 10
 MSN3700C: # Anaconda C
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -185,7 +185,7 @@ MSN3700C: # Anaconda C
   vxlanmgrd: 5
   sensord: 10
 MSN3800: # Tigris
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -208,7 +208,7 @@ MSN3800: # Tigris
   sensord: 10
 # SPC3
 MSN4410: # Ocelot
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -230,7 +230,7 @@ MSN4410: # Ocelot
   vxlanmgrd: 5
   sensord: 10
 MSN4600: # Liger
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -252,7 +252,7 @@ MSN4600: # Liger
   vxlanmgrd: 5
   sensord: 10
 MSN4600C: # Tigon
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
@@ -274,7 +274,7 @@ MSN4600C: # Tigon
   vxlanmgrd: 5
   sensord: 10
 MSN4700: # Leopard
-  total: 3500
+  total: 3700
   sx_sdk: 900
   syncd: 70
   redis-server: 50
