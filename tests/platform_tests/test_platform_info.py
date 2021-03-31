@@ -398,13 +398,13 @@ def turn_off_outlet_and_check_thermal_control(dut, pdu_ctrl, outlet, mocker):
     time.sleep(5)
 
     psu_under_test = None
-    psu_line_pattern = re.compile(r"PSU\s+\d+\s+(OK|NOT OK|NOT PRESENT)")
+    psu_line_pattern = re.compile(r"PSU\s+(\d+).*?(OK|NOT OK|NOT PRESENT)")
     cli_psu_status = dut.command(CMD_PLATFORM_PSUSTATUS)
     for line in cli_psu_status["stdout_lines"][2:]:
         pytest_assert(psu_line_pattern.match(line), "Unexpected PSU status output")
-        fields = line.split()
-        if fields[2] != "OK":
-            psu_under_test = fields[1]
+        match = psu_line_pattern.match(line)
+        if match.group(2) != "OK":
+            psu_under_test = match.group(1)
 
     pytest_assert(psu_under_test is not None, "No PSU is turned off")
     logging.info('Wait and check all FAN speed turn to 100%...')
