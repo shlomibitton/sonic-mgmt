@@ -58,6 +58,14 @@ def get_acl_crm_stat(env, resource):
     return int(current_used), int(current_available)
 
 
+def ensure_crm_acl_table_not_empty(env):
+    """
+    Verify that CRM ACL table is not empty
+    """
+    acl_res = "acl_entry"
+    assert get_acl_crm_stat(env, acl_res) is not None, "CRM ACL table is empty"
+
+
 def verify_counters(env, resource, used, used_sign, available):
     """
     Verifies used and available counters for specific CRM resource
@@ -321,7 +329,6 @@ def test_crm_fdb_entry(env, cleanup, interfaces):
 
 @pytest.mark.build
 @pytest.mark.push_gate
-@pytest.mark.ngts_skip({'rm_ticket_list': [2599134]})
 @allure.title('Test CRM ACL counters')
 def test_crm_acl(env, cleanup):
     """
@@ -335,6 +342,11 @@ def test_crm_acl(env, cleanup):
     with allure.step('Adding basic ACL config'):
         apply_acl_config(env, entry_num=1)
     cleanup.append((env.sonic_cli.acl.delete_config, env.dut_engine))
+
+    with allure.step('Wait until CRM ACL table will be created'):
+        retry_call(
+            ensure_crm_acl_table_not_empty, fargs=[env, ], tries=MAX_CRM_UPDATE_TIME, delay=1, logger=None
+        )
 
     acl_entry_used, acl_entry_available = get_acl_crm_stat(env, acl_entry_resource)
     acl_counter_used, acl_counter_available = get_acl_crm_stat(env, acl_counter_resource)
