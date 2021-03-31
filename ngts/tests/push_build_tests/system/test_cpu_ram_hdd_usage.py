@@ -10,7 +10,7 @@ from ngts.constants.constants import SonicConst
 
 logger = logging.getLogger()
 
-partitions_and_expected_usage = [{'partition': '/', 'max_usage': 6500}, {'partition': '/var/log/', 'max_usage': 50}]
+partitions_and_expected_usage = [{'partition': '/', 'max_usage': 7000}, {'partition': '/var/log/', 'max_usage': 50}]
 
 
 class TestCpuRamHddUsage:

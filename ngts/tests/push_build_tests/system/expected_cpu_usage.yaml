@@ -95,6 +95,28 @@ SN2700: # Panther
   nbrmgrd: 2
   vxlanmgrd: 2
   sensord: 2
+MSN2700: # Simx Panther
+  total: 40
+  sx_sdk: 30
+  syncd: 5
+  redis-server: 5
+  snmpd: 2
+  zebra: 2
+  bgpd: 2
+  bgpcfgd: 2
+  bgpmon: 2
+  fpmsyncd: 2
+  orchagent: 2
+  ntpd: 2
+  neighsyncd: 2
+  vlanmgrd: 2
+  intfmgrd: 2
+  portmgrd: 2
+  buffermgrd: 2
+  vrfmgrd: 2
+  nbrmgrd: 2
+  vxlanmgrd: 2
+  sensord: 2
 # SPC2
 MSN3420: # Lionfish
   total: 20

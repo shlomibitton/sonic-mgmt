@@ -33,6 +33,7 @@ class TestRebootReload:
         self.setup_name = platform_params.setup_name
         self.sonic_ver = sonic_version
 
+    @pytest.mark.ngts_skip({'platform_prefix_list': ['simx']})
     @pytest.mark.parametrize('reboot_type', reboot_types)
     def test_push_gate_reboot(self, platform_params, request, reboot_type):
         """
@@ -75,6 +76,7 @@ class TestRebootReload:
             logger.info('Uploading test results to MySQL DB')
             DB().insert(table='reboot_time', columns_values=mysql_columns_values)
 
+    @pytest.mark.ngts_skip({'platform_prefix_list': ['simx']})
     def test_push_gate_config_reload(self, request):
         """
         This tests checks config reload time, it doing reload and after execution - it upload test results to MySQL DB

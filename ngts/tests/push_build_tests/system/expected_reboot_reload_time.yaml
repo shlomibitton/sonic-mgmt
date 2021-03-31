@@ -28,6 +28,11 @@ SN2700: # Panther
   warm-reboot: 120
   reboot: 150
   config_reload: 160
+MSN2700: # Simx Panther
+  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  warm-reboot: 120
+  reboot: 150
+  config_reload: 160
 # SPC2
 MSN3420: # Lionfish
   fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
