@@ -8,7 +8,6 @@ import re
 import os
 import pathlib
 import json
-from jinja2 import Environment, FileSystemLoader
 from retry import retry
 from shutil import copyfile
 from ngts.constants.constants import LinuxConsts, ConfigDbJsonConst, SonicConst
@@ -49,9 +48,6 @@ def init_parser():
 
     group.add_argument('-n', '--noga', dest='noga_configuration_files', action='store_true',
                        help='Take port_config.ini and config_db.json files from switch resource on noga.')
-
-    parser.add_argument('--basic', dest='is_basic_config', action='store_true',
-                        help='configure basic_port_config.ini and basic_config_db.json files on switch.')
 
     parser.add_argument('-s', '--switch', dest='switch_ip',
                         help='SONiC switch ip, e.g. 10.210.25.102')
@@ -104,9 +100,8 @@ def apply_base_configuration_from_noga(args):
     """
     engine, config_files_dir_path = get_switch_resource_from_noga(args)
     platform, hwsku = get_platform_and_hwsku_from_switch(engine, args)
-    port_config_ini_path, config_db_json_path, minigraph_xml_path = get_configuration_files_paths(args, config_files_dir_path)
+    port_config_ini_path, config_db_json_path = get_configuration_files_paths(args, config_files_dir_path)
     load_configuration_files_to_switch(engine, port_config_ini_path, config_db_json_path, platform, hwsku)
-    load_minigraph_xml_to_switch(engine, minigraph_xml_path)
     engine.reload(reload_cmd_set=['sudo reboot'])
 
 
@@ -129,7 +124,6 @@ def apply_base_configuration_from_user(args):
                                                                                        hostname)
     save_port_config_ini_file(args)
     config_db_path = save_config_db(args, updated_init_config_db)
-    save_minigraph_xml(args, hwsku, hostname)
     load_configuration_files_to_switch(engine, port_config_ini_path, config_db_path, platform, hwsku)
     engine.reload(reload_cmd_set=['sudo reboot'])
 
@@ -178,14 +172,9 @@ def get_configuration_files_paths(args, config_files_dir_path):
     :param config_files_dir_path: the path to where the files are located
     :return: the basic/with splits configuration files path
     """
-    if args.is_basic_config:
-        port_config_ini_path = os.path.join(str(config_files_dir_path), "basic_{}".format(SonicConst.PORT_CONFIG_INI))
-        config_db_json_path = os.path.join(str(config_files_dir_path), "basic_{}".format(SonicConst.CONFIG_DB_JSON))
-    else:
-        port_config_ini_path = os.path.join(str(config_files_dir_path), SonicConst.PORT_CONFIG_INI)
-        config_db_json_path = os.path.join(str(config_files_dir_path), SonicConst.CONFIG_DB_JSON)
-    minigraph_xml_path = os.path.join(str(config_files_dir_path), SonicConst.MINIGRAPH_XML)
-    return port_config_ini_path, config_db_json_path, minigraph_xml_path
+    port_config_ini_path = os.path.join(str(config_files_dir_path), SonicConst.PORT_CONFIG_INI)
+    config_db_json_path = os.path.join(str(config_files_dir_path), SonicConst.CONFIG_DB_JSON)
+    return port_config_ini_path, config_db_json_path
 
 
 def get_init_config_db_from_switch(engine, hwsku):
@@ -339,8 +328,9 @@ def set_switch_type(init_config_db_json):
         ConfigDbJsonConst.TOR_ROUTER
     return init_config_db_json
 
+
 def save_port_config_ini_file(args):
-    file_name = 'basic_port_config.ini' if args.is_basic_config else 'port_config.ini'
+    file_name = 'port_config.ini'
     dst = os.path.join(args.configuration_path_dst, file_name)
     copyfile(args.port_config_ini, dst)
 
@@ -351,35 +341,13 @@ def save_config_db(args, config_db_json):
     :param config_db_json: an updated json of the initial config_db.json file
     :return: the config_db.json file path
     """
-    file_name = 'basic_config_db.json' if args.is_basic_config else 'config_db.json'
+    file_name = 'config_db.json'
     config_db_path = os.path.join(args.configuration_path_dst, file_name)
     logger.info("Save config_db with port configuration on to {}".format(config_db_path))
     with open(config_db_path, "w") as outfile:
         json.dump(config_db_json, outfile, indent=1)
     sleep_until_file_created(config_db_path)
     return config_db_path
-
-
-def save_minigraph_xml(args, hwsku, hostname):
-        """
-        create the minigarph.xml file in path.
-        :param args: script parsed arguments
-        :param hwsku: switch hwsku
-        :param hostname: switch hostname
-        :return: None
-        """
-        p = os.path.join(str(pathlib.Path(__file__).parent.absolute()), 'minigraph_xml_files')
-        file_loader = FileSystemLoader(str(p))
-        env = Environment(loader=file_loader)
-        env.trim_blocks = True
-        env.lstrip_blocks = True
-        env.rstrip_blocks = True
-        template = env.get_template("{}_minigraph.xml".format(hwsku))
-        file_contents = template.render(hostname=hostname)
-        file_path = os.path.join(args.configuration_path_dst, 'minigraph.xml')
-        f = open(file_path, "w+")
-        f.write(file_contents)
-        f.close()
 
 
 @retry(Exception, tries=6, delay=10)
@@ -426,19 +394,6 @@ def load_config_db_to_switch(engine, config_db_path):
     logger.info("Load modified initial config_db.json on to switch {}.".format(SonicConst.CONFIG_DB_JSON_PATH))
     engine.run_cmd(
         'sudo curl {}{} -o {}'.format(SHARED_MOUNTS_HTTP_SERVER_URL, config_db_path, SonicConst.CONFIG_DB_JSON_PATH))
-
-
-@retry(Exception, tries=5, delay=2)
-def load_minigraph_xml_to_switch(engine, minigraph_xml_path):
-    """
-    load the minigraph.xml to switch.
-    :param engine:  ssh engine of switch
-    :param minigraph_xml_path: path to saved minigraph.xml, e.g. mars/scripts/minigraph.xml
-    :return: None
-    """
-    logger.info("Load minigraph.xml on to switch {}.".format(SonicConst.MINIGRAPH_XML_PATH))
-    engine.run_cmd(
-        'sudo curl {}{} -o {}'.format(SHARED_MOUNTS_HTTP_SERVER_URL, minigraph_xml_path, SonicConst.MINIGRAPH_XML_PATH))
 
 
 def validate_configuration_path_dst(configuration_path_dst):

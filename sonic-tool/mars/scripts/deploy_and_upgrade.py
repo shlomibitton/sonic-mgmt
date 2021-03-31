@@ -460,9 +460,6 @@ def main():
     install_image(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                   sonic_topo=args.sonic_topo, image_url=image_urls["base_version"], upgrade_type=args.upgrade_type)
 
-    generate_minigraph(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
-                       sonic_topo=args.sonic_topo, port_number=args.port_number)
-
     # For Canonical setups do not apply minigraph - just apply configs from shared location
     if args.sonic_topo == 'ptf-any':
         ngts_device = topo.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
@@ -471,6 +468,8 @@ def main():
                                         connect_kwargs={"password": ngts_device.USERS[0].PASSWORD})
         apply_canonical_config(topo=args.topo, dut_name=args.dut_name, ngts_engine=ngts_docker_engine)
     else:
+        generate_minigraph(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
+                           sonic_topo=args.sonic_topo, port_number=args.port_number)
         deploy_minigprah(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                          sonic_topo=args.sonic_topo, recover_by_reboot=args.recover_by_reboot)
 

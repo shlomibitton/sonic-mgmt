@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 import logging
 import re
 import sys
+import shutil
 
 from collections import OrderedDict
 from xml.etree.ElementTree import Element
@@ -13,8 +14,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from infra.noga.noga import get_noga_resource_data
 
 logger = logging.getLogger(__name__)
-
-BASIC_PORT_CONFIG_FILE = "basic_port_config.ini"
 
 TESTBED_CSV_ROW = OrderedDict([("# conf-name", None), ("group-name", "vm-t1"), ("topo", "ptf-any"),
                                 ("ptf_image_name", "docker-ptf-mlnx"), ("ptf", "ptf-dummy"),
@@ -86,7 +85,7 @@ class Inventory:
         Ensure entry with specified DUT exists in 'ansible/inventory' file
         @param dut_name: DUT name
         """
-        with open(inventory_path) as inventory_file:
+        with open(self.inventory_path) as inventory_file:
             for line in inventory_file.read().splitlines():
                 if dut_name in line:
                     return True
@@ -215,41 +214,12 @@ class Lab:
 
 
 class MinigraphFacts:
-    def __init__(self, mgmt_minigraph_path, port_config, dut_name):
+    def __init__(self, mgmt_minigraph_path):
         self.mgmt_minigraph_path = mgmt_minigraph_path
-        self.port_config = port_config
-        self.dut_name = dut_name
-
-    def compose_lines(self):
-        prefix = "    if hostname == \"{dut_name}\":\n"
-        line_template = "        port_alias_to_name_map[\"{alias}\"] = \"{ifname}\"\n"
-        buff = prefix.format(dut_name=self.dut_name)
-        with open(self.port_config) as port_conf_ini:
-            for item in port_conf_ini.readlines()[1:]:
-                iface, _, al, _, _ = item.split()
-                buff += line_template.format(alias=al, ifname=iface)
-        return buff
-
-
-    def compose_minigraph_facts(self):
-        start_marker = "    global port_alias_asic_map"
-        end_marker = "    port_alias_to_name_map, port_alias_asic_map = get_port_alias_to_name_map(hostname, hwsku, asic_id)"
-
-        with open(self.mgmt_minigraph_path) as mg_file:
-            minigraph_facts = ""
-            source_code = mg_file.read()
-            minigraph_facts = source_code[0: source_code.find(start_marker) + len(start_marker)]
-            # Fill in 'port_alias_to_name_map' variable for current setup
-            minigraph_facts += "\n" + self.compose_lines() + "\n    "
-            # Remove existed definitions of 'port_alias_to_name_map'
-            # to avoid duplications
-            minigraph_facts += source_code[source_code.find(end_marker): ]
-        return minigraph_facts
+        self.stub_mgmt_minigraph_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "minigraph_facts.py")
 
     def write_minigraph_facts(self):
-        mg_facts_source_code = self.compose_minigraph_facts()
-        with open(self.mgmt_minigraph_path, "w") as mg_file:
-            mg_file.write(mg_facts_source_code)
+        shutil.copyfile(self.stub_mgmt_minigraph_path, self.mgmt_minigraph_path)
 
 
 def connection_gr_add_entry(file_path, hostname, hwsku):
@@ -308,7 +278,7 @@ if __name__ == "__main__":
     veos = Veos(conf_files.veos)
     lab = Lab(lab_path=conf_files.lab)
     inv = Inventory(conf_files.inventory)
-    mg_facts = MinigraphFacts(conf_files.minigraph_facts, os.path.join(topo_dir, BASIC_PORT_CONFIG_FILE), dut_name)
+    mg_facts = MinigraphFacts(conf_files.minigraph_facts)
 
     noga_resource = get_noga_resource_data(resource_name=dut_name)
     hwsku = get_hwsku_from_noga_res(noga_resource)

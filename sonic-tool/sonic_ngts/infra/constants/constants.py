@@ -40,8 +40,6 @@ class SonicConsts:
     ETC_SONIC_PATH = "/etc/sonic"
     CONFIG_DB_JSON = "config_db.json"
     CONFIG_DB_JSON_PATH = "{}/{}".format(ETC_SONIC_PATH, CONFIG_DB_JSON)
-    MINIGRAPH_XML = "minigraph.xml"
-    MINIGRAPH_XML_PATH = "{}/{}".format(ETC_SONIC_PATH, MINIGRAPH_XML)
     CONFIG_RELOAD = "sudo config reload -y"
     SHOW_LLDP_TABLE = "show lldp table"
     PORT_CONFIG_INI = "port_config.ini"
