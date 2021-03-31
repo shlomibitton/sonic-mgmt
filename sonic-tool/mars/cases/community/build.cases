@@ -25,7 +25,7 @@
              </params>
         </cmd>
         <ignore>
-			<bug> 2597025 </bug>
+			<bug>2431822</bug>
 		</ignore>
     </case>
 
