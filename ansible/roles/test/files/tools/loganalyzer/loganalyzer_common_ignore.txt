@@ -42,3 +42,4 @@ r, ".* ERR pmon#xcvrd.* Receive PMPE error event on module \d+: status 3 error t
 r, ".* WARNING pmon#syseepromd.*Failed to load data from eeprom using sonic_platform package due to.*retrying using deprecated plugin method"
 r, ".* ERR pmon#pcied.* PCIe device status check"
 r, ".* ERR swss#orchagent:.* Unsupported FDB Flush:"
+r, ".* INFO kernel:.*Giving out device to module sb_edac controller Broadwell.*\(INTERRUPT\)"
