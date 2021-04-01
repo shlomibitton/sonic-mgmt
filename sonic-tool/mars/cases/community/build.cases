@@ -59,7 +59,7 @@
         <name> platform_info_test_show_platform_temperature_mocked </name>
         <tout> 1800 </tout>
         <ignore>
-            <bug> 2348196 </bug>
+            <bug> 2604256 </bug>
         </ignore>
         <cmd>
              <params>
