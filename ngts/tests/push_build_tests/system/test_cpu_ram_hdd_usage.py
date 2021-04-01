@@ -81,7 +81,7 @@ class TestCpuRamHddUsage:
         cpu_usage_per_process = {}
         try:
             assertions_list = []
-            for attempt in range(5):
+            for attempt in range(10):
                 logger.info('Checking CPU utilization, attempt number: {}'.format(attempt))
                 assertions_list = []
                 total_cpu_usage, cpu_usage_per_process_dict = get_cpu_usage_and_processes(self.dut_engine)
