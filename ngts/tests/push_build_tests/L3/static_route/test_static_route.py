@@ -21,6 +21,7 @@ from ngts.tools.skip_test.skip import ngts_skip
 logger = logging.getLogger()
 
 
+@pytest.mark.ngts_skip({'rm_ticket_list': [2597709]})
 @pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test Basic Static Route')

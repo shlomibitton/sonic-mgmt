@@ -3,6 +3,7 @@ import logging
 import re
 import ipaddress
 import time
+import pytest
 from retry.api import retry_call
 
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
@@ -416,6 +417,7 @@ def test_lags_scale(topology_obj, engines, cleanup_list):
         raise AssertionError(err)
 
 
+@pytest.mark.ngts_skip({'rm_ticket_list': [2602350]})
 @allure.title('LAG port channels with member scale Test')
 def test_lags_with_member_scale(topology_obj, interfaces, engines, cleanup_list):
     """
