@@ -73,7 +73,7 @@
         <name> reload_config </name>
         <tout> 1200 </tout>
         <ignore>
-            <bug> 2367843 </bug>
+            <bug> 2588045 </bug>
         </ignore>
         <cmd>
              <params>
