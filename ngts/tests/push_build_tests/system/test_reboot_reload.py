@@ -51,9 +51,9 @@ class TestRebootReload:
         reboot_time = 0.0
         try:
             with allure.step('Rebooting the dut using reboot cmd: "sudo {}"'.format(reboot_type)):
-                self.dut_engine.reload(reload_cmd_set=['sudo {}'.format(reboot_type)], wait_after_ping=0)
-                self.cli_object.general.verify_dockers_are_up(self.dut_engine)
-                self.cli_object.general.check_link_state(self.dut_engine)
+                dut_cli = self.topology_obj.players['dut']['cli']
+                dut_cli.general.reboot_flow(self.dut_engine, reboot_type=reboot_type, topology_obj=self.topology_obj,
+                                            wait_after_ping=0)
 
             reboot_time = time.time() - start_time
             logger.info('Test reboot: {} run time is: {}'.format(reboot_type, reboot_time))

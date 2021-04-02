@@ -90,13 +90,14 @@ class SonicGeneralCli(GeneralCliCommon):
         engine.run_cmd('sudo curl {} -o {}'.format(url, target_file_path), validate=True)
 
     @staticmethod
-    def reboot_flow(engine, reboot_type='', ports_list=None, topology_obj=None):
+    def reboot_flow(engine, reboot_type='', ports_list=None, topology_obj=None, wait_after_ping=45):
         """
         Rebooting switch by given way(reboot, fast-reboot, warm-reboot) and validate dockers and ports state
         :param engine: ssh engine object
         :param reboot_type: reboot type
         :param ports_list: list of the ports to check status after reboot
         :param topology_obj: topology object
+        :param wait_after_ping: how long in second wait after ping before ssh connection
         :return: None, raise error in case of unexpected result
         """
         if not (ports_list or topology_obj):
@@ -106,7 +107,7 @@ class SonicGeneralCli(GeneralCliCommon):
         if not ports_list:
             ports_list = topology_obj.players_all_ports['dut']
         with allure.step('Reboot switch by CLI - sudo {}'.format(reboot_type)):
-            engine.reload(['sudo {}'.format(reboot_type)])
+            engine.reload(['sudo {}'.format(reboot_type)], wait_after_ping=wait_after_ping)
             SonicGeneralCli.verify_dockers_are_up(engine, SonicConst.DOCKERS_LIST)
             SonicGeneralCli.check_link_state(engine, ports_list)
 
