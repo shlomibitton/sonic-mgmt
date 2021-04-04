@@ -38,6 +38,9 @@
         <info> PFCWD function Case</info>
         <name> pfc_wd_func </name>
         <tout> 1200 </tout>
+        <ignore>
+                <bug> 2606366 </bug>
+        </ignore>
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw    -options "\'--log-cli-level info --show-capture=no -ra --showlocals -v\'" --test-scripts pfcwd/test_pfcwd_function.py  </static_args>
