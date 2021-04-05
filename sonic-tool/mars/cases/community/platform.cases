@@ -242,26 +242,6 @@
         </cmd>
     </case>
 
-    <case>
- 
-        <info> Test Firmware Utility Case </info>
-        <name> fwutil </name>
-        <tout> 5200 </tout>
-        <ignore>
-            <condition_group>
-                <operand> AND </operand>
-                <bug> 2403424 </bug>
-                <bug> 2589957 </bug>
-                <bug> 2437505 </bug>
-            </condition_group>
-        </ignore>
-        <cmd>
-             <params>
-                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals --config_file=config/mellanox_config.yml --binaries_path=/auto/sw_system_project/sonic/platform_fw/ --second_image_path=/auto/sw_system_release/sonic/master-lastrc-internal-sonic-mellanox.bin\'" --test-scripts platform_tests/fw_utility/test_fwutil.py </static_args>
-             </params>
-        </cmd>
-    </case>
-
     <!-- Platform API Test Case Begin-->
 
     <case>
@@ -387,6 +367,25 @@
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--skip-absent-sfp=True --log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_reset_status and not test_get_rx_los and not test_get_tx_fault and not test_get_temperature and not test_get_voltage and not test_get_tx_bias and not test_get_rx_power and not test_get_tx_power and not test_tx_disable and not test_lpmode and not test_thermals and not test_power_override and not test_tx_disable_channel\"\'" --test-scripts platform_tests/api/test_sfp.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Firmware Utility Case </info>
+        <name> fwutil </name>
+        <tout> 5200 </tout>
+        <ignore>
+            <condition_group>
+                <operand> OR </operand>
+                <bug> 2403424 </bug>
+                <bug> 2589957 </bug>
+                <bug> 2437505 </bug>
+            </condition_group>
+        </ignore>
+        <cmd>
+             <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals --config_file=config/mellanox_config.yml --binaries_path=/auto/sw_system_project/sonic/platform_fw/ --second_image_path=/auto/sw_system_release/sonic/master-lastrc-internal-sonic-mellanox.bin\'" --test-scripts platform_tests/fw_utility/test_fwutil.py </static_args>
              </params>
         </cmd>
     </case>
