@@ -292,3 +292,7 @@ class SonicGeneralCli(GeneralCliCommon):
         SonicGeneralCli.set_feature_state(dut_engine, 'what-just-happened', 'enabled')
         SonicGeneralCli.save_configuration(dut_engine)
         dut_engine.run_cmd('sudo rm -f {}'.format(wjh_package_local_name))
+
+    @staticmethod
+    def execute_command_in_docker(dut_engine, docker, command):
+        return dut_engine.run_cmd('docker exec -i {} {}'.format(docker, command))

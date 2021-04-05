@@ -1,3 +1,5 @@
+import json
+
 from ngts.cli_wrappers.common.route_clis_common import RouteCliCommon
 
 
@@ -74,3 +76,28 @@ class SonicRouteCli(RouteCliCommon):
             cmd += route
 
         return engine.run_cmd(cmd)
+
+    @staticmethod
+    def generate_route_app_data(route_list, mask_list, n_hop_list, ifaces_list, route_app_config_path=None, op='SET'):
+        """
+        This method generate APP route json data - save it to file. It can be used by swss docker for apply routes
+        :param route_list: list with route subnet IPs: ["192.168.0.0", "192.168.0.1"]
+        :param mask_list: list with subnet masks ["32", "32"]
+        :param n_hop_list: list with route next-hops ["192.168.5.1", "10.20.30.5"]
+        :param ifaces_list: list with route interfaces ["Ethernet0", "Ethernet12"]
+        :param route_app_config_path: path to file where app config should be stored: "/tmp/route_config.json"
+        :param op: app config operation, can be "SET" for add route or "DEL" for remove route
+        :return: routes app config(the same as writen in file)
+        """
+        route_app_config_data = []
+
+        for route, mask, n_hop, iface in zip(route_list, mask_list, n_hop_list, ifaces_list):
+            route_entry = {"ROUTE_TABLE:{}/{}".format(route, mask): {"nexthop": n_hop, "ifname": iface},
+                           "OP": "{}".format(op)}
+            route_app_config_data.append(route_entry)
+
+        if route_app_config_path:
+            with open(route_app_config_path, 'w') as file:
+                json.dump(route_app_config_data, file)
+
+        return route_app_config_data
