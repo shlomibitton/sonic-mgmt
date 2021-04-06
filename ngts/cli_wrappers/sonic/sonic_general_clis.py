@@ -281,8 +281,6 @@ class SonicGeneralCli(GeneralCliCommon):
             'sudo curl {}/{} -o {}'.format(shared_path, SonicConst.PORT_CONFIG_INI, switch_config_ini_path))
         dut_engine.run_cmd(
             'sudo curl {}/{} -o {}'.format(shared_path, SonicConst.CONFIG_DB_JSON, SonicConst.CONFIG_DB_JSON_PATH))
-        dut_engine.run_cmd(
-            'sudo curl {}/{} -o {}'.format(shared_path, SonicConst.MINIGRAPH_XML, SonicConst.MINIGRAPH_XML_PATH))
 
         dut_engine.reload(['sudo reboot'])
 
