@@ -19,7 +19,7 @@
     <case>
         <info> snmp_cpu  </info>
         <name> snmp_cpu </name>
-        <tout> 600 </tout>
+        <tout> 900 </tout>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_cpu.py </static_args>
@@ -30,7 +30,7 @@
     <case>
         <info> snmp_interfaces </info>
         <name> snmp_interfaces </name>
-        <tout> 300 </tout>
+        <tout> 600 </tout>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_interfaces.py </static_args>
@@ -41,7 +41,7 @@
     <case>
         <info> snmp_lldp </info>
         <name> snmp_lldp </name>
-        <tout> 300 </tout>
+        <tout> 600 </tout>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_lldp.py </static_args>
@@ -55,7 +55,7 @@
     <case>
         <info> snmp_pfc_counters </info>
         <name> snmp_pfc_counters </name>
-        <tout> 300 </tout>
+        <tout> 600 </tout>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_pfc_counters.py </static_args>
@@ -66,7 +66,7 @@
     <case>
         <info> snmp_queue </info>
         <name> snmp_queue </name>
-        <tout> 300 </tout>
+        <tout> 600 </tout>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_queue.py </static_args>
@@ -77,7 +77,7 @@
     <case>
         <info> snmp_psu </info>
         <name> snmp_psu </name>
-        <tout> 300 </tout>
+        <tout> 600 </tout>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level debug  --show-capture=no -ra --showlocals\'" --test-scripts snmp/test_snmp_psu.py </static_args>
