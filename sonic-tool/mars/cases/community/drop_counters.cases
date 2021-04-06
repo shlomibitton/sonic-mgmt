@@ -20,6 +20,9 @@
         <info> DROP_COUNTER Case </info>
         <name> drop_counter </name>
         <tout> 3600 </tout>
+        <ignore>
+            <bug> 2455660 </bug>
+        </ignore>
         <cmd>
             <params>
                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals -v -k \"not test_ip_pkt_with_expired_ttl and not test_not_expected_vlan_tag_drop and not test_egress_drop_on_down_link\"\'" --test-scripts drop_packets/test_drop_counters.py </static_args>

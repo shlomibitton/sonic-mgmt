@@ -48,6 +48,9 @@
         <info> VNET-VxLAN route leak test case </info>
         <name> vnet_route_leak </name>
         <tout> 6000 </tout>
+        <ignore>
+                <bug> 2608468 </bug>
+        </ignore>
         <cmd>
              <params>
                  <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --showlocals \'" --test-scripts vxlan/test_vnet_route_leak.py </static_args>

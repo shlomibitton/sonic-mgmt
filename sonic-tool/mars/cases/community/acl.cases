@@ -32,7 +32,7 @@
         <name> acl </name>
         <tout> 3600 </tout>
         <ignore>
-            <bug> 2136404 </bug>
+            <bug> 2455206 </bug>
         </ignore>
         <cmd>
             <params>

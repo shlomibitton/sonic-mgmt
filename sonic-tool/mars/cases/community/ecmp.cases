@@ -33,6 +33,7 @@
                     <op> != </op>
                     <value> 202012 </value>
                 </condition>
+                <bug> 2577145 </bug>
             </condition_group>
         </ignore>
         <cmd>
