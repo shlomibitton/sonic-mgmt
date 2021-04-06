@@ -43,3 +43,4 @@ r, ".* WARNING pmon#syseepromd.*Failed to load data from eeprom using sonic_plat
 r, ".* ERR pmon#pcied.* PCIe device status check"
 r, ".* ERR swss#orchagent:.* Unsupported FDB Flush:"
 r, ".* INFO kernel:.*Giving out device to module sb_edac controller Broadwell.*\(INTERRUPT\)"
+r, ".* INFO kernel:.*PMU erratum.*workaround disabled"
