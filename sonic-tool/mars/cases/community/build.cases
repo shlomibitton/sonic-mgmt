@@ -45,7 +45,7 @@
         <name> platform_info_test_show_platform_fanstatus_mocked </name>
         <tout> 1800 </tout>
         <ignore>
-            <bug> 2348187 </bug>
+            <bug> 2604969 </bug>
         </ignore>
         <cmd>
              <params>
