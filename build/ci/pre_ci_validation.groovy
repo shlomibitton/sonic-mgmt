@@ -10,7 +10,7 @@ def run_step(name, ci_tools) {
     try {
         mgmt_tools = ci_tools.load_project_lib("${env.SHARED_LIB_FILE}")
 
-        def topic = GerritTools.get_topic(ci_tools, env.GERRIT_CHANGE_NUMBER)
+        def topic = (GerritTools.get_topic(ci_tools, env.GERRIT_CHANGE_NUMBER)).replace("\"","")
         def topic_map = [:]
         for (_topic in topic.split(",")) {
             if (_topic.contains("=")) {
