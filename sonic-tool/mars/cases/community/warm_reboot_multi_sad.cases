@@ -29,7 +29,7 @@
             <name> run linkstate/up.yml </name>
             <tout> 300 </tout>
             <params>
-                <static_args> --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/up.yml -e lab_admin_pass=3tango -e fanout_listener=\"scripts/mlnx/fanout_listener.py\"\'" </static_args>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/up.yml -e lab_admin_pass=3tango -e fanout_listener=\"scripts/mlnx/fanout_listener.py\"\'" </static_args>
             </params>
         </pre>
 
@@ -38,7 +38,7 @@
         <tout> 7200 </tout>
         <cmd>
              <params>
-                 <static_args> --raw_args "\'test_sonic.yml -i inventory --limit [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_name=[[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_type=[[conf:extra_info.topology]] -e testcase_name=warm-reboot-multi-sad -e reboot_limit=1 [[conf:extra_info.verbosity]]\'" </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'test_sonic.yml -i inventory --limit [[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_name=[[conf:extra_info.dut_name]]-[[conf:extra_info.topology]] -e testbed_type=[[conf:extra_info.topology]] -e testcase_name=warm-reboot-multi-sad -e reboot_limit=1 [[conf:extra_info.verbosity]]\'" </static_args>
              </params>
         </cmd>
 
@@ -47,7 +47,7 @@
             <name> run linkstate/down.yml </name>
             <tout> 300 </tout>
             <params>
-                <static_args> --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/down.yml -e lab_admin_pass=3tango\'" </static_args>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --raw_args "\'-i linkstate/testbed_inv.py -e target_host=[[conf:extra_info.dut_name]]-fastreboot linkstate/down.yml -e lab_admin_pass=3tango\'" </static_args>
             </params>
         </post>
 
