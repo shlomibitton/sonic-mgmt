@@ -1,3 +1,5 @@
+import json
+import ipaddress
 from ngts.cli_wrappers.common.ip_clis_common import IpCliCommon
 
 
@@ -42,3 +44,45 @@ class LinuxIpCli(IpCliCommon):
         :return: command output
         """
         return LinuxIpCli.add_del_ip_from_interface(engine, 'del', interface, ip, mask)
+
+    @staticmethod
+    def get_ip_info(engine, ip_ver='4'):
+        """
+        This method returns json output for command: "ip address"
+        :param engine: engine object
+        :param ip_ver: IP protocol version
+        :return: json with ip command output data
+        """
+        ip_info = json.loads(engine.run_cmd('sudo ip -{} -j address'.format(ip_ver)))
+        return ip_info
+
+    @staticmethod
+    def get_interface_ip_addresses(interface, ip_cmd_json_data):
+        """
+        This method returns list with IP addresses on specific interface
+        :param interface: interface name
+        :param ip_cmd_json_data: output from command 'ip -j addresses', the same as in method 'get_ip_info'
+        :return: list with IPs
+        """
+        ips = []
+        for iface in ip_cmd_json_data:
+            if iface['ifname'] == interface:
+                for addr in iface['addr_info']:
+                    ips.append(addr['local'])
+                break
+        return ips
+
+    @staticmethod
+    def get_interface_link_local_ipv6_addresses(engine, interface, ip_cmd_json_data=None):
+        """
+        This method returns link-local IPv6 address for specific interface
+        :param engine: engine object
+        :param interface: interface name
+        :param ip_cmd_json_data: optional - output from command 'ip -j addresses', if not provided - will get it
+        :return: link-local ipv6 address
+        """
+        if not ip_cmd_json_data:
+            ip_cmd_json_data = LinuxIpCli().get_ip_info(engine, ip_ver='6')
+        iface_ips = LinuxIpCli().get_interface_ip_addresses(interface, ip_cmd_json_data)
+        linklocal_ipv6 = [ip for ip in iface_ips if ipaddress.IPv6Address(ip).is_link_local][0]
+        return linklocal_ipv6

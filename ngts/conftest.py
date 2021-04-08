@@ -18,6 +18,8 @@ from ngts.cli_wrappers.linux.linux_cli import LinuxCli
 from ngts.tools.allure_report.allure_server import AllureServer
 from ngts.tools.skip_test.skip import ngts_skip
 from ngts.cli_wrappers.linux.linux_mac_clis import LinuxMacCli
+from ngts.constants.constants import SonicConst
+
 logger = logging.getLogger()
 
 pytest_plugins = ('ngts.tools.sysdumps', 'ngts.tools.loganalyzer', 'ngts.tools.infra', 'pytester')
@@ -177,6 +179,21 @@ def pytest_runtest_makereport(item, call):
     # be "setup", "call", "teardown"
 
     setattr(item, "rep_" + rep.when, rep)
+
+
+@pytest.fixture(scope='session')
+def dut_mac(engines):
+    """
+    Fixture which get DUT mac address from DUT config_db.json file
+    :param engines: engines fixture
+    :return: dut mac address
+    """
+    logger.info('Getting DUT mac address')
+    config_db_json = engines.dut.run_cmd(cmd='cat {}'.format(SonicConst.CONFIG_DB_JSON_PATH), print_output=False)
+    config_db = json.loads(config_db_json)
+    dut_mac = config_db.get('DEVICE_METADATA').get('localhost').get('mac')
+    logger.info('DUT mac address is: {}'.format(dut_mac))
+    return dut_mac
 
 
 @pytest.fixture(scope='session')

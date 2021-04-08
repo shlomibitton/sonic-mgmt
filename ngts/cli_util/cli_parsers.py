@@ -66,3 +66,68 @@ def generic_sonic_output_parser(output, headers_ofset=0, len_ofset=1, data_ofset
         return result_dict
     else:
         return result_list
+
+
+def show_vlan_brief_parser(output):
+    """
+    This method doing parse for command "show vlan brief" output
+    :param output: command "show vlan brief" output which should be parsed
+    :return: dictionary with parsed data.
+
+    Example:
+    {'40': {'ips': ['4000::1/64', '40.0.0.1/24'],
+            'ports': {'Ethernet236': 'tagged', 'PortChannel0002': 'tagged'},
+            'dhcp_servers': [], 'proxy_arp': 'disabled'},
+    '69': {'ips': ['69.0.0.1/24'..... ]}}
+    """
+    result_dict = {}
+
+    data_line_index = 4
+    vlan_index = 0
+    ip_addr_index = 1
+    vlan_port_index = 2
+    vlan_port_mode_index = 3
+    dhcp_server_index = 4
+    proxy_arp_index = 5
+
+    # Read data without headers
+    data_lines = output.splitlines()[data_line_index:]
+
+    vlan = None
+    vlan_ips = []
+    vlan_ports = {}
+    dhcp_servers = []
+    proxy_arp = None
+
+    for line in data_lines:
+        # Skip lines like: +-----------+--------------+----- which does not have data, analyze only lines with data
+        splited_data_line = line.split('|')[1:]
+        if splited_data_line:
+            vlan_id = splited_data_line[vlan_index].strip()
+            if vlan_id:
+                # If next vlan data started - clean previous data
+                if vlan != vlan_id:
+                    vlan = None
+                    vlan_ips = []
+                    vlan_ports = {}
+                    dhcp_servers = []
+                    proxy_arp = None
+
+                vlan = vlan_id
+                proxy_arp = splited_data_line[proxy_arp_index].strip()
+
+            vlan_ip = splited_data_line[ip_addr_index].strip()
+            vlan_port = splited_data_line[vlan_port_index].strip()
+            dhcp_server = splited_data_line[dhcp_server_index].strip()
+
+            if vlan_ip:
+                vlan_ips.append(vlan_ip)
+            if vlan_port:
+                vlan_ports[vlan_port] = splited_data_line[vlan_port_mode_index].strip()
+            if dhcp_server:
+                dhcp_servers.append(dhcp_server)
+
+            result_dict[vlan] = {'ips': vlan_ips, 'ports': vlan_ports, 'dhcp_servers': dhcp_servers,
+                                 'proxy_arp': proxy_arp}
+
+    return result_dict

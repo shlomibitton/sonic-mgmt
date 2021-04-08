@@ -86,8 +86,8 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
         'dut': [{'iface': 'Vlan40', 'ips': [('40.0.0.1', '24'), ('4000::1', '64')]},
                 {'iface': 'PortChannel0001', 'ips': [('30.0.0.1', '24'), ('3000::1', '64')]},
                 {'iface': 'Vlan69', 'ips': [('69.0.0.1', '24'), ('6900::1', '64')]},
-                {'iface': 'Vlan690', 'ips': [('69.0.1.1', '24')]},
-                {'iface': 'Vlan691', 'ips': [('69.1.0.1', '24')]}
+                {'iface': 'Vlan690', 'ips': [('69.0.1.1', '24'), ('6900:1::1', '64')]},
+                {'iface': 'Vlan691', 'ips': [('69.1.0.1', '24'), ('6910::1', '64')]}
                 ],
         'ha': [{'iface': '{}.40'.format(interfaces.ha_dut_2), 'ips': [('40.0.0.2', '24'), ('4000::2', '64')]},
                {'iface': 'bond0', 'ips': [('30.0.0.2', '24'), ('3000::2', '64')]}],
@@ -113,9 +113,9 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
 
     # DHCP Relay config which will be used in test
     dhcp_relay_config_dict = {
-        'dut': [{'vlan_id': 690, 'dhcp_servers': ['69.0.0.2']},
+        'dut': [{'vlan_id': 690, 'dhcp_servers': ['69.0.0.2', '6900::2']},
                 # Second DHCP relay for check bug: https://github.com/Azure/sonic-buildimage/issues/6053
-                {'vlan_id': 691, 'dhcp_servers': ['69.0.0.2']}
+                {'vlan_id': 691, 'dhcp_servers': ['69.0.0.2', '6900::2']}
                 ]
     }
 
