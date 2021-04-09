@@ -56,6 +56,7 @@ class TestDHCPRelay:
         self.dut_mac = SonicMacCli.get_mac_address_for_interface(self.dut_engine, self.dut_vlan_iface)
         self.chaddr = bytes.fromhex(self.dhclient_mac.replace(':', ''))
 
+    @pytest.mark.dhcp_relay
     def test_basic_dhcp_relay(self):
         try:
             with allure.step('Validate the IP address provided by the DHCP server'):
@@ -68,6 +69,7 @@ class TestDHCPRelay:
         finally:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
 
+    @pytest.mark.dhcp_relay
     @pytest.mark.skip(reason='https://github.com/Azure/sonic-utilities/pull/1269')
     def test_dhcp_relay_remove_dhcp_server(self):
         cleanup_engine = StubEngine()
@@ -85,6 +87,7 @@ class TestDHCPRelay:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
             self.dut_engine.run_cmd_set(cleanup_engine.commands_list)
 
+    @pytest.mark.dhcp_relay
     @pytest.mark.ngts_skip({'github_ticket_list': ['https://github.com/Azure/sonic-buildimage/issues/6053']})
     def test_dhcp_relay_release_message(self):
         dhcp_release = '0x7'
@@ -109,6 +112,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     @pytest.mark.build
     def test_dhcp_relay_nak_message(self):
         dhcp_nak = '0x6'
@@ -135,6 +139,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     def test_dhcp_relay_decline_message(self):
         dhcp_decline = '0x4'
         bootp_body = 'chaddr={}'.format(self.chaddr)
@@ -159,6 +164,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     def test_dhcp_relay_inform_message(self):
         dhcp_inform = '0x8'
         bootp_body = 'chaddr={}'.format(self.chaddr)
@@ -182,6 +188,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     @pytest.mark.ngts_skip({'github_ticket_list': ['https://github.com/Azure/sonic-buildimage/issues/6053']})
     def test_dhcp_relay_unicast_request_message(self):
         try:
@@ -202,6 +209,7 @@ class TestDHCPRelay:
         finally:
             LinuxDhcpCli.kill_all_dhcp_clients(self.dhcp_client_engine)
 
+    @pytest.mark.dhcp_relay
     def test_dhcp_relay_request_message_with_custom_src_port(self):
         dhcp_ack = '0x5'
         bootp_body = 'chaddr={}'.format(self.chaddr)
@@ -236,6 +244,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     def test_dhcp_relay_request_message_with_empty_payload(self):
         """
         This test case check that if we send DHCP request packet with empty payload - packet forwarded to DHCP
@@ -269,6 +278,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     def test_dhcp_relay_udp_packet_with_src_and_dst_ports_the_same_as_dhcp(self):
         tcpdump_filter_src_1_2_3_4 = "src 1.2.3.4"
         dst_ip = "30.0.0.2"
@@ -296,6 +306,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     def test_dhcp_relay_packet_with_malformed_payload(self):
         mac1 = self.dhclient_mac.replace(':', '')[:8]
         mac2 = self.dhclient_mac.replace(':', '')[8:]
@@ -324,6 +335,7 @@ class TestDHCPRelay:
         except BaseException as err:
             raise AssertionError(err)
 
+    @pytest.mark.dhcp_relay
     @pytest.mark.skip(reason='https://github.com/Azure/sonic-utilities/pull/1269')
     def test_dhcp_relay_multiple_dhcp_servers(self, configure_additional_dhcp_server):
         """
