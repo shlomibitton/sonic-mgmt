@@ -1716,7 +1716,7 @@ class PGSharedWatermarkTest(sai_base_test.ThriftInterfaceDataPlane):
             q_wm_res, pg_shared_wm_res, pg_headroom_wm_res = sai_thrift_read_port_watermarks(self.client, port_list[src_port_id])
             print >> sys.stderr, "Init pkts num sent: %d, min: %d, actual watermark value to start: %d" % ((pkts_num_leak_out + pkts_num_fill_min), pkts_num_fill_min, pg_shared_wm_res[pg])
             # pkts_num_fill_min should be zero for lossless and lossy on Mellanox platform
-            if asic_type == 'mellanox' or pkts_num_fill_min:
+            if pkts_num_fill_min:
                 assert(pg_shared_wm_res[pg] == 0)
             else:
                 # on t1-lag, we found vm will keep sending control
