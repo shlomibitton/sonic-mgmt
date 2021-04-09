@@ -220,7 +220,7 @@ class SonicGeneralCli(GeneralCliCommon):
     def install_image_onie(dut_ip, image_url):
         sonic_cli_ssh_connect_timeout = 10
 
-        def install_image(host, url, timeout=300, num_retry=1):
+        def install_image(host, url, timeout=60, num_retry=10):
             client = OnieEngine(host, 'root').create_engine()
             client.expect(['#'])
 
@@ -233,25 +233,30 @@ class SonicGeneralCli(GeneralCliCommon):
             stdout += client.before.decode('ascii')
             logger.info(stdout)
             attempt = 0
-
-            while attempt < num_retry:
-                logger.info('Installing image')
-                client.sendline("onie-nos-install %s" % url)
-                i = client.expect(["Installed SONiC base image SONiC-OS successfully"] + prompts)
-                stdout += client.before.decode('ascii')
-                logger.info(stdout)
+            logger.info('Installing image')
+            client.sendline("onie-nos-install %s" % url)
+            i = client.expect(["Installed SONiC base image SONiC-OS successfully"] + prompts + [pexpect.TIMEOUT])
+            stdout += client.before.decode('ascii')
+            logger.info(stdout)
+            while num_retry > 0:
                 if i == 0:
                     break
-                elif i == 1:
-                    attempt += 1
-                    logger.error("Installation fails, retry %d..." % attempt)
+                elif i == 3:
+                    num_retry = num_retry - 1
+                    i = client.expect(
+                        ["Installed SONiC base image SONiC-OS successfully"] + prompts + [pexpect.TIMEOUT])
+                    logger.info("Got timeout on %d time.." % num_retry)
+                    logger.info("Printing output: %s" % client.before)
                 else:
-                    raise Exception("Failed to install sonic image. %s" % stdout)
+                    logger.info('Catched pexpect entry: %d' % i)
+                    raise AssertionError("Failed to install sonic image. %s" % stdout)
+            else:
+                logger.info("Did not installed image in %d seconds." % num_retry * timeout)
+                raise AssertionError("Failed to install sonic image. %s" % stdout)
             logger.info('SONiC installed')
             client.expect([pexpect.EOF, pexpect.TIMEOUT], timeout=15)
             stdout += client.before.decode('ascii')
             logger.info(stdout)
-            assert 'Installation finished. No error reported.' in stdout
             return stdout
 
         with allure.step('Installing image by "onie-nos-install"'):
