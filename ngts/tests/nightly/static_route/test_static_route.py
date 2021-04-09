@@ -205,8 +205,11 @@ def test_scale_static_route(engines, players, interfaces, static_route_configura
     except Exception as err:
         raise AssertionError(err)
     finally:
-        os.remove(pcap_ipv4_file_path)
-        os.remove(pcap_ipv6_file_path)
+        try:
+            os.remove(pcap_ipv4_file_path)
+            os.remove(pcap_ipv6_file_path)
+        except Exception as err:
+            logger.error('Failed to remove files: {}'.format(err))
 
 
 def do_traffic_validation(sender_host, sender_iface, pcap_file, receiver_host, receiver_iface, tcpdump_filter,
