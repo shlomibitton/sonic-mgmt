@@ -406,12 +406,24 @@ def test_lags_scale(topology_obj, engines, cleanup_list):
             add_lag_conf(topology_obj, lag_config_dict, cleanup_list)
 
         with allure.step('Validation port channels were created'):
-            verify_port_channels_status(dut_cli, engines.dut, lag_expected_info)
+            retry_call(
+                verify_port_channels_status,
+                fargs=[dut_cli, engines.dut, lag_expected_info],
+                tries=10,
+                delay=5,
+                logger=logger,
+            )
 
         with allure.step('Validation for bug 2435254 - reboot, validate dockers and lags'):
             dut_cli.general.save_configuration(engines.dut)
             dut_cli.general.reboot_flow(engines.dut, reboot_type='reboot', topology_obj=topology_obj)
-            verify_port_channels_status(dut_cli, engines.dut, lag_expected_info)
+            retry_call(
+                verify_port_channels_status,
+                fargs=[dut_cli, engines.dut, lag_expected_info],
+                tries=10,
+                delay=5,
+                logger=logger,
+            )
 
     except BaseException as err:
         raise AssertionError(err)
