@@ -37,7 +37,14 @@ STATUS_LED_COLOR_AMBER = "amber"
 STATUS_LED_COLOR_RED = "red"
 STATUS_LED_COLOR_OFF = "off"
 
+@pytest.fixture(scope="class")
+def gather_facts(request, duthost):
+    # Get platform facts from platform.json file
+    request.cls.chassis_facts = duthost.facts.get("chassis")
+    request.cls.asic_type = duthost.facts.get("asic_type")
 
+
+@pytest.mark.usefixtures("gather_facts")
 class TestFanDrawerFans(PlatformApiTestBase):
 
     num_fan_drawers = None
@@ -59,10 +66,11 @@ class TestFanDrawerFans(PlatformApiTestBase):
     # Helper functions
     #
 
-    def compare_value_with_platform_facts(self, duthost, key, value, fan_drawer_idx, fan_idx):
+    def compare_value_with_platform_facts(self, key, value, fan_drawer_idx, fan_idx):
         expected_value = None
-        if duthost.facts.get("chassis"):
-            expected_fan_drawers = duthost.facts.get("chassis").get("fan_drawers")
+
+        if self.chassis_facts:
+            expected_fan_drawers = self.chassis_facts.get("fan_drawers")
             if expected_fan_drawers:
                 expected_fans = expected_fan_drawers[fan_drawer_idx].get("fans")
                 if expected_fans:
@@ -77,8 +85,8 @@ class TestFanDrawerFans(PlatformApiTestBase):
     #
     # Functions to test methods inherited from DeviceBase class
     #
-    def test_get_name(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
-        duthost = duthosts[enum_rand_one_per_hwsku_hostname]
+    def test_get_name(self, duthost, localhost, platform_api_conn):
+
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
 
@@ -87,11 +95,11 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
                 if self.expect(name is not None, "Unable to retrieve fan drawer {} fan {} name".format(j, i)):
                     self.expect(isinstance(name, STRING_TYPE), "fan drawer {} fan {} name appears incorrect".format(j, i))
-                    self.compare_value_with_platform_facts(duthost, 'name', name, j, i)
+                    self.compare_value_with_platform_facts('name', name, j, i)
 
         self.assert_expectations()
 
-    def test_get_presence(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_presence(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -107,7 +115,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_get_model(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_model(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -120,7 +128,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_get_serial(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_serial(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -133,7 +141,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_get_status(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_status(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -169,7 +177,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
     # Functions to test methods defined in FanBase class
     #
 
-    def test_get_speed(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_speed(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -184,7 +192,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_get_direction(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_direction(self, duthost, localhost, platform_api_conn):
         # Ensure the fan speed is sane
         FAN_DIRECTION_LIST = [
             "intake",
@@ -202,7 +210,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_get_fans_target_speed(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_fans_target_speed(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -219,7 +227,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_get_fans_speed_tolerance(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_get_fans_speed_tolerance(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -232,7 +240,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_set_fans_speed(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
+    def test_set_fans_speed(self, duthost, localhost, platform_api_conn):
 
         for j in range(self.num_fan_drawers):
             num_fans = fan_drawer.get_num_fans(platform_api_conn, j)
@@ -252,8 +260,8 @@ class TestFanDrawerFans(PlatformApiTestBase):
 
         self.assert_expectations()
 
-    def test_set_fans_led(self, duthosts, enum_rand_one_per_hwsku_hostname, localhost, platform_api_conn):
-        duthost = duthosts[enum_rand_one_per_hwsku_hostname]
+    def test_set_fans_led(self, duthost, localhost, platform_api_conn):
+
         FAULT_LED_COLOR_LIST = [
             STATUS_LED_COLOR_AMBER,
             STATUS_LED_COLOR_RED
@@ -272,7 +280,7 @@ class TestFanDrawerFans(PlatformApiTestBase):
         LED_COLOR_TYPES.append(NORMAL_LED_COLOR_LIST)
 
         # Mellanox is not supporting set leds to 'off'
-        if duthost.facts.get("asic_type") != "mellanox":
+        if self.asic_type != "mellanox":
             LED_COLOR_TYPES.append(OFF_LED_COLOR_LIST)
 
         LED_COLOR_TYPES_DICT = {

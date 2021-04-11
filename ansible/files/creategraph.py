@@ -14,7 +14,6 @@ DEFAULT_PDUCSV = 'sonic_lab_pdu_links.csv'
 LAB_CONNECTION_GRAPH_ROOT_NAME = 'LabConnectionGraph'
 LAB_CONNECTION_GRAPH_DPGL2_NAME = 'DevicesL2Info'
 
-
 class LabGraph(object):
 
     """ 
@@ -40,6 +39,7 @@ class LabGraph(object):
         self.dpgroot = etree.Element('DataPlaneGraph')
         self.csgroot = etree.Element('ConsoleGraphDeclaration')
         self.pcgroot = etree.Element('PowerControlGraphDeclaration')
+
 
     def read_devices(self):
         with open(self.devcsv) as csv_dev:
@@ -108,17 +108,11 @@ class LabGraph(object):
             hostname = dev.get('Hostname', '')
             managementip = dev.get('ManagementIp', '')
             devtype = dev['Type'].lower()
-            if not hostname:
-                continue
-            if devtype in ('server', 'devsonic'):
-                # Build Management interface IP for server and DUT
+            if hostname and ('fanout' in devtype or 'ixiachassis' in devtype):
+                ###### Build Management interface IP here, if we create each device indivial minigraph file, we may comment this out 
                 l3inforoot = etree.SubElement(self.dpgroot, 'DevicesL3Info', {'Hostname': hostname})
                 etree.SubElement(l3inforoot, 'ManagementIPInterface', {'Name': 'ManagementIp', 'Prefix': managementip})
-            elif 'fanout' in devtype or 'ixiachassis' in devtype:
-                # Build Management interface IP here, if we create each device indivial minigraph file, we may comment this out
-                l3inforoot = etree.SubElement(self.dpgroot, 'DevicesL3Info', {'Hostname': hostname})
-                etree.SubElement(l3inforoot, 'ManagementIPInterface', {'Name': 'ManagementIp', 'Prefix': managementip})
-                # Build L2 information Here
+                ####### Build L2 information Here
                 l2inforoot = etree.SubElement(self.dpgroot, LAB_CONNECTION_GRAPH_DPGL2_NAME, {'Hostname': hostname})
                 vlanattr = {}
                 for link in self.links:
@@ -146,7 +140,7 @@ class LabGraph(object):
         '''
 
         onexml = open(self.one_xmlfile, 'w')
-        root = etree.Element(LAB_CONNECTION_GRAPH_ROOT_NAME)
+        root=etree.Element(LAB_CONNECTION_GRAPH_ROOT_NAME)
         root.append(self.pngroot)
         root.append(self.dpgroot)
         root.append(self.csgroot)

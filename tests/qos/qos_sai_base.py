@@ -161,14 +161,11 @@ class QosSaiBase:
                 size (str) size of shared headroom pool
                 None if shared headroom pool isn't enabled
         """
-        if self.isBufferInApplDb(duthost):
-            db = "0"
-            keystr = "BUFFER_POOL_TABLE:ingress_lossless_pool"
-        else:
-            db = "4"
-            keystr = "BUFFER_POOL|ingress_lossless_pool"
         result = dut_asic.run_redis_cmd(
-            argv = ["redis-cli", "-n", db, "HGETALL", keystr]
+            argv = [
+                "redis-cli", "-n", "4", "HGETALL",
+                "BUFFER_POOL|ingress_lossless_pool"
+            ]
         )
         it = iter(result)
         ingressLosslessPool = dict(zip(it, it))
