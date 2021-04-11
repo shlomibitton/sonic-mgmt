@@ -6,6 +6,7 @@ import pytest
 import time
 
 from ipaddress import ip_network, IPv4Network
+from tests.common.helpers.assertions import pytest_assert
 from tests.common.utilities import wait, wait_until
 from tests.common.dualtor.mux_simulator_control import *
 from tests.common.dualtor.dual_tor_utils import *
@@ -355,7 +356,9 @@ def check_mux_simulator(ptf_server_intf, tor_mux_intf, ptfadapter, upper_tor_hos
         # Run tests with upper ToR active
         toggle_simulator_port_to_upper_tor(tor_mux_intf)
 
-        if check_simulator_read_side(tor_mux_intf) != 1:
+        try:
+            pytest_assert(check_simulator_read_side(tor_mux_intf) == 1)
+        except AssertionError:
             results['failed'] = True
             results['failed_reason'] = 'Unable to switch active link to upper ToR'
             return results
@@ -384,19 +387,25 @@ def check_mux_simulator(ptf_server_intf, tor_mux_intf, ptfadapter, upper_tor_hos
 
         upper_tor_arp_table = upper_tor_host.switch_arptable()['ansible_facts']['arptable']['v4']
         lower_tor_arp_table = lower_tor_host.switch_arptable()['ansible_facts']['arptable']['v4']
-        if ptf_arp_tgt_ip not in upper_tor_arp_table:
+        try:
+            pytest_assert(ptf_arp_tgt_ip in upper_tor_arp_table)
+        except AssertionError:
             results['failed'] = True
             results['failed_reason'] = 'Packet from PTF not received on active upper ToR'
             return results
 
-        if ptf_arp_tgt_ip not in lower_tor_arp_table:
+        try:
+            pytest_assert(ptf_arp_tgt_ip in lower_tor_arp_table)
+        except AssertionError:
             results['failed'] = True
             results['failed_reason'] = 'Packet from PTF not received on standby lower ToR'
             return results
 
         # Repeat all tests with lower ToR active
         toggle_simulator_port_to_lower_tor(tor_mux_intf)
-        if check_simulator_read_side(tor_mux_intf) != 2:
+        try:
+            pytest_assert(check_simulator_read_side(tor_mux_intf) == 2)
+        except AssertionError:
             results['failed'] = True
             results['failed_reason'] = 'Unable to switch active link to lower ToR'
             return results
@@ -423,12 +432,16 @@ def check_mux_simulator(ptf_server_intf, tor_mux_intf, ptfadapter, upper_tor_hos
 
         upper_tor_arp_table = upper_tor_host.switch_arptable()['ansible_facts']['arptable']['v4']
         lower_tor_arp_table = lower_tor_host.switch_arptable()['ansible_facts']['arptable']['v4']
-        if ptf_arp_tgt_ip not in upper_tor_arp_table:
+        try:
+            pytest_assert(ptf_arp_tgt_ip in upper_tor_arp_table)
+        except AssertionError:
             results['failed'] = True
             results['failed_reason'] = 'Packet from PTF not received on standby upper ToR'
             return results
 
-        if ptf_arp_tgt_ip not in lower_tor_arp_table:
+        try:
+            pytest_assert(ptf_arp_tgt_ip in lower_tor_arp_table)
+        except AssertionError:
             results['failed'] = True
             results['failed_reason'] = 'Packet from PTF not received on active lower ToR'
             return results
@@ -662,4 +675,4 @@ def check_secureboot(duthosts, request):
             check_results.append(check_result)
 
         return check_results
-    return _check
+    return _check 
