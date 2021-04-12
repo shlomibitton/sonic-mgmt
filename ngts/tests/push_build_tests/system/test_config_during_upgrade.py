@@ -103,13 +103,13 @@ def compare_dut_configs(base_config, target_config, base_ver, target_ver, allowe
     for key, value in diff.items():
         logger.info('Found next difference in config_db.json after upgrade: {} \n {}'.format(key, diff[key]))
         for diff_item in value:
-            if diff_item not in allowed_diff_for_our_branch[key]:
+            if diff_item not in allowed_diff_for_our_branch.get(key, []):
                 logger.error('Found unexpected diff in config_db.json after upgrade: {} \n {}'.format(key, diff_item))
                 unexpected_diff_list.append({key: diff_item})
 
     for key, value in allowed_diff_for_our_branch.items():
         for diff_item in value:
-            if diff_item not in diff[key]:
+            if diff_item not in diff.get(key, []):
                 logger.error('Expected diff not found in config_db.json after upgrade: {} \n {}'.format(key, diff_item))
                 unexpected_diff_list.append({key: diff_item})
 

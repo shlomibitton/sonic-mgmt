@@ -21,6 +21,21 @@
   "202012":
     dictionary_item_added:
       - root['KDUMP']
+      - root['WJH']
+      - root['WJH_CHANNEL']
+      - root['CRM']['Config']['dnat_entry_high_threshold']
+      - root['CRM']['Config']['dnat_entry_low_threshold']
+      - root['CRM']['Config']['dnat_entry_threshold_type']
+      - root['CRM']['Config']['ipmc_entry_high_threshold']
+      - root['CRM']['Config']['ipmc_entry_low_threshold']
+      - root['CRM']['Config']['ipmc_entry_threshold_type']
+      - root['CRM']['Config']['snat_entry_high_threshold']
+      - root['CRM']['Config']['snat_entry_low_threshold']
+      - root['CRM']['Config']['snat_entry_threshold_type']
+      - root['DEVICE_METADATA']['localhost']['buffer_model']
+      - root['FEATURE']['what-just-happened']
+    values_changed:
+      - root['VERSIONS']['DATABASE']['VERSION']
   "master":
     dictionary_item_added:
       - root['KDUMP']

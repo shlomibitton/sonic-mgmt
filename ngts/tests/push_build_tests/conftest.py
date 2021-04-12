@@ -36,10 +36,9 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
     if upgrade_params.is_upgrade_required:
         with allure.step('Installing base version from ONIE'):
             logger.info('Deploying via ONIE or call manufacture script with arg onie')
-            SonicGeneralCli.deploy_image(engines.dut, upgrade_params.base_version, apply_base_config=True,
+            SonicGeneralCli.deploy_image(topology_obj, upgrade_params.base_version, apply_base_config=True,
                                          setup_name=platform_params.setup_name, platform=platform_params.platform,
-                                         hwsku=platform_params.hwsku, wjh_deb_url=upgrade_params.wjh_deb_url,
-                                         deploy_type='onie')
+                                         hwsku=platform_params.hwsku, deploy_type='onie')
 
     with allure.step('Check that links in UP state'.format()):
         ports_list = [interfaces.dut_ha_1, interfaces.dut_ha_2, interfaces.dut_hb_1, interfaces.dut_hb_2]
@@ -144,8 +143,8 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
                                       direction='get')
             with allure.step('Performing sonic to sonic upgrade'):
                 logger.info('Performing sonic to sonic upgrade')
-                SonicGeneralCli.deploy_image(engines.dut, upgrade_params.target_version, apply_base_config=False,
-                                             deploy_type='sonic')
+                SonicGeneralCli.deploy_image(topology_obj, upgrade_params.target_version, apply_base_config=False,
+                                             wjh_deb_url=upgrade_params.wjh_deb_url, deploy_type='sonic')
             with allure.step('Copying config_db.json from target version'):
                 engines.dut.copy_file(source_file='config_db.json',
                                       dest_file=POST_UPGRADE_CONFIG.format(engines.dut.ip),

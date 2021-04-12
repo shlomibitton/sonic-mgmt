@@ -19,7 +19,7 @@
     <info> </info>
     <cmd>
       <params>
-          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/push_build_tests/ --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals --disable_loganalyzer --base_version [[conf:extra_info.base_version]] --target_version [[conf:extra_info.target_version]] --wjh_deb_url [[conf:extra_info.wjh_deb_url]]\'"</static_args>
+          <static_args> --setup_name [[conf:extra_info.setup_name]] --test_script [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/tests/push_build_tests/ --raw_options "\'--rootdir=[[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts -c [[conf:extra_info.sonic_mgmt_workspace]]/sonic-mgmt/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results --showlocals --disable_loganalyzer --base_version=[[conf:extra_info.base_version]] --target_version=[[conf:extra_info.target_version]] --wjh_deb_url=[[conf:extra_info.wjh_deb_url]]\'"</static_args>
       </params>
     </cmd>
   </case>
