@@ -67,6 +67,10 @@ def _parse_args():
     parser.add_argument("--serve_files", help="Specify whether to run http server on the runnning machine and serve the installer files"
                                               "Note: this option is not supported when running from a docker without ip",
                         dest="serve_files", default=False, action='store_true')
+    parser.add_argument("--deploy_only_target", nargs="?", default='no', choices=["yes", "no"],
+                        dest="deploy_only_target", help="If yes - then the installation of the base version will be "
+                                                        "skipped and the target version will be installed instead of "
+                                                        "the base.")
 
     return parser.parse_args()
 
@@ -471,9 +475,17 @@ def main():
         recover_topology(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine,
                          hypervisor_engine=hypervisor_engine, dut_name=args.dut_name, sonic_topo=args.sonic_topo)
 
+    base_version_url = image_urls["base_version"]
+    if args.deploy_only_target == 'yes':
+        if image_urls["target_version"]:
+            base_version_url = image_urls["target_version"]
+        else:
+            raise Exception('Argument "target_version" must be provided when "deploy_only_target" flag is set to "yes".'
+                            ' Please provide a target version.')
+
     install_image(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                   topo=args.topo, sonic_topo=args.sonic_topo, setup_name=args.setup_name,
-                  image_url=image_urls["base_version"], upgrade_type=args.upgrade_type)
+                  image_url=base_version_url, upgrade_type=args.upgrade_type)
 
     # For Canonical setups do not apply minigraph - just apply configs from shared location - it is part of install phase
     if args.sonic_topo != 'ptf-any':
@@ -485,7 +497,7 @@ def main():
     post_install_check(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
                        sonic_topo=args.sonic_topo)
 
-    if image_urls["target_version"]:
+    if image_urls["target_version"] and args.deploy_only_target == 'no':
         logger.info("Target version is defined, upgrade switch again to the target version.")
 
         install_image(ansible_path=ansible_path, mgmt_docker_engine=mgmt_docker_engine, dut_name=args.dut_name,
