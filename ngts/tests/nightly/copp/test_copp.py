@@ -23,7 +23,9 @@ TRAP_GROUP = 'trap_group'
 TRAP_IDS = 'trap_ids'
 
 RATE_TRAFFIC_MULTIPLIER = 3
-TRAFFIC_DURATION = 10
+BURST_TRAFFIC_MULTIPLIER = 30
+RATE_TRAFFIC_DURATION = 10
+BURST_TRAFFIC_DURATION = 0.06
 
 # list of tested protocols
 PROTOCOLS_LIST = ["ARP", "IP2ME", "SNMP"]
@@ -80,73 +82,102 @@ class CoppBase:
                                                                              topology_obj.ports['dut-ha-1'])
         self.validation = None
         self.pre_validation = None
-        self.dispatch_time = None
+        self.traffic_duration = None
         self.pre_rx_counts = self.dut_cli_object.ifconfig.get_interface_ifconfig_details(self.dut_engine,
                                                                                          self.dut_iface).rx_packets
+        self.tested_protocol = self.get_tested_protocol_name()
         self.post_rx_counts = None
         self.default_cir = None
         self.default_cbs = None
-        self.user_cir = None
-        self.user_cbs = None
+        self.low_limit = 100
+        self.user_limit = None
         self.trap_ids = None
 
     # -------------------------------------------------------------------------------
 
     def copp_test_runner(self, protocol_for_reboot_flow):
         """
-        Test runner, defines general logic of the test case
+        Test runner, defines general logic of the test case.
+        Note - To validate specific traffic type, need to set low value for second traffic type in configuration file.
         :param protocol_for_reboot_flow: protocol name for reboot flow
         :return: None, raise error in case of unexpected result
         """
-        # TODO burst limit currently have a bug 17762939
         # check default burst and rate value
-        # with allure.step('Check functionality of default burst limit'):
-        #     self.run_validation_flow(self.default_cbs, 'cbs')
+        with allure.step('Check functionality of default burst limit'):
+            self.run_validation_flow(self.default_cbs, self.low_limit, 'burst')
         with allure.step('Check functionality of default rate limit'):
-            self.run_validation_flow(self.default_cir)
+            self.run_validation_flow(self.low_limit, self.default_cir)
 
-        # check user burst and rate value
-        self.config_user_limit_values()
-        # with allure.step('Check functionality of configured burst limit'):
-        #     self.run_validation_flow(self.user_cbs, 'cbs')
-        with allure.step('Check functionality of configured rate limit'):
-            self.run_validation_flow(self.user_cir)
-
-        if protocol_for_reboot_flow.lower() == self.get_tested_protocol_name():
-            with allure.step('Check functionality of configured limits after reboot'):
-                self.dut_cli_object.general.save_configuration(self.dut_engine)
-                self.dut_cli_object.general.reboot_flow(self.dut_engine, topology_obj=self.topology)
-                self.pre_rx_counts = self.dut_cli_object.ifconfig.\
-                    get_interface_ifconfig_details(self.dut_engine, self.dut_iface).rx_packets
-                time.sleep(10)  # to make sure all services are Up
-                # with allure.step('Check functionality of configured burst limit after reboot'):
-                #     self.run_validation_flow(self.user_cbs, 'cbs')
-                with allure.step('Check functionality of configured rate limit after reboot'):
-                    self.run_validation_flow(self.user_cir)
+        # check non default burst and rate limit value with reboot
+        if protocol_for_reboot_flow.lower() == self.tested_protocol:
+            self.run_validation_flow_with_reboot()
         else:
-            logger.info('Ignore reboot validation on this protocol,'
-                        ' reboot validation will run on: {}'.format(protocol_for_reboot_flow))
+            logger.info('Ignore reboot validation on this protocol, '
+                        'reboot validation will run on: {}'.format(protocol_for_reboot_flow))
+            with allure.step('Check functionality of configured burst limit'):
+                self.run_validation_flow(self.user_limit, self.low_limit, 'burst')
+            with allure.step('Check functionality of configured rate limit'):
+                self.run_validation_flow(self.low_limit, self.user_limit)
 
         # check restored default burst and rate value
-        self.config_default_limit_values()
-        # with allure.step('Check functionality of restored to default burst limit'):
-        #     self.run_validation_flow(self.user_cbs, 'cbs')
+        with allure.step('Check functionality of restored to default burst limit'):
+            self.run_validation_flow(self.default_cbs, self.low_limit, 'burst')
         with allure.step('Check functionality of restored to default rate limit'):
-            self.run_validation_flow(self.default_cir)
+            self.run_validation_flow(self.low_limit, self.default_cir)
 
     # -------------------------------------------------------------------------------
 
-    def run_validation_flow(self, pps, traffic_type='cir'):
+    def run_validation_flow_with_reboot(self):
         """
-        Runs validation flow logic
-        :param pps: pps value for testing
-        :param traffic_type: type of the traffic - rate/burst
+        Runs validation flow logic with reboot.
+        To save time and do not reboot for each traffic type,
+        will be randomized primary validation, which will be checked specific traffic type before and after reboot,
+        and secondary validation,which will be checked specific traffic type only after reboot
         :return: None, raise error in case of unexpected result
         """
-        if traffic_type != 'cir':
-            self.create_burst_validation(pps)
+        traffic_type = random.choice(['rate', 'burst'])
+        if traffic_type == 'rate':
+            with allure.step('Check functionality of non default rate limit before reboot'):
+                self.run_validation_flow(self.low_limit, self.user_limit, 'rate')
+            primary_validation_flow = "self.run_validation_flow(self.low_limit, self.user_limit, 'rate', False)"
+            secondary_validation_flow = "self.run_validation_flow(self.user_limit, self.low_limit, 'burst')"
         else:
-            self.create_rate_validation(pps)
+            with allure.step('Check functionality of non default burst limit before reboot'):
+                self.run_validation_flow(self.user_limit, self.low_limit, 'burst')
+            primary_validation_flow = "self.run_validation_flow(self.user_limit, self.low_limit, 'burst', False)"
+            secondary_validation_flow = "self.run_validation_flow(self.low_limit, self.user_limit, 'rate')"
+
+        logger.info('Reboot Switch')
+        self.dut_cli_object.general.save_configuration(self.dut_engine)
+        self.dut_cli_object.general.reboot_flow(self.dut_engine, topology_obj=self.topology)
+        self.pre_rx_counts = self.dut_cli_object.ifconfig. \
+            get_interface_ifconfig_details(self.dut_engine, self.dut_iface).rx_packets
+
+        with allure.step('Check functionality of non default {} limit value after reboot'.format(traffic_type[0])):
+            eval(primary_validation_flow)
+        with allure.step('Check functionality of non default {} limit value'.format(traffic_type[1])):
+            eval(secondary_validation_flow)
+
+    # -------------------------------------------------------------------------------
+
+    def run_validation_flow(self, cbs_value, cir_value, traffic_type='rate', update_configs_request=True):
+        """
+        Runs validation flow logic
+        :param cbs_value: burst limit value
+        :param cir_value: rate limit value
+        :param traffic_type: type of the traffic - rate/burst
+        :param update_configs_request: the flag to update limit values in the config file
+        :return: None, raise error in case of unexpected result
+        """
+        if update_configs_request:
+            self.config_limit_value(cir_value, cbs_value)
+
+        if traffic_type == 'rate':
+            self.create_rate_validation(cir_value)
+            pps = cir_value
+        else:
+            self.create_burst_validation(cbs_value)
+            pps = cbs_value
         self.send_traffic()
         self.validate_results(pps)
 
@@ -166,8 +197,8 @@ class CoppBase:
         Creating burst valudation, based on given CBS value
         :param cbs_value: CBS value
         """
-        self.create_validation(pps=cbs_value*RATE_TRAFFIC_MULTIPLIER,
-                               times=cbs_value*RATE_TRAFFIC_MULTIPLIER)
+        self.create_validation(pps=cbs_value*BURST_TRAFFIC_MULTIPLIER,
+                               times=int(cbs_value*BURST_TRAFFIC_MULTIPLIER*BURST_TRAFFIC_DURATION))
         self.create_pre_validation()
 
     # -------------------------------------------------------------------------------
@@ -178,7 +209,7 @@ class CoppBase:
         :param cir_value: CIR value
         """
         self.create_validation(pps=cir_value*RATE_TRAFFIC_MULTIPLIER,
-                               times=cir_value*RATE_TRAFFIC_MULTIPLIER*TRAFFIC_DURATION)
+                               times=cir_value*RATE_TRAFFIC_MULTIPLIER*RATE_TRAFFIC_DURATION)
         self.create_pre_validation()
 
     # -------------------------------------------------------------------------------
@@ -207,13 +238,14 @@ class CoppBase:
         Pre validation - to be sure main all validation will be received
         Validation - main traffic sends
         """
+        logger.info('validation: {}'.format(str(self.validation)))
         with allure.step('Send pre traffic of 1 packet'):
             ScapyChecker(self.topology.players, self.pre_validation).run_validation()
             time.sleep(1)
         with allure.step('Send traffic'):
             start_time = time.time()
             ScapyChecker(self.topology.players, self.validation).run_validation()
-            self.dispatch_time = dispatch_time_correction(time.time() - start_time)
+            self.traffic_duration = time.time() - start_time
             time.sleep(1)
 
     # -------------------------------------------------------------------------------
@@ -229,31 +261,16 @@ class CoppBase:
                                                                                               self.dut_iface).rx_packets
             rx_count = int(self.post_rx_counts) - int(self.pre_rx_counts)
             self.pre_rx_counts = self.post_rx_counts
-            logger.info('The dispatch time is {:10.4f} '.format(self.dispatch_time))
+            logger.info('The traffic duration is {:10.4f} '.format(self.traffic_duration))
             logger.info('The delta of RX counters is {} '.format(rx_count))
-            rx_pps = int(rx_count / self.dispatch_time)
+            self.traffic_duration = correct_traffic_duration_for_calculations(self.traffic_duration)
+            rx_pps = int(rx_count / self.traffic_duration)
             # We use +- 15% threshold due to not possible to be more precise
             logger.info("Verify that received pps({}) is in allowed rate: {} +-15%".format(rx_pps, expected_pps))
             assert int(rx_pps) > int(expected_pps) * 0.85, \
                 "The received pps {} is less then 85% of expected {}".format(rx_pps, expected_pps)
             assert int(rx_pps) < int(expected_pps) * 1.15, \
                 "The received pps {} is bigger then 115% of expected {}".format(rx_pps, expected_pps)
-
-    # -------------------------------------------------------------------------------
-
-    def config_default_limit_values(self):
-        """
-        Configuration of default CIR and CBS values into the config database
-        """
-        self.config_limit_value(self.default_cir, self.default_cbs)
-
-    # -------------------------------------------------------------------------------
-
-    def config_user_limit_values(self):
-        """
-        Configuration of use CIR and CBS values into the config database
-        """
-        self.config_limit_value(self.user_cir, self.user_cbs)
 
     # -------------------------------------------------------------------------------
 
@@ -308,8 +325,7 @@ class ARPTest(CoppBase):
         CoppBase.__init__(self, topology_obj)
         self.default_cir = 600
         self.default_cbs = 600
-        self.user_cir = 500
-        self.user_cbs = 500
+        self.user_limit = 500
         self.dst_mac = 'ff:ff:ff:ff:ff:ff'
 
     # -------------------------------------------------------------------------------
@@ -348,10 +364,13 @@ class SNMPTest(CoppBase):
         CoppBase.__init__(self, topology_obj)
         # TODO trapped as ip2me. Mellanox should add support for SNMP trap. update values accordingly
         self.default_cir = 6000
-        self.default_cbs = 6000
-        self.user_cir = 2000
-        self.user_cbs = 2000
+        self.default_cbs = 1000
+        self.user_limit = 600
         self.trap_ids = 'snmp'
+        logger.info("The tested protocol SNMP have too big default value for burst, "
+                    "can't be tested on canonical systems. "
+                    "Will be tested the value {} instead"
+                    .format(self.default_cbs))
 
     # -------------------------------------------------------------------------------
 
@@ -391,9 +410,12 @@ class IP2METest(CoppBase):
     def __init__(self, topology_obj):
         CoppBase.__init__(self, topology_obj)
         self.default_cir = 6000
-        self.default_cbs = 6000
-        self.user_cir = 3000
-        self.user_cbs = 3000
+        self.default_cbs = 1000
+        self.user_limit = 600
+        logger.info("The tested protocol IP2ME have too big default value for burst, "
+                    "can't be tested on canonical systems. "
+                    "Will be tested the value {} instead"
+                    .format(self.default_cbs))
 
     # -------------------------------------------------------------------------------
 
@@ -425,8 +447,7 @@ class SSHTest(CoppBase):
         CoppBase.__init__(self, topology_obj)
         self.default_cir = 600
         self.default_cbs = 600
-        self.user_cir = 400
-        self.user_cbs = 400
+        self.user_limit = 400
         self.trap_ids = 'ssh'
 
     # -------------------------------------------------------------------------------
@@ -540,37 +561,35 @@ def update_limit_values(copp_dict, trap_group, cir_value, cbs_value):
 # -------------------------------------------------------------------------------
 
 
-def dispatch_time_correction(current_dispatch_time):
+def correct_traffic_duration_for_calculations(current_traffic_duration):
     """
-    This function correct the rate traffic dispatch time from some network/scapy delays.
-    :param current_dispatch_time: current dispatch time of traffic
-    :return: dispatch time after correction
+    This function correct the traffic duration time from some network/scapy delays.
+    :param current_traffic_duration: current traffic duration time
+    :return: traffic duration time after correction
     """
-    if current_dispatch_time >= 10:
-        return rate_dispatch_time_correction(current_dispatch_time)
+    if current_traffic_duration >= 10:
+        return rate_traffic_duration_time_correction(current_traffic_duration)
     else:
-        return burst_dispatch_time_correction(current_dispatch_time)
+        return burst_traffic_duration_time_correction()
 
 # -------------------------------------------------------------------------------
 
 
-def rate_dispatch_time_correction(current_dispatch_time):
+def rate_traffic_duration_time_correction(current_traffic_duration):
     """
-    The rate traffic time is 10 seconds. So the dispatch time can't be bigger then 11 seconds
-    :param current_dispatch_time: current dispatch time of traffic
-    :return: dispatch time after correction
+    The rate traffic time is 10 seconds. So the traffic duration time can't be bigger then 11 seconds
+    :param current_traffic_duration: current traffic duration time
+    :return: traffic duration time after correction
     """
-    max_rate_dispatch_time = 11
-    return min(current_dispatch_time, max_rate_dispatch_time)
+    max_rate_traffic_duration = 11
+    return min(current_traffic_duration, max_rate_traffic_duration)
 
 # -------------------------------------------------------------------------------
 
 
-def burst_dispatch_time_correction(current_dispatch_time):
+def burst_traffic_duration_time_correction():
     """
-    The burst traffic time is 1 second. So the dispatch time can't be bigger then 1.1 seconds
-    :param current_dispatch_time: current dispatch time of traffic
-    :return: dispatch time after correction
+    The burst traffic time is <0.1 second. So for calculation burst traffic will be returned value 1
+    :return: traffic duration time after correction
     """
-    max_burst_dispatch_time = 1.1
-    return min(current_dispatch_time, max_burst_dispatch_time)
+    return 1
