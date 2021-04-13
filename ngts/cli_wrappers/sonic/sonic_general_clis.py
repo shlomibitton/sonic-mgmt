@@ -4,8 +4,6 @@ import random
 import time
 import pexpect
 import netmiko
-import shlex
-import sys
 from retry import retry
 from retry.api import retry_call
 from ngts.cli_wrappers.common.general_clis_common import GeneralCliCommon
@@ -15,9 +13,15 @@ from infra.tools.validations.traffic_validations.ping.send import ping_till_aliv
 from infra.tools.connection_tools.onie_engine import OnieEngine
 from infra.tools.exceptions.real_issue import RealIssue
 from ngts.constants.constants import SonicConst, InfraConst
-from ngts.constants.constants import LinuxConsts, ConfigDbJsonConst, SonicConst
+
 
 logger = logging.getLogger()
+
+
+class OnieInstallationError(Exception):
+    """
+    An exception for errors that reflect problematic behavior of the OS installation
+    """
 
 
 class SonicGeneralCli(GeneralCliCommon):
@@ -161,19 +165,36 @@ class SonicGeneralCli(GeneralCliCommon):
             return output.splitlines()[-1]
 
     @staticmethod
+    def do_installation(topology_obj, dut_engine, image_path, deploy_type):
+        with allure.step('Preparing switch for installation'):
+            in_onie = SonicGeneralCli.prepare_for_installation(topology_obj)
+
+        if deploy_type == 'sonic':
+            if in_onie:
+                raise AssertionError("The request deploy type is 'sonic'(upgrade sonic to sonic)"
+                                     " while the switch is running ONIE instead of SONiC OS.")
+            SonicGeneralCli.deploy_sonic(dut_engine, image_path)
+
+        if deploy_type == 'onie':
+            SonicGeneralCli.deploy_onie(dut_engine, image_path, in_onie)
+
+    @staticmethod
     def deploy_image(topology_obj, image_path, apply_base_config=False, setup_name=None,
                      platform=None, hwsku=None,
                      wjh_deb_url=None, deploy_type='sonic'):
         dut_engine = topology_obj.players['dut']['engine']
         if not image_path.startswith('http'):
             image_path = '{}{}'.format(InfraConst.HTTP_SERVER, image_path)
-        in_onie = SonicGeneralCli.prepare_for_installation(topology_obj)
-
-        if deploy_type == 'sonic':
-            SonicGeneralCli.deploy_sonic(dut_engine, image_path)
-
-        if deploy_type == 'onie':
-            SonicGeneralCli.deploy_onie(dut_engine, image_path, in_onie)
+        try:
+            with allure.step("Trying to install sonic image"):
+                SonicGeneralCli.do_installation(topology_obj, dut_engine, image_path, deploy_type)
+        except OnieInstallationError:
+            with allure.step("Catched exception OnieInstallationError during install. Perform reboot and trying again"):
+                logger.error('Catched exception OnieInstallationError during install. Perform reboot and trying again')
+                SonicGeneralCli.remote_reboot(topology_obj)
+                logger.info('Sleeping %s seconds to handle ssh flapping' % InfraConst.SLEEP_AFTER_RRBOOT)
+                time.sleep(InfraConst.SLEEP_AFTER_RRBOOT)
+                SonicGeneralCli.do_installation(topology_obj, dut_engine, image_path, deploy_type)
 
         if apply_base_config:
             SonicGeneralCli.apply_basic_config(dut_engine, setup_name, platform, hwsku)
@@ -212,8 +233,10 @@ class SonicGeneralCli(GeneralCliCommon):
     @staticmethod
     def deploy_onie(dut_engine, image_path, in_onie=False):
         if not in_onie:
-            SonicGeneralCli.set_next_boot_entry_to_onie(dut_engine)
-            dut_engine.reload(['sudo reboot'], wait_after_ping=15, ssh_after_reload=False)
+            with allure.step('Setting boot order to sonic'):
+                SonicGeneralCli.set_next_boot_entry_to_onie(dut_engine)
+            with allure.step('Rebooting the switch'):
+                dut_engine.reload(['sudo reboot'], wait_after_ping=15, ssh_after_reload=False)
         SonicGeneralCli.install_image_onie(dut_engine.ip, image_path)
 
     @staticmethod
@@ -249,10 +272,10 @@ class SonicGeneralCli(GeneralCliCommon):
                     logger.info("Printing output: %s" % client.before)
                 else:
                     logger.info('Catched pexpect entry: %d' % i)
-                    raise AssertionError("Failed to install sonic image. %s" % stdout)
+                    raise OnieInstallationError("Failed to install sonic image. %s" % stdout)
             else:
                 logger.info("Did not installed image in %d seconds." % num_retry * timeout)
-                raise AssertionError("Failed to install sonic image. %s" % stdout)
+                raise OnieInstallationError("Failed to install sonic image. %s" % stdout)
             logger.info('SONiC installed')
             client.expect([pexpect.EOF, pexpect.TIMEOUT], timeout=15)
             stdout += client.before.decode('ascii')
@@ -311,6 +334,21 @@ class SonicGeneralCli(GeneralCliCommon):
         client.expect(prompts)
         stdout += client.before.decode('ascii')
         logger.info(stdout)
+        return stdout
+
+    @staticmethod
+    def check_onie_mode_and_set_install(ip):
+        if 'boot_reason=install' not in SonicGeneralCli.check_in_onie(ip, 'cat /proc/cmdline'):
+            logger.info('Switch is not in ONIE install mode, fixing')
+            SonicGeneralCli.check_in_onie(ip, 'onie-boot-mode -o install')
+            SonicGeneralCli.check_in_onie(ip, 'reboot')
+            logger.info('Sleep %s seconds before doing ping till alive' % InfraConst.SLEEP_BEFORE_RRBOOT)
+            time.sleep(InfraConst.SLEEP_BEFORE_RRBOOT)
+            ping_till_alive(should_be_alive=True, destination_host=ip)
+            logger.info('Sleeping %s seconds after switch reply to ping to handle ssh session' % InfraConst.SLEEP_AFTER_RRBOOT)
+            time.sleep(InfraConst.SLEEP_AFTER_RRBOOT)
+        else:
+            logger.info('Switch is in ONIE install mode')
 
 
     @staticmethod
@@ -323,10 +361,9 @@ class SonicGeneralCli(GeneralCliCommon):
             # Checking if device is in sonic
             dut_engine.run_cmd(dummy_command, validate=True)
         except netmiko.ssh_exception.NetmikoAuthenticationException:
-            # Check switch is in onie
-            SonicGeneralCli.check_in_onie(dut_engine.ip, dummy_command)
-            switch_in_onie = True
             logger.info('Login to onie succeed!')
+            SonicGeneralCli.check_onie_mode_and_set_install(dut_engine.ip)
+            switch_in_onie = True
         return switch_in_onie
 
     @staticmethod

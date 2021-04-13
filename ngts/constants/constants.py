@@ -22,6 +22,8 @@ class InfraConst:
     MYSQL_DB = 'sonic'
     RC_SUCCESS = 0
     NGTS_PATH_PYTEST = '/ngts_venv/bin/pytest'
+    SLEEP_BEFORE_RRBOOT = 5
+    SLEEP_AFTER_RRBOOT = 35
 
 
 class LinuxConsts:
