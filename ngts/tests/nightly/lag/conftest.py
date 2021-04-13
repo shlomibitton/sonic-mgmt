@@ -9,6 +9,8 @@ from ngts.config_templates.vlan_config_template import VlanConfigTemplate
 from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
 from ngts.config_templates.lag_lacp_config_template import LagLacpConfigTemplate
 from ngts.config_templates.ip_config_template import IpConfigTemplate
+from ngts.cli_wrappers.linux.linux_interface_clis import LinuxInterfaceCli
+
 
 logger = logging.getLogger()
 
@@ -85,7 +87,17 @@ def lag_lacp_base_configuration(topology_obj, interfaces, engines):
     InterfaceConfigTemplate.cleanup(topology_obj, interfaces_config_dict)
 
     dut_cli.general.save_configuration(engines.dut)
-
+    # to prevent advertising the same mac on an interfaces,
+    # need to restart ports status after lldp enbling
+    hosts_aliases = ['ha', 'hb']
+    for host_alias in hosts_aliases:
+        host_engine = topology_obj.players[host_alias]['engine']
+        cli_object = topology_obj.players[host_alias]['cli']
+        if not cli_object.lldp.is_lldp_enabled_on_host(host_engine):
+            cli_object.lldp.enable_lldp_on_host(host_engine)
+            for port in topology_obj.players_all_ports[host_alias]:
+                LinuxInterfaceCli.disable_interface(host_engine, port)
+                LinuxInterfaceCli.enable_interface(host_engine, port)
     logger.info('Lag LACP Test Common cleanup completed')
 
 
