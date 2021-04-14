@@ -161,7 +161,11 @@ def pytest_sessionfinish(session, exitstatus):
         allure_server_ip = '10.215.11.120'
         allure_server_port = '5050'
         allure_report_dir = session.config.known_args_namespace.allure_report_dir
-        AllureServer(allure_server_ip, allure_server_port, allure_report_dir).generate_allure_report()
+        try:
+            AllureServer(allure_server_ip, allure_server_port, allure_report_dir).generate_allure_report()
+        except Exception as err:
+            logger.error('Failed to upload allure report to server. Allure report not available. '
+                         '\nError: {}'.format(err))
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
