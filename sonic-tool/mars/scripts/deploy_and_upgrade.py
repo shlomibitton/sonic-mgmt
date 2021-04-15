@@ -331,19 +331,17 @@ def install_image(ansible_path, mgmt_docker_engine, dut_name, topo, sonic_topo, 
     if sonic_topo == 'ptf-any':
         sonic_mgmt_path = '/workspace/{setup_name}/sonic-mgmt/'
         sonic_mgmt_dir = sonic_mgmt_path.format(setup_name=setup_name)
-
-        cmd = "PYTHONPATH=/devts:{sonic_mgmt_dir} {ngts_pytest} --setup_name={setup_name} --rootdir={sonic_mgmt_dir}/ngts" \
-              " -c {sonic_mgmt_dir}/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results" \
-              " --base_version={base_version} --deploy_type={deploy_type} --disable_loganalyzer" \
-              " {sonic_mgmt_dir}/ngts/scripts/sonic_deploy/test_sonic_deploy_image.py".format(ngts_pytest=constants.NGTS_PATH_PYTEST, sonic_mgmt_dir=sonic_mgmt_dir, setup_name=setup_name,
-                                                                                              base_version=image_url, deploy_type=upgrade_type)
+        apply_base_config = '--apply_base_config=True '
     else:
-        cmd = 'ansible-playbook -i inventory --limit {dut}-{topo} upgrade_sonic.yml ' \
-              '-e "upgrade_type={upgrade_type}" -e "image_url={image_url}" -vvvvv'.format(dut=dut_name,
-                                                                                          topo=sonic_topo,
-                                                                                          upgrade_type=upgrade_type,
-                                                                                          image_url=image_url)
+        sonic_mgmt_dir = '/root/mars/workspace/sonic-mgmt/'
+        apply_base_config = ''
 
+    cmd = "PYTHONPATH=/devts:{sonic_mgmt_dir} {ngts_pytest} --setup_name={setup_name} --rootdir={sonic_mgmt_dir}/ngts" \
+          " -c {sonic_mgmt_dir}/ngts/pytest.ini --log-level=INFO --clean-alluredir --alluredir=/tmp/allure-results" \
+          " --base_version={base_version} --deploy_type={deploy_type} --disable_loganalyzer {apply_base_config}" \
+          " {sonic_mgmt_dir}/ngts/scripts/sonic_deploy/test_sonic_deploy_image.py".\
+        format(ngts_pytest=constants.NGTS_PATH_PYTEST, sonic_mgmt_dir=sonic_mgmt_dir, setup_name=setup_name,
+               base_version=image_url, deploy_type=upgrade_type, apply_base_config=apply_base_config)
     with mgmt_docker_engine.cd(ansible_path):
         logger.info("Running CMD: {}".format(cmd))
         mgmt_docker_engine.run(cmd)

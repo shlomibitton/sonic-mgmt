@@ -200,32 +200,32 @@ def create_and_start_container(conn, image_name, image_tag, container_name, mac_
         logger.error("Configure docker container failed.")
         sys.exit(1)
 
-    if constants.DOCKER_SONIC_MGMT_IMAGE_NAME in image_name:
-        logger.info("Install extra packages")
-        if not install_extra_packages(conn, container_name):
-            logger.error("Install extra packages failed.")
-            sys.exit(1)
 
-        logger.info("Add required configuration for installing ver_sdk tool on sonic-mgmt")
-        conn.run('docker exec --user root {CONTAINER_NAME} bash -c "echo \'export PYTHONPATH=\\"/opt/ver_sdk\\":\\"\\$PYTHONPATH\\"\' >> /root/.bashrc"'
-                 .format(CONTAINER_NAME=container_name))
-        conn.run('docker exec --user root {CONTAINER_NAME} bash -c "echo \'export PATH=\\"/opt/ver_sdk/bin\\":\\"\\$PATH\\"\' >> /root/.bashrc"'
-                 .format(CONTAINER_NAME=container_name))
+    logger.info("Install extra packages")
+    if not install_extra_packages(conn, container_name):
+        logger.error("Install extra packages failed.")
+        sys.exit(1)
 
-        if image_tag != "2018":
-            # Some of our Jenkins node are still using old sonic-mgmt image. I added tag "2018" for this old version in
-            # our internal docker registry. The latest sonic-mgmt image is different with the "2018" image:
-            # * By default, root SSH login is disabled.
-            # * The default root password is no longer "12345".
-            # When the sonic-mgmt image is not the "2018" version, we need to enable root SSH login and reset password.
-            logger.info("Extra configuration for root SSH login")
-            conn.run("docker exec {CONTAINER_NAME} bash -c \"sudo "
-                     "sed -i -E 's/^#?PermitRootLogin.*$/PermitRootLogin yes/g' /etc/ssh/sshd_config\""
-                     .format(CONTAINER_NAME=container_name))
-            conn.run('docker exec {CONTAINER_NAME} bash -c "sudo /etc/init.d/ssh restart"'
-                     .format(CONTAINER_NAME=container_name))
-            conn.run("docker exec --user root {CONTAINER_NAME} bash -c \"echo 'root:12345' | chpasswd\""
-                     .format(CONTAINER_NAME=container_name))
+    logger.info("Add required configuration for installing ver_sdk tool on sonic-mgmt")
+    conn.run('docker exec --user root {CONTAINER_NAME} bash -c "echo \'export PYTHONPATH=\\"/opt/ver_sdk\\":\\"\\$PYTHONPATH\\"\' >> /root/.bashrc"'
+             .format(CONTAINER_NAME=container_name))
+    conn.run('docker exec --user root {CONTAINER_NAME} bash -c "echo \'export PATH=\\"/opt/ver_sdk/bin\\":\\"\\$PATH\\"\' >> /root/.bashrc"'
+             .format(CONTAINER_NAME=container_name))
+
+    if image_tag != "2018":
+        # Some of our Jenkins node are still using old sonic-mgmt image. I added tag "2018" for this old version in
+        # our internal docker registry. The latest sonic-mgmt image is different with the "2018" image:
+        # * By default, root SSH login is disabled.
+        # * The default root password is no longer "12345".
+        # When the sonic-mgmt image is not the "2018" version, we need to enable root SSH login and reset password.
+        logger.info("Extra configuration for root SSH login")
+        conn.run("docker exec {CONTAINER_NAME} bash -c \"sudo "
+                 "sed -i -E 's/^#?PermitRootLogin.*$/PermitRootLogin yes/g' /etc/ssh/sshd_config\""
+                 .format(CONTAINER_NAME=container_name))
+        conn.run('docker exec {CONTAINER_NAME} bash -c "sudo /etc/init.d/ssh restart"'
+                 .format(CONTAINER_NAME=container_name))
+        conn.run("docker exec --user root {CONTAINER_NAME} bash -c \"echo 'root:12345' | chpasswd\""
+                 .format(CONTAINER_NAME=container_name))
 
 
 @retry(Exception, tries=3, delay=10)
@@ -357,10 +357,8 @@ def main():
     topo = parse_topology(args.topo)
     test_server_device = topo.get_device_by_topology_id(constants.TEST_SERVER_DEVICE_ID)
 
-    if constants.DOCKER_NGTS_IMAGE_NAME in docker_name:
-        docker_host = topo.get_device_by_topology_id(constants.NGTS_DEVICE_ID)
-    else:
-        docker_host = topo.get_device_by_topology_id(constants.SONIC_MGMT_DEVICE_ID)
+
+    docker_host = topo.get_device_by_topology_id(constants.SONIC_MGMT_DEVICE_ID)
     mac = docker_host.MAC_ADDRESS
 
     test_server = Connection(test_server_device.BASE_IP, user=test_server_device.USERS[0].USERNAME,
