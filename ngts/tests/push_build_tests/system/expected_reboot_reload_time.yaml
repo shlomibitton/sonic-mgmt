@@ -9,69 +9,69 @@
 
 # SPC1
 MSN2010: # Boxer
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 150
   reboot: 140
   config_reload: 120
 MSN2100: # Bulldog
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 180
   reboot: 140
   config_reload: 120
 MSN2410: # Spider
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 130
   reboot: 160
   config_reload: 170
 SN2700: # Panther
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 120
   reboot: 150
   config_reload: 160
 MSN2700: # Simx Panther
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 120
   reboot: 150
   config_reload: 160
 # SPC2
 MSN3420: # Lionfish
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 150
   reboot: 120
   config_reload: 120
 MSN3700: # Anaconda
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 180
   reboot: 120
   config_reload: 120
 MSN3700C: # Anaconda C
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 180
   reboot: 120
   config_reload: 120
 MSN3800: # Tigris
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 160
   reboot: 190
   config_reload: 170
 # SPC3
 MSN4410: # Ocelot
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 160
   reboot: 140
   config_reload: 140
 MSN4600: # Liger
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 160
   reboot: 160
   config_reload: 120
 MSN4600C: # Tigon
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 110
   reboot: 150
   config_reload: 150
 MSN4700: # Leopard
-  fast-reboot: 110 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
+  fast-reboot: 120 # need to check - for now it not work due to https://github.com/Azure/sonic-utilities/pull/1393
   warm-reboot: 160
   reboot: 150
   config_reload: 140

@@ -148,7 +148,7 @@ class SonicGeneralCli(GeneralCliCommon):
         with allure.step('Check that link in UP state'):
             retry_call(SonicInterfaceCli.check_ports_status,
                        fargs=[engine, ifaces],
-                       tries=5,
+                       tries=8,
                        delay=10,
                        logger=logger)
 
