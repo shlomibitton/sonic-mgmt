@@ -15,6 +15,13 @@
     </Case>
   </global>
   <case>
+        <ignore>
+            <condition>
+                <key> sonic_branch </key>
+                <op> in </op>
+                <value> ["201911"] </value>
+            </condition>
+        </ignore>
     <name> COPP </name>
     <info> </info>
     <cmd>

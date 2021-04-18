@@ -36,6 +36,7 @@ CHIP_LAG_MEMBERS_LIM = {
 }
 
 
+@pytest.mark.ngts_skip({'platform_prefix_list': ['simx']})
 @allure.title('LAG_LACP core functionality and reboot')
 def test_core_functionality_with_reboot(topology_obj, traffic_type, interfaces, engines, cleanup_list):
     """
@@ -385,6 +386,7 @@ def test_lag_members_scale(topology_obj, interfaces, engines, cleanup_list):
         raise AssertionError(err)
 
 
+@pytest.mark.ngts_skip({'platform_prefix_list': ['simx']})
 @allure.title('LAGs scale Test')
 def test_lags_scale(topology_obj, engines, cleanup_list):
     """
