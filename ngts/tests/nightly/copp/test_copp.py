@@ -42,6 +42,7 @@ def protocol_for_reboot_flow():
 
 
 @allure.title('CoPP Policer test case')
+@pytest.mark.ngts_skip({'rm_ticket_list': [2617611]})
 @pytest.mark.parametrize("protocol", PROTOCOLS_LIST)
 def test_copp_policer(topology_obj, protocol, protocol_for_reboot_flow):
     """

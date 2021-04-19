@@ -27,6 +27,7 @@
                     <value> SPC3 </value>
                 </condition>
                 <bug> 2430822 </bug>
+                <bug> 2616518 </bug>
             </condition_group>
         </ignore>
         <cmd>

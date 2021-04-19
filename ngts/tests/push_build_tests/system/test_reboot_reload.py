@@ -76,7 +76,7 @@ class TestRebootReload:
             logger.info('Uploading test results to MySQL DB')
             DB().insert(table='reboot_time', columns_values=mysql_columns_values)
 
-    @pytest.mark.ngts_skip({'platform_prefix_list': ['simx']})
+    @pytest.mark.ngts_skip({'platform_prefix_list': ['simx'], 'rm_ticket_list': [2615940]})
     def test_push_gate_config_reload(self, request):
         """
         This tests checks config reload time, it doing reload and after execution - it upload test results to MySQL DB

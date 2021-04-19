@@ -157,6 +157,7 @@ def static_route_configuration(topology_obj, engines, interfaces, platform_param
     logger.info('StaticRoute Scale cleanup completed')
 
 
+@pytest.mark.ngts_skip({'rm_ticket_list': [2613057]})
 @allure.title('Test Scale Static Route')
 def test_scale_static_route(engines, players, interfaces, static_route_configuration):
     """
