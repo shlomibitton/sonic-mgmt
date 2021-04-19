@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CASEDEF>
+    <global>
+        <Test>
+            <info> SFLOW test </info>
+            <name> sflow tests </name>
+            <owner> SONiC </owner>
+        </Test>
+        <Case>
+            <tags> SFLOW </tags>
+            <wrapper> community_mars_pytest_runner.py </wrapper>
+            <tout> 9600 </tout>
+        </Case>
+    </global>
+
+    <case>
+        <info> SFLOW tests</info>
+        <name> sflow tests </name>
+        <tout> 9600 </tout>
+        <cmd>
+            <params>
+                <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info --show-capture=no -ra --enable_sflow_feature --showlocals -v\'" --test-scripts sflow/test_sflow.py </static_args>
+            </params>
+        </cmd>
+        <ignore>
+            <condition>
+                <key> topology </key>
+                <op> not in </op>
+                <value> ["t0"] </value>
+            </condition>
+        </ignore>
+    </case>
+
+</CASEDEF>
