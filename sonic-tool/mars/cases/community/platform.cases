@@ -273,7 +273,7 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_components and not test_fans and not test_status_led\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_components and not test_fans and not test_status_led and not test_get_my_slot and not test_get_supervisor_slot\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
              </params>
         </cmd>
     </case>
