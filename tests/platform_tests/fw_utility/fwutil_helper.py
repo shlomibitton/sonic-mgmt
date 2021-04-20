@@ -709,30 +709,30 @@ class CpldComponent(FwComponent):
         except Exception as e:
             pytest.fail("Failed to get {} number of PSUs: {}".format(hostname, str(e)))
 
-        logger.info("Create {} PSU controller".format(hostname))
-        psu_controller = request.getfixturevalue('psu_controller')
-        if psu_controller is None:
-            pytest.fail("Failed to create {} PSU controller".format(hostname))
+        logger.info("Create {} PDU controller".format(hostname))
+        pdu_controller = request.getfixturevalue('pdu_controller')
+        if pdu_controller is None:
+            pytest.fail("Failed to create {} PDU controller".format(hostname))
 
-        all_psu_status = psu_controller.get_psu_status()
-        if all_psu_status:
+        outlet_status = pdu_controller.get_outlet_status()
+        if outlet_status:
             # turn off all psu
-            for psu in all_psu_status:
-                if psu['psu_on']:
-                    logger.info("Turn off psu: id={}".format(psu['psu_id']))
-                    psu_controller.turn_off_psu(psu['psu_id'])
+            for outlet in outlet_status:
+                if outlet['outlet_on']:
+                    logger.info("Turn off outlet: id={}".format(outlet['outlet_id']))
+                    pdu_controller.turn_off_outlet(outlet)
                     time.sleep(5)
 
             logger.info("Wait for 30 sec to trigger {} firmware refresh".format(self.get_name()))
             time.sleep(30)
 
-            all_psu_status = psu_controller.get_psu_status()
-            if all_psu_status:
+            outlet_status = pdu_controller.get_outlet_status()
+            if outlet_status:
                 # turn on all psu
-                for psu in all_psu_status:
-                    if not psu['psu_on']:
-                        logger.info("Turn on psu: id={}".format(psu['psu_id']))
-                        psu_controller.turn_on_psu(psu['psu_id'])
+                for outlet in outlet_status:
+                    if not outlet['outlet_on']:
+                        logger.info("Turn on outlet: id={}".format(outlet['outlet_id']))
+                        pdu_controller.turn_on_outlet(outlet)
                         time.sleep(5)
 
         logger.info("Wait for {} to come back".format(hostname))

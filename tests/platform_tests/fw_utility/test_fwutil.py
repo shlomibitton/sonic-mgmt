@@ -25,7 +25,7 @@ def test_show_positive(duthost, platform_components):
 
 @pytest.mark.disable_loganalyzer
 @pytest.mark.parametrize("component_firmware", [ FW_TYPE_INSTALL ], indirect=True)
-def test_install_positive(request, skip_if_no_update, component_object, component_firmware):
+def test_install_positive(request, skip_if_no_update, component_object, component_firmware, pdu_controller):
     """
     Verify firmware install from local path
     """
