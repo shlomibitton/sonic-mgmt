@@ -67,9 +67,11 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
     if upgrade_params.is_upgrade_required:
         with allure.step('Installing base version from ONIE'):
             logger.info('Deploying via ONIE or call manufacture script with arg onie')
+            reboot_after_install = True if '201911' in upgrade_params.base_version else None
             SonicGeneralCli.deploy_image(topology_obj, upgrade_params.base_version, apply_base_config=True,
                                          setup_name=platform_params.setup_name, platform=platform_params.platform,
-                                         hwsku=platform_params.hwsku, deploy_type='onie')
+                                         hwsku=platform_params.hwsku, deploy_type='onie',
+                                         reboot_after_install=reboot_after_install)
 
     with allure.step('Check that links in UP state'.format()):
         ports_list = [interfaces.dut_ha_1, interfaces.dut_ha_2, interfaces.dut_hb_1, interfaces.dut_hb_2]

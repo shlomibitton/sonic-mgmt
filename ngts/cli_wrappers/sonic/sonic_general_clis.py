@@ -4,6 +4,7 @@ import random
 import time
 import pexpect
 import netmiko
+import traceback
 from retry import retry
 from retry.api import retry_call
 from ngts.cli_wrappers.common.general_clis_common import GeneralCliCommon
@@ -122,6 +123,25 @@ class SonicGeneralCli(GeneralCliCommon):
             SonicGeneralCli.check_link_state(engine, ports_list)
 
     @staticmethod
+    def validate_dockers_are_up_reboot_if_fail(engine, retries=2):
+        """
+        Reboot and validate docker containers are up on the switch
+        :param engine: dut engine
+        :param retries: int how many times do reboot of switch
+        """
+        initial_count = retries
+        while retries:
+            try:
+                SonicGeneralCli.verify_dockers_are_up(engine)
+                break
+            except:
+                logger.error('Catched exception {} during verifing docker conatiners are up.'
+                             ' Rebooting dut and try again, try number {}'.format(traceback.print_exc(),
+                                                                                  initial_count - retries + 1))
+                engine.reload(['sudo reboot'])
+            retries = retries - 1
+
+    @staticmethod
     @retry(Exception, tries=12, delay=10)
     def verify_dockers_are_up(engine, dockers_list=None):
         """
@@ -181,7 +201,7 @@ class SonicGeneralCli(GeneralCliCommon):
     @staticmethod
     def deploy_image(topology_obj, image_path, apply_base_config=False, setup_name=None,
                      platform=None, hwsku=None,
-                     wjh_deb_url=None, deploy_type='sonic'):
+                     wjh_deb_url=None, deploy_type='sonic', reboot_after_install=None):
         dut_engine = topology_obj.players['dut']['engine']
         if not image_path.startswith('http'):
             image_path = '{}{}'.format(InfraConst.HTTP_SERVER, image_path)
@@ -198,6 +218,9 @@ class SonicGeneralCli(GeneralCliCommon):
 
         if apply_base_config:
             SonicGeneralCli.apply_basic_config(dut_engine, setup_name, platform, hwsku)
+
+        if reboot_after_install:
+            SonicGeneralCli.validate_dockers_are_up_reboot_if_fail(dut_engine)
 
         if wjh_deb_url:
             SonicGeneralCli.install_wjh(dut_engine, wjh_deb_url)
