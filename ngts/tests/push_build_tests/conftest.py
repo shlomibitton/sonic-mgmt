@@ -21,8 +21,33 @@ POST_UPGRADE_CONFIG = '/tmp/config_db_{}_target.json'
 logger = logging.getLogger()
 
 
+@pytest.fixture(scope='session')
+def run_config_only(request):
+    """
+    Method for get run_config_only from pytest arguments
+    """
+    return request.config.getoption('--run_config_only')
+
+
+@pytest.fixture(scope='session')
+def run_test_only(request):
+    """
+    Method for get run_test_only from pytest arguments
+    """
+    return request.config.getoption('--run_test_only')
+
+
+@pytest.fixture(scope='session')
+def run_cleanup_only(request):
+    """
+    Method for get run_cleanup_only from pytest arguments
+    """
+    return request.config.getoption('--run_cleanup_only')
+
+
 @pytest.fixture(scope='package', autouse=True)
-def push_gate_configuration(topology_obj, engines, interfaces, platform_params, upgrade_params):
+def push_gate_configuration(topology_obj, engines, interfaces, platform_params, upgrade_params,
+                            run_config_only, run_test_only, run_cleanup_only):
     """
     Pytest fixture which are doing configuration fot test case based on push gate config
     :param topology_obj: topology object fixture
@@ -30,7 +55,13 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
     :param interfaces: interfaces fixture
     :param platform_params: platform_params fixture
     :param upgrade_params: upgrade_params fixture
+    :param run_config_only: test run mode run_config_only
+    :param run_test_only: test run mode run_test_only
+    :param run_cleanup_only: test run mode run_cleanup_only
     """
+    full_flow_run = all(arg is False for arg in [run_config_only, run_test_only, run_cleanup_only])
+    skip_tests = False
+
     cli_object = topology_obj.players['dut']['cli']
 
     if upgrade_params.is_upgrade_required:
@@ -118,21 +149,22 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
                 ]
     }
 
-    logger.info('Starting PushGate Common configuration')
-    InterfaceConfigTemplate.configuration(topology_obj, interfaces_config_dict)
-    LagLacpConfigTemplate.configuration(topology_obj, lag_lacp_config_dict)
-    VlanConfigTemplate.configuration(topology_obj, vlan_config_dict)
-    IpConfigTemplate.configuration(topology_obj, ip_config_dict)
-    RouteConfigTemplate.configuration(topology_obj, static_route_config_dict)
-    DhcpRelayConfigTemplate.configuration(topology_obj, dhcp_relay_config_dict)
-    logger.info('PushGate Common configuration completed')
+    if run_config_only or full_flow_run:
+        logger.info('Starting PushGate Common configuration')
+        InterfaceConfigTemplate.configuration(topology_obj, interfaces_config_dict)
+        LagLacpConfigTemplate.configuration(topology_obj, lag_lacp_config_dict)
+        VlanConfigTemplate.configuration(topology_obj, vlan_config_dict)
+        IpConfigTemplate.configuration(topology_obj, ip_config_dict)
+        RouteConfigTemplate.configuration(topology_obj, static_route_config_dict)
+        DhcpRelayConfigTemplate.configuration(topology_obj, dhcp_relay_config_dict)
+        logger.info('PushGate Common configuration completed')
 
-    with allure.step('Doing debug logs print'):
-        log_debug_info_before_upgrade(engines.dut)
+        with allure.step('Doing debug logs print'):
+            log_debug_info_before_upgrade(engines.dut)
 
-    with allure.step('Doing conf save'):
-        logger.info('Doing config save')
-        cli_object.general.save_configuration(engines.dut)
+        with allure.step('Doing conf save'):
+            logger.info('Doing config save')
+            cli_object.general.save_configuration(engines.dut)
 
     if upgrade_params.is_upgrade_required:
         with allure.step('Doing upgrade to target version'):
@@ -151,18 +183,25 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
                                       file_system=SonicConst.SONIC_CONFIG_FOLDER, overwrite_file=True, verify_file=False,
                                       direction='get')
 
-    yield
+    if run_test_only or full_flow_run:
+        yield
+    else:
+        skip_tests = True
 
-    logger.info('Starting PushGate Common configuration cleanup')
-    DhcpRelayConfigTemplate.cleanup(topology_obj, dhcp_relay_config_dict)
-    RouteConfigTemplate.cleanup(topology_obj, static_route_config_dict)
-    IpConfigTemplate.cleanup(topology_obj, ip_config_dict)
-    VlanConfigTemplate.cleanup(topology_obj, vlan_config_dict)
-    LagLacpConfigTemplate.cleanup(topology_obj, lag_lacp_config_dict)
-    InterfaceConfigTemplate.cleanup(topology_obj, interfaces_config_dict)
-    logger.info('Doing config save after cleanup')
-    cli_object.general.save_configuration(engines.dut)
-    logger.info('PushGate Common cleanup completed')
+    if run_cleanup_only or full_flow_run:
+        logger.info('Starting PushGate Common configuration cleanup')
+        DhcpRelayConfigTemplate.cleanup(topology_obj, dhcp_relay_config_dict)
+        RouteConfigTemplate.cleanup(topology_obj, static_route_config_dict)
+        IpConfigTemplate.cleanup(topology_obj, ip_config_dict)
+        VlanConfigTemplate.cleanup(topology_obj, vlan_config_dict)
+        LagLacpConfigTemplate.cleanup(topology_obj, lag_lacp_config_dict)
+        InterfaceConfigTemplate.cleanup(topology_obj, interfaces_config_dict)
+        logger.info('Doing config save after cleanup')
+        cli_object.general.save_configuration(engines.dut)
+        logger.info('PushGate Common cleanup completed')
+
+    if skip_tests:
+        pytest.skip('Skipping test according to flags: run_config_only/run_test_only/run_cleanup_only')
 
 
 def log_debug_info_before_upgrade(dut_engine):

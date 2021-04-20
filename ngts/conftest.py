@@ -36,6 +36,11 @@ def pytest_addoption(parser):
     parser.addoption('--base_version', action='store', default=None, help='Path to base SONiC version')
     parser.addoption('--target_version', action='store', default=None, help='Path to target SONiC version')
     parser.addoption('--wjh_deb_url', action='store', default=None, help='URL path to WJH deb package')
+    parser.addoption('--run_config_only', action='store_true', help='If set then only the configuration part defined '
+                                                                    'in the push_build conftest will be executed')
+    parser.addoption('--run_test_only', action='store_true', help='If set then only the test(push_build) will be executed')
+    parser.addoption('--run_cleanup_only', action='store_true', help='If set then only the cleanup part defined '
+                                                                     'in the push_build conftest will be executed')
 
 
 @pytest.fixture(scope="session")
