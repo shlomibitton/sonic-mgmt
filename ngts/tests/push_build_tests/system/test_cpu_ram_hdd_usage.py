@@ -27,6 +27,7 @@ class TestCpuRamHddUsage:
         self.setup_name = platform_params.setup_name
         self.sonic_ver = sonic_version
 
+    @pytest.mark.ngts_skip({'platform_prefix_list': ['simx']})
     @pytest.mark.parametrize('partition_usage', partitions_and_expected_usage)
     def test_hdd_usage(self, request, partition_usage):
         """
