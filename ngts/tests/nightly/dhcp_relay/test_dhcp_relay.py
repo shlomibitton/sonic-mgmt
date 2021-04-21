@@ -8,18 +8,24 @@ from ngts.config_templates.ip_config_template import IpConfigTemplate
 from ngts.config_templates.dhcp_relay_config_template import DhcpRelayConfigTemplate
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 from infra.tools.validations.traffic_validations.ping.ping_runner import PingChecker
+from ngts.cli_wrappers.sonic.sonic_interface_clis import SonicInterfaceCli
 
 logger = logging.getLogger()
 num_of_dhcp_servers = 10
+dhcp_client_vlan = 100
+dhcp_servers_first_vlan = 101
 
 
 @pytest.fixture(scope='module', autouse=True)
-def configure_dhcp_scale(topology_obj):
+def configure_dhcp_scale(topology_obj, interfaces, engines):
     dutha1 = topology_obj.ports['dut-ha-1']
     duthb1 = topology_obj.ports['dut-hb-1']
     hbdut1 = topology_obj.ports['hb-dut-1']
-    dhcp_client_vlan = 100
-    dhcp_servers_first_vlan = 101
+
+    with allure.step('Check that links in UP state'.format()):
+        ports_list = [interfaces.dut_ha_1, interfaces.dut_ha_2, interfaces.dut_hb_1, interfaces.dut_hb_2]
+        retry_call(SonicInterfaceCli.check_ports_status, fargs=[engines.dut, ports_list], tries=10, delay=10,
+                   logger=logger)
 
     vlan_config_dict = {
         'dut': [{'vlan_id': dhcp_client_vlan, 'vlan_members': [{dutha1: 'access'}]}],
@@ -51,18 +57,6 @@ def configure_dhcp_scale(topology_obj):
     DhcpRelayConfigTemplate.configuration(topology_obj, dhcp_relay_config_dict)
     logger.info('DHCP relay scale configuration completed')
 
-    # Validation below required for update ARP for peers(DHCP servers)
-    for item in range(dhcp_servers_first_vlan, dhcp_servers_first_vlan + num_of_dhcp_servers):
-        validation_create_arp_ipv4 = {'sender': 'hb', 'args': {'interface': '{}.{}'.format(hbdut1, item),
-                                                               'count': 3, 'dst': '10.{}.0.1'.format(item)}}
-        ping_checker = PingChecker(topology_obj.players, validation_create_arp_ipv4)
-        retry_call(ping_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
-
-        validation_create_neigh_ipv6 = {'sender': 'hb', 'args': {'interface': '{}.{}'.format(hbdut1, item),
-                                                                 'count': 3, 'dst': '2{}::1'.format(item)}}
-        ping6_checker = PingChecker(topology_obj.players, validation_create_neigh_ipv6)
-        retry_call(ping6_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
-
     yield
 
     logger.info('Starting DHCP relay scale configuration cleanup')
@@ -70,6 +64,20 @@ def configure_dhcp_scale(topology_obj):
     IpConfigTemplate.cleanup(topology_obj, ip_config_dict)
     VlanConfigTemplate.cleanup(topology_obj, vlan_config_dict)
     logger.info('DHCP relay scale configuration completed')
+
+
+@pytest.fixture(autouse=True, scope='module')
+def update_arp_for_peers_DHCP_servers(topology_obj, interfaces):
+    for item in range(dhcp_servers_first_vlan, dhcp_servers_first_vlan + num_of_dhcp_servers):
+        validation_create_arp_ipv4 = {'sender': 'hb', 'args': {'interface': '{}.{}'.format(interfaces.hb_dut_1, item),
+                                                               'count': 3, 'dst': '10.{}.0.1'.format(item)}}
+        ping_checker = PingChecker(topology_obj.players, validation_create_arp_ipv4)
+        retry_call(ping_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
+
+        validation_create_neigh_ipv6 = {'sender': 'hb', 'args': {'interface': '{}.{}'.format(interfaces.hb_dut_1, item),
+                                                                 'count': 3, 'dst': '2{}::1'.format(item)}}
+        ping6_checker = PingChecker(topology_obj.players, validation_create_neigh_ipv6)
+        retry_call(ping6_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
 
 
 @allure.title('Test DHCP Relay scale')

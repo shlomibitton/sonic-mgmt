@@ -288,8 +288,8 @@ class TestDHCPRelay:
             with allure.step('Validate UDP message with SRC and DST port the same as DHCP not forwarded to DHCP server'):
                 # PING below need to prevent issue when packet not forwarded to host from switch
                 validation_ping = {'sender': 'ha', 'args': {'count': 3,  'dst': '30.0.0.1'}}
-                PingChecker(self.players, validation_ping).run_validation()
-
+                retry_call(PingChecker(self.players, validation_ping).run_validation, fargs=[], tries=2,  delay=5,
+                           logger=logger)
                 validation_udp_packet = {'sender': 'ha', 'send_args': {'interface': self.dhclient_iface,
                                                                        'packets': udp_pkt, 'count': 3},
                                          'receivers':
