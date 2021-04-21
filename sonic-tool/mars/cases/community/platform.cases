@@ -273,7 +273,7 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_base_mac and not test_get_system_eeprom_info and not test_components and not test_fans and not test_status_led and not test_get_my_slot and not test_get_supervisor_slot\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_presence and not test_get_model and not test_get_serial and not test_get_status and not test_get_base_mac and not test_get_system_eeprom_info and not test_components and not test_fans and not test_status_led and not test_get_my_slot and not test_get_supervisor_slot\"\'" --test-scripts platform_tests/api/test_chassis.py </static_args>
              </params>
         </cmd>
     </case>
@@ -285,7 +285,19 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_position_in_parent and not test_is_replaceable and not test_set_fans_led and not test_get_fans_target_speed and not test_set_fans_speed\"\'" --test-scripts platform_tests/api/test_chassis_fans.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_set_fans_led and not test_get_fans_target_speed and not test_set_fans_speed\"\'" --test-scripts platform_tests/api/test_chassis_fans.py </static_args>
+             </params>
+        </cmd>
+    </case>
+
+    <case>
+        <info> Test Thermal API Case </info>
+        <name> platform_api_thermal </name>
+        <tout> 1200 </tout>
+
+        <cmd>
+             <params>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_position_in_parent or test_is_replaceable\"\'" --test-scripts platform_tests/api/test_thermal.py </static_args>
              </params>
         </cmd>
     </case>
@@ -301,7 +313,7 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_presence or test_fans\"\'" --test-scripts platform_tests/api/test_psu.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_presence or test_fans or test_get_position_in_parent or test_is_replaceable or test_thermals \"\'" --test-scripts platform_tests/api/test_psu.py </static_args>
              </params>
         </cmd>
     </case>
@@ -313,7 +325,7 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_fans_target_speed and not test_set_fans_speed and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable\"\'" --test-scripts platform_tests/api/test_psu_fans.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_fans_target_speed and not test_set_fans_speed and not test_set_fans_led\"\'" --test-scripts platform_tests/api/test_psu_fans.py </static_args>
              </params>
         </cmd>
     </case>
@@ -325,7 +337,7 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_presence or test_get_all_fans\"\'" --test-scripts platform_tests/api/test_fan_drawer.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"test_get_presence or test_get_all_fans or test_get_position_in_parent or test_is_replaceable\"\'" --test-scripts platform_tests/api/test_fan_drawer.py </static_args>
              </params>
         </cmd>
     </case>
@@ -337,7 +349,7 @@
 
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_set_fans_led and not test_get_position_in_parent and not test_is_replaceable and not test_set_fans_speed and not test_get_fans_target_speed\"\'" --test-scripts platform_tests/api/test_fan_drawer_fans.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_set_fans_led and not test_set_fans_speed and not test_get_fans_target_speed\"\'" --test-scripts platform_tests/api/test_fan_drawer_fans.py </static_args>
              </params>
         </cmd>
     </case>
@@ -366,7 +378,7 @@
         </ignore>
         <cmd>
              <params>
-                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--skip-absent-sfp=True --log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_is_replaceable and not test_get_reset_status and not test_get_rx_los and not test_get_tx_fault and not test_get_temperature and not test_get_voltage and not test_get_tx_bias and not test_get_rx_power and not test_get_tx_power and not test_tx_disable and not test_lpmode and not test_thermals and not test_power_override and not test_tx_disable_channel\"\'" --test-scripts platform_tests/api/test_sfp.py </static_args>
+                 <static_args> --sonic-mgmt-dir [[conf:extra_info.sonic_mgmt_workspace]]/[[conf:extra_info.sonic_mgmt_repo_name]] --dut-name [[conf:extra_info.dut_name]] --sonic-topo [[conf:extra_info.topology]] --json-root-dir [[conf:extra_info.json_root_dir]] --raw-options "\'--skip-absent-sfp=True --log-cli-level info  --show-capture=no -ra --showlocals -k \"not test_get_name and not test_get_model and not test_get_serial and not test_get_status and not test_get_position_in_parent and not test_get_reset_status and not test_get_rx_los and not test_get_tx_fault and not test_get_temperature and not test_get_voltage and not test_get_tx_bias and not test_get_rx_power and not test_get_tx_power and not test_tx_disable and not test_thermals and not test_power_override and not test_tx_disable_channel and not test_lpmode\"\'" --test-scripts platform_tests/api/test_sfp.py </static_args>
              </params>
         </cmd>
     </case>
