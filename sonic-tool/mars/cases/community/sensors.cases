@@ -20,14 +20,25 @@
         <tout> 900 </tout>
         <ignore>
             <condition_group>
-                <operand> AND </operand>
-                <condition>
-                    <key> chip_type </key>
-                    <op> == </op>
-                    <value> SPC3 </value>
-                </condition>
-                <bug> 2430822 </bug>
-                <bug> 2616518 </bug>
+                <operand> OR </operand>
+                <condition_group>
+                    <operand> AND </operand>
+                    <condition>
+                        <key> dut_hwsku </key>
+                        <op> in </op>
+                        <value>  ["ACS-MSN2100"] </value>
+                    </condition>
+                    <bug> 2616518 </bug>
+                </condition_group>
+                <condition_group>
+                    <operand> AND </operand>
+                    <condition>
+                        <key> chip_type </key>
+                        <op> == </op>
+                        <value> SPC3 </value>
+                    </condition>
+                    <bug> 2430822 </bug>
+                </condition_group>
             </condition_group>
         </ignore>
         <cmd>
