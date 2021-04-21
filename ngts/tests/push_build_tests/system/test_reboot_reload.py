@@ -33,6 +33,19 @@ class TestRebootReload:
         self.setup_name = platform_params.setup_name
         self.sonic_ver = sonic_version
 
+    @pytest.fixture(autouse=True)
+    def ignore_expected_loganalyzer_exceptions(self, loganalyzer):
+        """
+        expanding the ignore list of the loganalyzer for these tests because of reboot.
+        :param loganalyzer: loganalyzer utility fixture
+        :return: None
+        """
+        if loganalyzer:
+            ignore_regex_list = loganalyzer.parse_regexp_file(src=str(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                                   "..", "..", "..",
+                                                                                   "tools", "loganalyzer", "reboot_loganalyzer_ignore.txt")))
+            loganalyzer.ignore_regex.extend(ignore_regex_list)
+
     @pytest.mark.ngts_skip({'platform_prefix_list': ['simx'], 'rm_ticket_list': [2566883]})
     @pytest.mark.parametrize('reboot_type', reboot_types)
     def test_push_gate_reboot(self, platform_params, request, reboot_type):

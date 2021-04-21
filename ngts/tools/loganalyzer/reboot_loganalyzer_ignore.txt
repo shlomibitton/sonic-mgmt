@@ -25,3 +25,6 @@ r, ".* ERR syncd#SDK:.*mlnx_initialize_switch: Transaction mode should be enable
 r, ".* NOTICE syncd#SDK:.*Create trap.*"
 r, ".* ERR neighbor_advertiser: EVERFLOW.* table does not exist.*"
 r, ".* INFO systemd.*: Finished Kernel crash dump capture service.*"
+r, ".* ERR syncd#SDK:.*\[SAI_BRIDGE.ERR\].*Isolation group is only supported for bridge port type port.*"
+r, ".* ERR syncd#SDK:.*\[SAI_PORT.ERR\].*Port index not found in DB by log id.*"
+r, ".* ERR teamd#teammgrd:.*/usr/bin/teamd -k -t.*"

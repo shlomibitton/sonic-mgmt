@@ -21,7 +21,8 @@ def ignore_expected_loganalyzer_exceptions(loganalyzer):
     if loganalyzer:
         ignore_regex_list = \
             loganalyzer.parse_regexp_file(src=str(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                                               "copp_loganalyzer_ignore.txt")))
+                                                               "..", "..", "..",
+                                                               "tools", "loganalyzer", "reboot_loganalyzer_ignore.txt")))
         loganalyzer.ignore_regex.extend(ignore_regex_list)
 
 
