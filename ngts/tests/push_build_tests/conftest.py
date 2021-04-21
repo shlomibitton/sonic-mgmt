@@ -130,15 +130,6 @@ def push_gate_configuration(topology_obj, engines, interfaces, platform_params, 
 
     # Static route config which will be used in test
     static_route_config_dict = {
-        'dut': [{'dst': '20.0.0.10', 'dst_mask': 32, 'via': ['69.0.0.2']},
-                # TODO: static route below commented(we add it directly in static_route test case)
-                #  due to the bug: https://github.com/Azure/sonic-buildimage/issues/7028
-                # {'dst': '20.0.0.1', 'dst_mask': 32, 'via': ['PortChannel0001']},
-                {'dst': '20.0.0.0', 'dst_mask': 24, 'via': ['30.0.0.2']},
-                {'dst': '2000::10', 'dst_mask': 128, 'via': ['6900::2']},
-                {'dst': '2000::1', 'dst_mask': 128, 'via': ['Vlan69']},
-                {'dst': '2000::', 'dst_mask': 64, 'via': ['3000::2']}
-                ],
         'hb': [{'dst': '69.0.1.0', 'dst_mask': 24, 'via': ['69.0.0.1']},
                {'dst': '69.1.0.0', 'dst_mask': 24, 'via': ['69.0.0.1']}]
     }

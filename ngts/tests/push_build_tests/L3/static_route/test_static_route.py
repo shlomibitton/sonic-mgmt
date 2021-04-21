@@ -8,7 +8,7 @@ from infra.tools.validations.traffic_validations.ping.ping_runner import PingChe
 from infra.tools.validations.traffic_validations.scapy.scapy_runner import ScapyChecker
 from ngts.cli_util.verify_cli_show_cmd import verify_show_cmd
 from retry.api import retry_call
-from ngts.tools.skip_test.skip import ngts_skip
+from ngts.config_templates.route_config_template import RouteConfigTemplate
 
 """
 
@@ -21,34 +21,51 @@ from ngts.tools.skip_test.skip import ngts_skip
 logger = logging.getLogger()
 
 
-@pytest.mark.ngts_skip({'rm_ticket_list': [2597709]})
+@pytest.fixture(autouse=True)
+def static_route_configuration(topology_obj):
+    static_route_config_dict = {
+        'dut': [{'dst': '20.0.0.10', 'dst_mask': 32, 'via': ['69.0.0.2']},
+                {'dst': '20.0.0.1', 'dst_mask': 32, 'via': ['PortChannel0001']},
+                {'dst': '20.0.0.0', 'dst_mask': 24, 'via': ['30.0.0.2']},
+                {'dst': '2000::10', 'dst_mask': 128, 'via': ['6900::2']},
+                {'dst': '2000::1', 'dst_mask': 128, 'via': ['Vlan69']},
+                {'dst': '2000::', 'dst_mask': 64, 'via': ['3000::2']}
+                ]
+    }
+
+    RouteConfigTemplate.configuration(topology_obj, static_route_config_dict)
+
+    yield
+
+    RouteConfigTemplate.cleanup(topology_obj, static_route_config_dict)
+
+
 @pytest.mark.build
 @pytest.mark.push_gate
 @allure.title('Test Basic Static Route')
-def test_basic_static_route(upgrade_params, platform_params, engines, interfaces, players):
+def test_basic_static_route(engines, interfaces, players):
     """
     This test will check basic static route functionality.
     :return: raise assertion error in case when test failed
     """
-    if upgrade_params.is_upgrade_required:
-        ngts_skip(platform_params.platform, github_ticket_list=['https://github.com/Azure/sonic-buildimage/issues/6997'])
-
-    # TODO: this static route should be a part of main conftest,
-    #  we add it here due to bug: https://github.com/Azure/sonic-buildimage/issues/7028
-    engines.dut.run_cmd('sudo config route add prefix 20.0.0.1/32 nexthop PortChannel0001')
 
     try:
         # TODO: Workaround for bug https://redmine.mellanox.com/issues/2350931
         validation_create_arp_1_ipv4 = {'sender': 'hb', 'args': {'interface': 'bond0.69', 'count': 3, 'dst': '69.0.0.1'}}
-        ping_checker = PingChecker(players, validation_create_arp_1_ipv4)
-        # Retry required, because some time this validation fail
-        retry_call(ping_checker.run_validation, fargs=[], tries=3, delay=10, logger=logger)
+        ping_checker_hb = PingChecker(players, validation_create_arp_1_ipv4)
+        retry_call(ping_checker_hb.run_validation, fargs=[], tries=3, delay=10, logger=logger)
+
         validation_create_arp_1_ipv6 = {'sender': 'hb', 'args': {'interface': 'bond0.69', 'count': 3, 'dst': '6900::1'}}
-        PingChecker(players, validation_create_arp_1_ipv6).run_validation()
+        ping_checker_hb_v6 = PingChecker(players, validation_create_arp_1_ipv6)
+        retry_call(ping_checker_hb_v6.run_validation, fargs=[], tries=3, delay=10, logger=logger)
+
         validation_create_arp_2_ipv4 = {'sender': 'ha', 'args': {'interface': 'bond0', 'count': 3, 'dst': '30.0.0.1'}}
-        PingChecker(players, validation_create_arp_2_ipv4).run_validation()
+        ping_checker_ha = PingChecker(players, validation_create_arp_2_ipv4)
+        retry_call(ping_checker_ha.run_validation, fargs=[], tries=3, delay=10, logger=logger)
+
         validation_create_arp_2_ipv6 = {'sender': 'ha', 'args': {'interface': 'bond0', 'count': 3, 'dst': '3000::1'}}
-        PingChecker(players, validation_create_arp_2_ipv6).run_validation()
+        ping_checker_ha_v6 = PingChecker(players, validation_create_arp_2_ipv6)
+        retry_call(ping_checker_ha_v6.run_validation, fargs=[], tries=3, delay=10, logger=logger)
         # TODO: End workaround for bug https://redmine.mellanox.com/issues/2350931
 
         # Test started here
