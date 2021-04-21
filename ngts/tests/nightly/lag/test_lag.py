@@ -258,7 +258,7 @@ def test_lag_min_links(topology_obj, traffic_type, interfaces, engines, cleanup_
                                                   PORTCHANNEL_NAME,
                                                   'Dw',
                                                   [],
-                                                  tries=2)
+                                                  tries=5)
         cleanup_last_config_in_stack(cleanup_list)
 
         with allure.step('STEP2: Create PortChannel with min-links 1 and 1 member'):
@@ -276,7 +276,7 @@ def test_lag_min_links(topology_obj, traffic_type, interfaces, engines, cleanup_
                                                   PORTCHANNEL_NAME,
                                                   'Up',
                                                   [(interfaces.dut_hb_1, 'S')],
-                                                  tries=2)
+                                                  tries=5)
         cleanup_last_config_in_stack(cleanup_list)
 
         with allure.step('STEP3: Create PortChannel with min-links 2 and 1 member'):
@@ -294,7 +294,7 @@ def test_lag_min_links(topology_obj, traffic_type, interfaces, engines, cleanup_
                                                   PORTCHANNEL_NAME,
                                                   'Dw',
                                                   [(interfaces.dut_hb_1, 'S')],
-                                                  tries=2)
+                                                  tries=5)
 
         with allure.step('STEP4: Add second member to PortChannel with min-links 2'):
             lag_config_dict = {
@@ -308,7 +308,7 @@ def test_lag_min_links(topology_obj, traffic_type, interfaces, engines, cleanup_
                                                   PORTCHANNEL_NAME,
                                                   'Up',
                                                   [(interfaces.dut_hb_1, 'S'), (interfaces.dut_hb_2, 'S')],
-                                                  tries=2)
+                                                  tries=5)
 
         vlan_config_dict = {
             'dut': [{'vlan_id': 50, 'vlan_members': [{PORTCHANNEL_NAME: 'trunk'}]}]
@@ -363,7 +363,7 @@ def test_lag_members_scale(topology_obj, interfaces, engines, cleanup_list):
 
         with allure.step('Check that all interfaces in Up state'.format()):
             ports_list = member_interfaces + [PORTCHANNEL_NAME]
-            retry_call(SonicInterfaceCli.check_ports_status, fargs=[engines.dut, ports_list], tries=10, delay=10,
+            retry_call(SonicInterfaceCli.check_ports_status, fargs=[engines.dut, ports_list], tries=20, delay=10,
                        logger=logger)
 
         with allure.step('Validate members status in PortChannel'):
@@ -379,7 +379,7 @@ def test_lag_members_scale(topology_obj, interfaces, engines, cleanup_list):
                                                   PORTCHANNEL_NAME,
                                                   'Up',
                                                   expected_ports_status_list,
-                                                  tries=3)
+                                                  tries=5)
         with allure.step('Validate dockers status'):
             SonicGeneralCli.verify_dockers_are_up(engines.dut)
     except BaseException as err:
