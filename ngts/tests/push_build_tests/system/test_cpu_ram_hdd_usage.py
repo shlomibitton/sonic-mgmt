@@ -78,7 +78,7 @@ class TestCpuRamHddUsage:
             expected_cpu_usage_dict = yaml.load(raw_cpu_data, Loader=yaml.FullLoader)
         expected_cpu_usage_dict = expected_cpu_usage_dict[self.platform]
 
-        total_cpu_usage = None
+        total_cpu_usage = 0
         cpu_usage_per_process = {}
         try:
             assertions_list = []
@@ -95,7 +95,7 @@ class TestCpuRamHddUsage:
                         if cpu_usage_per_process_dict[process]['cpu_usage'] > expected_cpu_usage_dict[process]:
                             assertions_list.append({process: cpu_usage_per_process_dict[process]['cpu_usage']})
                     except KeyError:
-                        cpu_usage_per_process[process] = None
+                        cpu_usage_per_process[process] = 0
                         logger.error('Can not find CPU usage for process: {} - process is not running'.format(process))
                 if not assertions_list:
                     break
@@ -140,8 +140,8 @@ class TestCpuRamHddUsage:
         expected_ram_usage_dict = expected_ram_usage_dict[self.platform]
 
         assertions_list = []
-        total_ram_size_mb = None
-        used_ram_size_mb = None
+        total_ram_size_mb = 0
+        used_ram_size_mb = 0
         ram_usage_per_process = {}
         try:
             total_cpu_usage, cpu_usage_per_process_dict = get_cpu_usage_and_processes(self.dut_engine)
@@ -166,7 +166,7 @@ class TestCpuRamHddUsage:
                     if used_ram_mb > expected_ram_usage_dict[process]:
                         assertions_list.append({process: used_ram_mb})
                 except KeyError:
-                    ram_usage_per_process[process] = None
+                    ram_usage_per_process[process] = 0
                     logger.error('Can not find RAM usage for process: {} - process is not running'.format(process))
             assert not assertions_list, 'RAM usage: {} \n is more than expected: \n {}'.format(assertions_list,
                                                                                                expected_ram_usage_dict)
