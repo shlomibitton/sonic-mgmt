@@ -138,7 +138,7 @@ def static_route_configuration(topology_obj, engines, interfaces, platform_param
     ipv6_list = ip_range('2000::1', '2000::7ffd', ip_type='ipv6', step=1)
 
     # if SPC1 - use less value which supported by platform
-    if 'MSN2' in platform_params.hwsku:
+    if 'SN2' in platform_params.hwsku:
         # Range for 8191 IPv4 and IPv6 addresses
         ipv4_list = ip_range('100.0.0.1', '100.0.31.255', ip_type='ipv4', step=1)
         ipv6_list = ip_range('2000::1', '2000::1fff', ip_type='ipv6', step=1)
